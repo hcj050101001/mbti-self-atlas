@@ -1,0 +1,281 @@
+{
+  "version": "OEJTS 1.2 · 中文试译 1.0",
+  "source": "https://openpsychometrics.org/tests/OJTS/development/OEJTS1.2.pdf",
+  "license": "CC BY-NC-SA 4.0 · https://creativecommons.org/licenses/by-nc-sa/4.0/ · Eric Jorgenson (2015) · 中文试译为本项目改编，未获独立心理测量验证",
+  "items": [
+    {
+      "id": 1,
+      "leftEn": "makes lists",
+      "rightEn": "relies on memory",
+      "leftZh": "列清单",
+      "rightZh": "依靠记忆"
+    },
+    {
+      "id": 2,
+      "leftEn": "sceptical",
+      "rightEn": "wants to believe",
+      "leftZh": "心存怀疑",
+      "rightZh": "愿意相信"
+    },
+    {
+      "id": 3,
+      "leftEn": "bored by time alone",
+      "rightEn": "needs time alone",
+      "leftZh": "独处时感到无聊",
+      "rightZh": "需要独处的时间"
+    },
+    {
+      "id": 4,
+      "leftEn": "accepts things as they are",
+      "rightEn": "unsatisfied with the ways things are",
+      "leftZh": "接受事物的现状",
+      "rightZh": "对事物的现状感到不满"
+    },
+    {
+      "id": 5,
+      "leftEn": "keeps a clean room",
+      "rightEn": "just puts stuff where ever",
+      "leftZh": "保持房间整洁",
+      "rightZh": "东西随手放置"
+    },
+    {
+      "id": 6,
+      "leftEn": "thinks \"robotic\" is an insult",
+      "rightEn": "strives to have a mechanical mind",
+      "leftZh": "认为被说“像机器人”是一种冒犯",
+      "rightZh": "追求像机器般运作的思维"
+    },
+    {
+      "id": 7,
+      "leftEn": "energetic",
+      "rightEn": "mellow",
+      "leftZh": "精力充沛",
+      "rightZh": "平和舒缓"
+    },
+    {
+      "id": 8,
+      "leftEn": "prefer to take multiple choice test",
+      "rightEn": "prefer essay answers",
+      "leftZh": "偏好做选择题",
+      "rightZh": "偏好做论述题"
+    },
+    {
+      "id": 9,
+      "leftEn": "chaotic",
+      "rightEn": "organized",
+      "leftZh": "杂乱无章",
+      "rightZh": "有条有理"
+    },
+    {
+      "id": 10,
+      "leftEn": "easily hurt",
+      "rightEn": "thick-skinned",
+      "leftZh": "容易受到伤害",
+      "rightZh": "不容易被冒犯或伤害"
+    },
+    {
+      "id": 11,
+      "leftEn": "works best in groups",
+      "rightEn": "works best alone",
+      "leftZh": "合作时表现最好",
+      "rightZh": "独自做事时表现最好"
+    },
+    {
+      "id": 12,
+      "leftEn": "focused on the present",
+      "rightEn": "focused on the future",
+      "leftZh": "关注当下",
+      "rightZh": "关注未来"
+    },
+    {
+      "id": 13,
+      "leftEn": "plans far ahead",
+      "rightEn": "plans at the last minute",
+      "leftZh": "早早做好计划",
+      "rightZh": "到最后一刻才做计划"
+    },
+    {
+      "id": 14,
+      "leftEn": "wants people's respect",
+      "rightEn": "wants their love",
+      "leftZh": "希望得到他人的尊重",
+      "rightZh": "希望得到他人的喜爱"
+    },
+    {
+      "id": 15,
+      "leftEn": "gets worn out by parties",
+      "rightEn": "gets fired up by parties",
+      "leftZh": "聚会让自己疲惫",
+      "rightZh": "聚会让自己振奋"
+    },
+    {
+      "id": 16,
+      "leftEn": "fits in",
+      "rightEn": "stands out",
+      "leftZh": "融入群体",
+      "rightZh": "显得与众不同"
+    },
+    {
+      "id": 17,
+      "leftEn": "keeps options open",
+      "rightEn": "commits",
+      "leftZh": "保留各种选择",
+      "rightZh": "作出决定并投入"
+    },
+    {
+      "id": 18,
+      "leftEn": "wants to be good at fixing things",
+      "rightEn": "wants to be good at fixing people",
+      "leftZh": "希望擅长修理物品",
+      "rightZh": "希望擅长帮助人解决自身问题"
+    },
+    {
+      "id": 19,
+      "leftEn": "talks more",
+      "rightEn": "listens more",
+      "leftZh": "说得更多",
+      "rightZh": "听得更多"
+    },
+    {
+      "id": 20,
+      "leftEn": "when describing an event, will tell people what happened",
+      "rightEn": "when describing an event, will tell people what it meant",
+      "leftZh": "描述事件时，讲述发生了什么",
+      "rightZh": "描述事件时，讲述它意味着什么"
+    },
+    {
+      "id": 21,
+      "leftEn": "gets work done right away",
+      "rightEn": "procrastinates",
+      "leftZh": "立即把事情做完",
+      "rightZh": "拖延着再做"
+    },
+    {
+      "id": 22,
+      "leftEn": "follows the heart",
+      "rightEn": "follows the head",
+      "leftZh": "听从内心感受",
+      "rightZh": "听从理性思考"
+    },
+    {
+      "id": 23,
+      "leftEn": "stays at home",
+      "rightEn": "goes out on the town",
+      "leftZh": "待在家里",
+      "rightZh": "外出娱乐"
+    },
+    {
+      "id": 24,
+      "leftEn": "wants the big picture",
+      "rightEn": "wants the details",
+      "leftZh": "想了解整体情况",
+      "rightZh": "想了解具体细节"
+    },
+    {
+      "id": 25,
+      "leftEn": "improvises",
+      "rightEn": "prepares",
+      "leftZh": "临场发挥",
+      "rightZh": "事先准备"
+    },
+    {
+      "id": 26,
+      "leftEn": "bases morality on justice",
+      "rightEn": "bases morality on compassion",
+      "leftZh": "以公正为道德判断的基础",
+      "rightZh": "以同情关怀为道德判断的基础"
+    },
+    {
+      "id": 27,
+      "leftEn": "finds it difficult to yell very loudly",
+      "rightEn": "yelling to others when they are far away comes naturally",
+      "leftZh": "觉得很难大声喊叫",
+      "rightZh": "向远处的人大声喊话很自然"
+    },
+    {
+      "id": 28,
+      "leftEn": "theoretical",
+      "rightEn": "empirical",
+      "leftZh": "偏重理论",
+      "rightZh": "偏重实证经验"
+    },
+    {
+      "id": 29,
+      "leftEn": "works hard",
+      "rightEn": "plays hard",
+      "leftZh": "努力工作",
+      "rightZh": "尽情玩乐"
+    },
+    {
+      "id": 30,
+      "leftEn": "uncomfortable with emotions",
+      "rightEn": "values emotions",
+      "leftZh": "面对情绪感到不自在",
+      "rightZh": "重视情绪感受"
+    },
+    {
+      "id": 31,
+      "leftEn": "likes to perform in front of other people",
+      "rightEn": "avoids public speaking",
+      "leftZh": "喜欢在他人面前表演",
+      "rightZh": "回避公开发言"
+    },
+    {
+      "id": 32,
+      "leftEn": "likes to know \"who?\", \"what?\", \"when?\"",
+      "rightEn": "likes to know \"why?\"",
+      "leftZh": "喜欢了解“谁、什么、何时”",
+      "rightZh": "喜欢了解“为什么”"
+    }
+  ],
+  "translationNotes": [
+    {
+      "id": 2,
+      "note": "wants to believe 含有希望相信的意愿，译为“愿意相信”；不是对诚实、智力或轻信程度的道德评价。"
+    },
+    {
+      "id": 6,
+      "note": "robotic 与 mechanical mind 带有评价色彩且难直译；保留“机器人/机器般运作”的原始比喻，不额外加入“理性更优”等价值判断。"
+    },
+    {
+      "id": 7,
+      "note": "mellow 可含平和、柔和、放松等意思，“平和舒缓”只是近似表达，并不表示精力不足。"
+    },
+    {
+      "id": 10,
+      "note": "thick-skinned 直译“脸皮厚”在中文带较强贬义；译为“不容易被冒犯或伤害”，含义接近但语义未验证。"
+    },
+    {
+      "id": 16,
+      "note": "fits in / stands out 受到文化与环境影响；译文保留“融入群体/与众不同”，不将其中任一侧解释为优劣。"
+    },
+    {
+      "id": 18,
+      "note": "fixing people 字面为“修复人”，此处译为“帮助人解决自身问题”；没有暗示他人有缺陷，且文化语义可能不完全等同。"
+    },
+    {
+      "id": 23,
+      "note": "goes out on the town 偏向外出娱乐，原题可能受到行动条件、生活阶段和文化影响。"
+    },
+    {
+      "id": 26,
+      "note": "justice 与 compassion 分别译为“公正”和“同情关怀”；二者并非现实生活中必然对立的道德品质。"
+    },
+    {
+      "id": 27,
+      "note": "大声喊话也可能受到身体、语言、场景或文化条件影响；不应单凭此题推断人格。"
+    },
+    {
+      "id": 29,
+      "note": "works hard / plays hard 是原题提供的对照，译为“努力工作/尽情玩乐”；现实中两者可以并存，不据此推断勤奋或品德。"
+    },
+    {
+      "id": 31,
+      "note": "表演与公开发言并非完全对称的活动，中文保留原文这一差异，不自行改成同义反向题。"
+    },
+    {
+      "id": null,
+      "note": "所有中文题目均为项目试译；未完成专业回译、跨文化等值检验或中文常模验证。原题与五点作答格式保留用于核对，不将译文称为官方中文版。"
+    }
+  ]
+}
