@@ -6,6 +6,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const core = require("../src/core.js");
+const bank = require("../sources/oejts-1.2.json");
 
 // Independently transcribed item directions from the questionnaire scoring key.
 // Each tuple says which preference dimension increases when this answer increases.
@@ -34,13 +35,13 @@ test("a hand-calculated complete response keeps source scores and scale order", 
   const result = core.score(answers);
   assert.deepEqual(result.dimensions, [
     { key: "IE", low: "I", high: "E", score: 29, letter: "E", distance: 5, borderline: false, position: 65.625 },
-    { key: "SN", low: "S", high: "N", score: 22, letter: "S", distance: 2, borderline: true, position: 43.75 },
+    { key: "SN", low: "S", high: "N", score: 22, letter: "S", distance: 2, borderline: false, position: 43.75 },
     { key: "FT", low: "F", high: "T", score: 23, letter: "F", distance: 1, borderline: true, position: 46.875 },
     { key: "JP", low: "J", high: "P", score: 21, letter: "J", distance: 3, borderline: false, position: 40.625 }
   ]);
   assert.equal(result.type, "ESFJ");
   assert.equal(result.originalType, "ESFJ");
-  assert.equal(result.cautiousType, "EXXJ");
+  assert.equal(result.cautiousType, "ESXJ");
   assert.deepEqual(answers, before, "scoring must not mutate saved responses");
 });
 
@@ -135,8 +136,8 @@ test("each of the 32 items moves exactly one expected dimension by its signed st
   });
 });
 
-test("the custom review zone includes ±2 and excludes ±3 on either side", () => {
-  for (const [offset, borderline] of [[-3, false], [-2, true], [-1, true], [0, true], [1, true], [2, true], [3, false]]) {
+test("the custom review zone includes only ±1 (23–25) and excludes ±2 on either side", () => {
+  for (const [offset, borderline] of [[-3, false], [-2, false], [-1, true], [0, true], [1, true], [2, false], [3, false]]) {
     const answers = Array(32).fill(3);
     // Q15 and Q23 both increase E: together they produce the requested displacement.
     const first = Math.max(-2, Math.min(2, offset));
@@ -162,10 +163,70 @@ test("source metadata is exposed, immutable, and the script works without a modu
   assert.equal(core.VERSION, "OEJTS1.2");
   assert.equal(core.SOURCE, "https://openpsychometrics.org/tests/OJTS/development/OEJTS1.2.pdf");
   assert.deepEqual(Object.keys(core.FORMULAS), scales);
+  assert.deepEqual(core.FORMULAS, {
+    IE: "30-Q3-Q7-Q11+Q15-Q19+Q23+Q27-Q31",
+    SN: "12+Q4+Q8+Q12+Q16+Q20-Q24-Q28+Q32",
+    FT: "30-Q2+Q6+Q10-Q14-Q18+Q22-Q26-Q30",
+    JP: "18+Q1+Q5-Q9+Q13-Q17+Q21-Q25+Q29"
+  });
+  assert.deepEqual(core.REVIEW_ZONE, { minPercent: 45, maxPercent: 55 });
+  assert.equal(Object.isFrozen(core.REVIEW_ZONE), true);
   assert.equal(Object.isFrozen(core), true);
   assert.equal(Object.isFrozen(core.FORMULAS), true);
-  const browserContext = {};
+  const browserContext = { QUESTION_BANK: bank };
   vm.createContext(browserContext);
   vm.runInContext(fs.readFileSync(path.join(__dirname, "../src/core.js"), "utf8"), browserContext);
   assert.equal(browserContext.MBTICore.score(Array(32).fill(3)).type, "XXXX");
+});
+
+test("the canonical bank validates all item fields, signed membership, constants, and bounds", () => {
+  assert.equal(core.validateQuestionBank(bank), true);
+  const corruptions = [
+    data => { data.items[0].id = 2; },
+    data => { data.items[0].leftEn = " "; },
+    data => { data.items[0].rightZh = null; },
+    data => { data.items[0].coefficient = 0; },
+    data => { data.items[0].scale = "EI"; },
+    data => { data.items[0].scale = "IE"; },
+    data => { data.scales.IE.constant += 1; },
+    data => { data.scoring.min += 1; },
+    data => { data.scoring.max -= 1; },
+    data => { data.scoring.threshold += 1; },
+    data => { data.responseScale.max = 6; },
+    data => { data.translationVersion = ""; },
+    data => { data.translationVersion = 1.1; },
+    data => { data.translationNotes = []; },
+    data => { data.translationNotes[0].id = 33; },
+    data => { data.translationNotes[0].note = ""; },
+    data => { data.translationNotes.push(data.translationNotes[0]); },
+    data => { data.scales.IE.formula = "30+Q3"; },
+    data => { data.scales.IE.negative = [3, 7, 11, 19, 19]; },
+    data => { data.scales.IE.negative = ["3", 7, 11, 19, 31]; },
+    data => { data.scoring.highWhen = "score >= 24"; }
+  ];
+  for (const corrupt of corruptions) {
+    const data = JSON.parse(JSON.stringify(bank));
+    corrupt(data);
+    assert.throws(() => core.validateQuestionBank(data), /Invalid questionnaire/);
+  }
+});
+
+test("a coherent offset of every scoring scale cannot silently change the instrument bounds", () => {
+  const data = JSON.parse(JSON.stringify(bank));
+  for (const scale of Object.values(data.scales)) scale.constant += 1;
+  data.scoring.min += 1;
+  data.scoring.max += 1;
+  data.scoring.threshold += 1;
+  data.scoring.highWhen = "score > 25";
+  assert.throws(() => core.validateQuestionBank(data), /expected OEJTS 1.2 scoring bounds 8\/40\/24/);
+});
+
+test("legacy scoring references must agree with the single item definition", () => {
+  const data = JSON.parse(JSON.stringify(bank));
+  data.scales.IE.formula = "30 - Q3 - Q7 - Q11 + Q15 - Q19 + Q23 + Q27 - Q31";
+  data.scales.IE.negative = [31, 19, 11, 7, 3];
+  data.scales.IE.positive = [15, 23, 27];
+  assert.equal(core.validateQuestionBank(data), true);
+  data.scales.IE.positive.push(31);
+  assert.throws(() => core.validateQuestionBank(data), /inconsistent IE positive/);
 });

@@ -9,13 +9,14 @@
   "license": "CC BY-NC-SA 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
   "adaptation": "中文译文为本项目翻译，未经独立跨文化或心理测量验证；英文与原 PDF 一一对应。OEJTS 并非官方 MBTI，也不隶属于其发行方。",
+  "translationVersion": "1.0",
   "itemCount": 32,
   "responseScale": { "min": 1, "max": 5, "midpoint": 3, "direction": "1 最接近左侧，5 最接近右侧，3 两侧大致相当。没有正确或错误答案。" },
   "scales": {
-    "IE": { "constant": 30, "negative": [3, 7, 11, 19, 31], "positive": [15, 23, 27], "low": "I", "high": "E", "formula": "30 - Q3 - Q7 - Q11 + Q15 - Q19 + Q23 + Q27 - Q31" },
-    "SN": { "constant": 12, "negative": [24, 28], "positive": [4, 8, 12, 16, 20, 32], "low": "S", "high": "N", "formula": "12 + Q4 + Q8 + Q12 + Q16 + Q20 - Q24 - Q28 + Q32" },
-    "FT": { "constant": 30, "negative": [2, 14, 18, 26, 30], "positive": [6, 10, 22], "low": "F", "high": "T", "formula": "30 - Q2 + Q6 + Q10 - Q14 - Q18 + Q22 - Q26 - Q30" },
-    "JP": { "constant": 18, "negative": [9, 17, 25], "positive": [1, 5, 13, 21, 29], "low": "J", "high": "P", "formula": "18 + Q1 + Q5 - Q9 + Q13 - Q17 + Q21 - Q25 + Q29" }
+    "IE": { "constant": 30, "low": "I", "high": "E" },
+    "SN": { "constant": 12, "low": "S", "high": "N" },
+    "FT": { "constant": 30, "low": "F", "high": "T" },
+    "JP": { "constant": 18, "low": "J", "high": "P" }
   },
   "scoring": {
     "min": 8,
@@ -23,7 +24,6 @@
     "threshold": 24,
     "highWhen": "score > 24",
     "originalTieRule": "score == 24 时，原 PDF 分别归为 I、S、F、J。临界结果不等于已确定偏好。",
-    "displayPositionFormula": "(score - 8) / 32 * 100",
     "displayPositionMeaning": "仅为量表位置，不是概率、百分位、准确率或人格强度。"
   },
   "items": [
@@ -44,7 +44,7 @@
     { "id": 15, "leftEn": "gets worn out by parties", "rightEn": "gets fired up by parties", "leftZh": "聚会让自己疲惫", "rightZh": "聚会让自己振奋", "scale": "IE", "coefficient": 1 },
     { "id": 16, "leftEn": "fits in", "rightEn": "stands out", "leftZh": "融入群体", "rightZh": "显得与众不同", "scale": "SN", "coefficient": 1 },
     { "id": 17, "leftEn": "keeps options open", "rightEn": "commits", "leftZh": "保留各种选择", "rightZh": "作出决定并投入", "scale": "JP", "coefficient": -1 },
-    { "id": 18, "leftEn": "wants to be good at fixing things", "rightEn": "wants to be good at fixing people", "leftZh": "希望擅长修理物品", "rightZh": "希望擅长帮助人解决自身问题", "scale": "FT", "coefficient": -1, "translationNote": "原文 fixing people 直译为“修复人”；中文采用便于理解的表达，但文化语义可能不完全等同。" },
+    { "id": 18, "leftEn": "wants to be good at fixing things", "rightEn": "wants to be good at fixing people", "leftZh": "希望擅长修理物品", "rightZh": "希望擅长帮助人解决自身问题", "scale": "FT", "coefficient": -1 },
     { "id": 19, "leftEn": "talks more", "rightEn": "listens more", "leftZh": "说得更多", "rightZh": "听得更多", "scale": "IE", "coefficient": -1 },
     { "id": 20, "leftEn": "when describing an event, will tell people what happened", "rightEn": "when describing an event, will tell people what it meant", "leftZh": "描述事件时，讲述发生了什么", "rightZh": "描述事件时，讲述它意味着什么", "scale": "SN", "coefficient": 1 },
     { "id": 21, "leftEn": "gets work done right away", "rightEn": "procrastinates", "leftZh": "立即把事情做完", "rightZh": "拖延着再做", "scale": "JP", "coefficient": 1 },
@@ -59,5 +59,55 @@
     { "id": 30, "leftEn": "uncomfortable with emotions", "rightEn": "values emotions", "leftZh": "面对情绪感到不自在", "rightZh": "重视情绪感受", "scale": "FT", "coefficient": -1 },
     { "id": 31, "leftEn": "likes to perform in front of other people", "rightEn": "avoids public speaking", "leftZh": "喜欢在他人面前表演", "rightZh": "回避公开发言", "scale": "IE", "coefficient": -1 },
     { "id": 32, "leftEn": "likes to know \"who?\", \"what?\", \"when?\"", "rightEn": "likes to know \"why?\"", "leftZh": "喜欢了解“谁、什么、何时”", "rightZh": "喜欢了解“为什么”", "scale": "SN", "coefficient": 1 }
+  ],
+  "translationNotes": [
+    {
+      "id": 2,
+      "note": "wants to believe 含有希望相信的意愿，译为“愿意相信”；不是对诚实、智力或轻信程度的道德评价。"
+    },
+    {
+      "id": 6,
+      "note": "robotic 与 mechanical mind 带有评价色彩且难直译；保留“机器人/机器般运作”的原始比喻，不额外加入“理性更优”等价值判断。"
+    },
+    {
+      "id": 7,
+      "note": "mellow 可含平和、柔和、放松等意思，“平和舒缓”只是近似表达，并不表示精力不足。"
+    },
+    {
+      "id": 10,
+      "note": "thick-skinned 直译“脸皮厚”在中文带较强贬义；译为“不容易被冒犯或伤害”，含义接近但语义未验证。"
+    },
+    {
+      "id": 16,
+      "note": "fits in / stands out 受到文化与环境影响；译文保留“融入群体/与众不同”，不将其中任一侧解释为优劣。"
+    },
+    {
+      "id": 18,
+      "note": "fixing people 字面为“修复人”，此处译为“帮助人解决自身问题”；没有暗示他人有缺陷，且文化语义可能不完全等同。"
+    },
+    {
+      "id": 23,
+      "note": "goes out on the town 偏向外出娱乐，原题可能受到行动条件、生活阶段和文化影响。"
+    },
+    {
+      "id": 26,
+      "note": "justice 与 compassion 分别译为“公正”和“同情关怀”；二者并非现实生活中必然对立的道德品质。"
+    },
+    {
+      "id": 27,
+      "note": "大声喊话也可能受到身体、语言、场景或文化条件影响；不应单凭此题推断人格。"
+    },
+    {
+      "id": 29,
+      "note": "works hard / plays hard 是原题提供的对照，译为“努力工作/尽情玩乐”；现实中两者可以并存，不据此推断勤奋或品德。"
+    },
+    {
+      "id": 31,
+      "note": "表演与公开发言并非完全对称的活动，中文保留原文这一差异，不自行改成同义反向题。"
+    },
+    {
+      "id": null,
+      "note": "所有中文题目均为项目试译；未完成专业回译、跨文化等值检验或中文常模验证。原题与五点作答格式保留用于核对，不将译文称为官方中文版。"
+    }
   ]
 }

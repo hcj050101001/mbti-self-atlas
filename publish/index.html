@@ -4,17 +4,1913 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f5f3ee">
-  <meta name="description" content="见己：可离线使用的 OEJTS 1.2 中文试译探索工具，32道完整题目、透明计分与可复制结果。非官方 MBTI 测评。">
+  <meta name="description" content="见己：可离线使用的 OEJTS 1.2 中文试译探索工具，32道完整题目、透明计分与本地规则解读。非官方 MBTI 测评。">
   <title>见己 · MBTI 四维探索</title>
   <style>
 @charset "UTF-8";
-:root{--paper:#f5f3ee;--card:#fffefa;--ink:#242c29;--muted:#66706a;--line:#dcdfd7;--green:#234f43;--green-soft:#e7eee6;--purple:#776aab;--purple-soft:#e9e4f3;--orange:#b6673e;--orange-soft:#f3e2d4;--blue:#527a8e;--blue-soft:#dfeaf0;--shadow:0 16px 50px #293d2e08;--radius:24px;font-family:Inter,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--paper);font-synthesis:none}
-*{box-sizing:border-box}body{margin:0;font-size:15px;line-height:1.7}button,input,textarea{font:inherit}button,a,input,textarea{-webkit-tap-highlight-color:transparent}button{cursor:pointer;color:inherit}button:disabled{cursor:not-allowed;opacity:.4}a{color:var(--green);text-underline-offset:4px}button{border:0;background:none}button:focus-visible,a:focus-visible,summary:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid #7965ad;outline-offset:4px}button,a{touch-action:manipulation}::selection{background:#d8e6d4}h1,h2,h3,p{margin-top:0}h1,h2,h3{line-height:1.3}h2{font-size:28px;letter-spacing:-.7px}h3{font-size:17px}small{font-size:12px}.site-shell{max-width:1240px;margin:auto;padding:0 48px}.site-header{height:100px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{display:flex;gap:12px;align-items:center;padding:0;text-align:left;font-size:23px;font-weight:650;line-height:1.2;letter-spacing:2px}.brand-en{display:block;font-size:9px;letter-spacing:2.4px;font-weight:500;margin-top:6px}.brand-mark{display:grid;grid-template-columns:repeat(2,12px);gap:3px;transform:rotate(-8deg)}.brand-mark i{width:12px;height:12px;border-radius:3px;background:var(--green)}.brand-mark i:nth-child(2){background:#b5a9d2}.brand-mark i:nth-child(3){background:#dda57b}.brand-mark i:nth-child(4){background:#8ba6b2}.site-header nav{display:flex;gap:28px}.text-button{font-size:13px;padding:8px 0;color:var(--muted)}.text-button:hover{color:var(--green)}.site-footer{border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;padding:24px 0 30px;font-size:11px;color:var(--muted);margin-top:56px}.footer-dot{padding:0 8px}.eyebrow{font-size:11px;font-weight:650;letter-spacing:2px;text-transform:uppercase;color:var(--green)}.muted{color:var(--muted)}.skip-link{position:fixed;left:20px;top:-100px;background:var(--card);padding:10px;z-index:100}.skip-link:focus{top:10px}#main:focus{outline:0}.view{animation:arrive .34s ease both}@keyframes arrive{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}.hero{display:grid;grid-template-columns:1.1fr 1fr;align-items:center;gap:70px;padding:68px 0 46px}.hero h1{font-size:52px;letter-spacing:-2.6px;line-height:1.35;font-weight:600;margin:18px 0 22px}.hero h1 em{font-style:normal;color:var(--green);position:relative;white-space:nowrap}.hero-copy{color:var(--muted);font-size:15px;line-height:1.9;max-width:445px;margin-bottom:25px}.instrument-label{display:inline-flex;align-items:center;gap:7px;font-size:11px;border:1px solid var(--line);padding:5px 10px;border-radius:30px;color:var(--muted);margin-bottom:24px}.instrument-label:before{content:"";width:6px;height:6px;background:#6c8568;border-radius:50%}.button{display:inline-flex;align-items:center;justify-content:center;gap:14px;min-height:48px;border-radius:10px;padding:12px 22px;font-weight:600;font-size:14px;transition:background .15s,transform .15s,box-shadow .15s;text-decoration:none;border:1px solid transparent}.button:hover{transform:translateY(-1px)}.button:active{transform:translateY(0)}.primary{background:var(--green);color:white;box-shadow:0 5px 12px #234f4314}.primary:hover{background:#193f34;box-shadow:0 7px 20px #234f4320}.secondary{background:var(--card);border-color:var(--line)}.secondary:hover{background:#eeeee7}.ghost{color:var(--muted)}.arrow{font-size:20px;font-weight:400;line-height:1}.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.hero-foot{font-size:11px;color:var(--muted);margin:14px 0 0}.atlas{position:relative;width:100%;aspect-ratio:1.05;max-width:440px;margin:auto;display:flex;align-items:center;justify-content:center}.atlas:before{content:"";position:absolute;inset:12%;border:1px dashed #c9cec4;border-radius:50%}.atlas:after{content:"";position:absolute;inset:2%;border:1px solid #d9ded4;border-radius:50%}.atlas-grid{position:relative;width:70%;height:72%;display:grid;grid-template-columns:1fr 1fr;gap:10px;transform:rotate(-9deg)}.petal{border-radius:60% 40% 30% 40%;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}.petal:before,.petal:after{content:"";position:absolute;inset:16px;border:1px solid #ffffff8c;border-radius:inherit}.petal:after{inset:32px}.petal:nth-child(1){background:#ceddc5;border-radius:85% 35% 20% 35%}.petal:nth-child(2){background:#d6c9e8;border-radius:35% 85% 35% 20%}.petal:nth-child(3){background:#edcaac;border-radius:35% 20% 35% 85%}.petal:nth-child(4){background:#c1d5dd;border-radius:20% 35% 85% 35%}.petal span{transform:rotate(9deg);font-family:Georgia,serif;font-size:33px;color:#3c493d;position:relative;z-index:1}.atlas-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;display:grid;place-items:center;background:var(--card);border-radius:50%;font-size:28px;color:var(--green);box-shadow:0 2px 18px #27382c0c;z-index:2}.atlas-note{position:absolute;background:var(--paper);padding:2px 8px;font-size:11px;color:var(--muted);z-index:2;letter-spacing:1px}.atlas-note.top{top:0}.atlas-note.bottom{bottom:0}.atlas-star{position:absolute;right:8%;top:13%;font-size:25px;color:var(--purple);z-index:2}.stats-row{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:25px 0}.stat{display:flex;align-items:center;gap:15px;padding-left:30px;border-left:1px solid var(--line)}.stat:first-child{padding-left:0;border-left:0}.stat-value{font-family:Georgia,serif;font-size:31px;line-height:1;color:var(--green)}.stat-label{font-size:12px;line-height:1.6}.stat-label span{display:block;color:var(--muted);font-size:11px}.intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:55px;margin-top:37px}.section-kicker{font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:15px}.principles{display:flex;flex-direction:column;gap:18px}.principle{display:flex;gap:14px}.principle-num{font-size:11px;font-family:monospace;color:var(--green);background:var(--green-soft);width:28px;height:28px;flex-shrink:0;border-radius:50%;display:grid;place-items:center}.principle strong{font-size:13px;display:block;font-weight:600}.principle p{font-size:12px;color:var(--muted);margin:4px 0 0;line-height:1.8}.boundary-note{background:#ebece3;padding:25px 28px;border-radius:16px}.boundary-note h3{font-size:14px;margin-bottom:10px}.boundary-note p{color:var(--muted);font-size:12px;line-height:1.85;margin-bottom:12px}.boundary-note a{font-size:12px}.settings-line{display:flex;align-items:flex-start;gap:9px;font-size:12px;color:var(--muted);cursor:pointer}.settings-line input{accent-color:var(--green);width:16px;height:16px;flex-shrink:0;margin:3px 0 0}.hero-settings{margin-top:20px;max-width:460px}.resume-note{padding:12px 16px;background:var(--green-soft);border-radius:12px;font-size:12px;margin-bottom:16px}.steps{display:flex;align-items:center;gap:12px;justify-content:center;margin:34px 0 35px;color:#81887e;font-size:12px}.step{display:flex;align-items:center;gap:7px;white-space:nowrap}.step i{display:grid;place-items:center;font-style:normal;border:1px solid var(--line);width:21px;height:21px;border-radius:50%;font-size:10px}.step.active{color:var(--green);font-weight:600}.step.active i{background:var(--green);color:white;border-color:var(--green)}.step.done i{background:var(--green-soft);border-color:var(--green-soft);color:var(--green)}.step-line{width:50px;height:1px;background:var(--line)}.assessment-layout{max-width:880px;margin:auto}.assessment-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:12px}.assessment-top strong{font-size:14px;color:var(--green)}.progress{height:4px;border-radius:5px;background:#e0e5db;overflow:hidden}.progress span{display:block;height:100%;background:var(--green);border-radius:5px;transition:width .3s}.question-card{margin-top:22px;background:var(--card);border:1px solid #e1e4da;box-shadow:var(--shadow);border-radius:var(--radius);padding:28px 40px 34px;min-height:372px}.question-meta{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:27px}.question-number{font-family:Georgia,serif;color:var(--green);font-size:16px}.question-tools{display:flex;gap:16px}.question-tools button{font-size:11px;color:var(--muted);padding:6px 0}.question-tools button[aria-pressed=true]{color:var(--orange)}.question-title{font-size:19px;font-weight:500;text-align:center;margin-bottom:8px;letter-spacing:.2px}.question-help{font-size:12px;color:var(--muted);text-align:center;margin-bottom:32px}.poles{display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:center;margin:0 0 25px}.pole{font-size:21px;line-height:1.6;font-weight:600}.pole.left{color:var(--green);text-align:left}.pole.right{color:#756090;text-align:right}.pole-en{display:block;font-size:12px;line-height:1.6;font-weight:400;margin-top:7px;color:var(--muted);letter-spacing:0}.versus{font-family:Georgia,serif;font-size:18px;font-style:italic;color:#949a91;font-weight:400}.scale-fieldset{border:0;padding:0;margin:0;min-width:0}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.choices{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.choice{position:relative;text-align:center;cursor:pointer;display:flex;align-items:center;flex-direction:column;gap:8px;border-radius:13px;border:1px solid #e2e5dc;padding:17px 5px 12px;background:#fbfcf7;transition:border-color .15s,background .15s,transform .15s}.choice:nth-child(n+4){background:#fbf9fd}.choice:hover{border-color:#879b7e;transform:translateY(-2px)}.choice input{position:absolute;opacity:0;width:100%;height:100%;inset:0;margin:0;cursor:pointer}.choice:has(input:focus-visible){outline:3px solid #7965ad;outline-offset:4px}.choice-circle{height:36px;width:36px;border-radius:50%;border:1.5px solid #97aa92;display:grid;place-items:center;color:#66815e;font-size:12px;transition:all .18s}.choice:nth-child(2) .choice-circle,.choice:nth-child(4) .choice-circle{height:30px;width:30px;margin:3px}.choice:nth-child(3) .choice-circle{height:24px;width:24px;margin:6px;border-color:#acb2a8;color:#798173}.choice:nth-child(n+4) .choice-circle{color:#89729f;border-color:#baa8cb}.choice-text{font-size:11px;color:var(--muted)}.choice:has(input:checked){background:var(--green-soft);border-color:var(--green);transform:translateY(-2px)}.choice:has(input:checked) .choice-circle{background:var(--green);color:white;border-color:var(--green)}.choice:nth-child(n+4):has(input:checked){background:var(--purple-soft);border-color:var(--purple)}.choice:nth-child(n+4):has(input:checked) .choice-circle{background:var(--purple);border-color:var(--purple)}.choice:nth-child(3):has(input:checked){background:#eceee8;border-color:#747d6b}.choice:nth-child(3):has(input:checked) .choice-circle{background:#747d6b;border-color:#747d6b}.question-footnote{font-size:11px;color:var(--muted);margin:20px 0 0;text-align:center}.question-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:15px}.bottom-actions{display:flex;gap:10px;align-items:center}.question-bottom .button{min-width:106px}.keyboard-hint{text-align:center;color:#8b9186;font-size:11px;margin:23px 0 0}kbd{font-family:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;background:var(--card);font-size:10px}.draft-line{font-size:11px;color:var(--muted);margin:10px 0 0}.palette-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:9px;margin:20px 0}.palette-grid button{border:1px solid var(--line);border-radius:9px;aspect-ratio:1;background:var(--card);font-size:13px;position:relative}.palette-grid button.answered{background:var(--green-soft);color:var(--green);border-color:#b8cdb4}.palette-grid button.flagged:after{content:"";width:6px;height:6px;position:absolute;right:5px;top:5px;background:var(--orange);border-radius:50%}.palette-grid button.current{outline:2px solid var(--green);outline-offset:2px}.review-header,.result-header{text-align:center;margin:0 auto 30px;max-width:650px}.review-header p,.result-header p{font-size:13px;color:var(--muted);line-height:1.9}.review-header h1{font-size:34px;margin:10px 0 14px}.review-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:18px}.filter-tabs{display:flex;background:#e9ece4;padding:4px;border-radius:10px;gap:3px}.filter-tabs button{font-size:12px;padding:7px 13px;border-radius:7px}.filter-tabs button.active{background:var(--card);box-shadow:0 2px 5px #223d2310}.review-count{font-size:11px;color:var(--muted)}.review-list{display:grid;grid-template-columns:1fr 1fr;gap:10px}.review-item{background:var(--card);border:1px solid var(--line);border-radius:12px;text-align:left;padding:14px 18px;display:flex;gap:14px;align-items:center;min-height:82px}.review-item:hover{border-color:#8caa88}.review-item-num{color:#7a8374;font-family:Georgia,serif;font-size:14px;flex-shrink:0;width:18px}.review-item-main{flex:1;min-width:0}.review-item-title{display:block;font-size:12px;line-height:1.6;word-break:break-word}.review-item-answer{display:block;font-size:11px;color:var(--green);margin-top:4px}.review-item.flagged .review-item-answer{color:var(--orange)}.review-sticky{position:sticky;bottom:0;background:#f5f3eef2;backdrop-filter:blur(12px);padding:18px 0 10px;display:flex;justify-content:space-between;align-items:center;gap:16px;border-top:1px solid var(--line);margin-top:25px}.review-sticky p{font-size:12px;color:var(--muted);margin:0}.empty-state{text-align:center;padding:40px;color:var(--muted);grid-column:1/-1}.result-intro{display:grid;grid-template-columns:1fr 1.1fr;gap:60px;align-items:center;margin:10px 0 35px}.result-type{display:flex;gap:9px;margin:18px 0 22px}.letter-tile{font-family:Georgia,serif;font-size:48px;width:73px;height:91px;border-radius:15px;display:grid;place-items:center;background:var(--green-soft);color:var(--green)}.letter-tile:nth-child(2){background:var(--purple-soft);color:var(--purple)}.letter-tile:nth-child(3){background:var(--orange-soft);color:var(--orange)}.letter-tile:nth-child(4){background:var(--blue-soft);color:var(--blue)}.letter-tile.unclear{background:transparent;border:1px dashed #a9b0a1;color:#7c8474}.result-subtitle{font-size:22px;margin:0 0 12px}.result-lead{font-size:13px;color:var(--muted);line-height:1.9;margin-bottom:18px}.result-summary-box{border-left:1px solid var(--line);padding-left:40px}.result-summary-box h3{font-size:16px}.result-summary-box p{font-size:12px;color:var(--muted);margin:12px 0}.result-facts{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.fact{background:#e9ece3;border-radius:6px;padding:5px 9px;font-size:10px;color:var(--muted)}.dimension-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.dimension-card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:24px}.dimension-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:17px}.dimension-title h3{font-size:14px;margin:0;font-weight:500}.score-tag{font-size:11px;color:var(--muted);white-space:nowrap}.dimension-poles{display:flex;justify-content:space-between;align-items:center;font-size:12px}.dimension-poles b{font-size:18px;margin-right:5px;font-family:Georgia,serif;font-weight:400}.track{height:9px;border-radius:10px;position:relative;margin:16px 5px 9px;background:linear-gradient(90deg,#dbe8d6,#ebeee6 50%,#ddd3ea)}.track:before{content:"";position:absolute;top:-4px;bottom:-4px;left:50%;width:1px;background:#a3aa9c}.track-marker{position:absolute;top:50%;width:17px;height:17px;background:var(--green);border:3px solid var(--card);box-shadow:0 0 0 1px var(--green);border-radius:50%;transform:translate(-50%,-50%)}.track-labels{display:flex;justify-content:space-between;font-size:9px;color:#899181;margin-bottom:18px}.dimension-meaning{font-size:12px;margin:0;color:var(--muted);line-height:1.85}.boundary-tag{display:inline-block;color:#956342;font-size:10px;padding:2px 6px;background:#f5e8da;border-radius:5px;margin-right:6px}.score-explainer{font-size:11px;color:var(--muted);margin:15px 0 30px}.result-lower{display:grid;grid-template-columns:1.1fr 1fr;gap:25px;margin-top:30px}.panel{border:1px solid var(--line);background:var(--card);padding:26px;border-radius:17px}.panel h3{margin-bottom:10px;font-size:16px}.panel p{font-size:12px;color:var(--muted);line-height:1.9}.note-field{display:flex;flex-direction:column;gap:7px;margin:15px 0 0;font-size:12px}.note-field textarea{width:100%;resize:vertical;min-height:94px;border:1px solid var(--line);background:#fafbf7;border-radius:9px;padding:11px 12px;font-size:12px;line-height:1.8;color:var(--ink)}.export-panel{background:var(--green);border-color:var(--green);color:white}.export-panel h3{color:white}.export-panel p{color:#c9d8cc}.export-panel .button.primary{background:#f5f7ed;color:var(--green);width:100%;margin:10px 0}.export-panel .button.secondary{background:transparent;border-color:#698575;color:#e5ede5;min-height:40px;padding:8px 12px;font-size:12px;flex:1}.export-panel .button.secondary:hover{background:#ffffff14}.export-panel .export-note{color:#bdcebe;font-size:10px;margin:15px 0 0}.candidate-box{margin-top:24px;font-size:12px;line-height:1.9;color:var(--muted)}.candidate-list{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.candidate-chip{display:inline-block;padding:3px 9px;border:1px solid var(--line);border-radius:6px;color:var(--green);font-size:11px;letter-spacing:1px;background:var(--card)}.result-bottom{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:30px}.result-bottom .button{font-size:12px;min-height:41px}.modal{border:1px solid var(--line);border-radius:22px;background:var(--card);color:var(--ink);padding:25px 32px 32px;width:min(720px,calc(100% - 28px));max-height:85dvh;box-shadow:0 30px 100px #16251835}.modal::backdrop{background:#1b2e255c;backdrop-filter:blur(5px)}.modal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;position:sticky;top:-25px;background:var(--card);padding-top:3px;z-index:1}.icon-button{font-size:26px;line-height:1;width:36px;height:36px;border-radius:50%;color:var(--muted)}.icon-button:hover{background:var(--green-soft)}.modal h2{font-size:25px;margin-bottom:20px}.modal h3{font-size:15px;margin:23px 0 10px}.modal p,.modal li{font-size:13px;color:var(--muted);line-height:1.9}.modal ul{padding-left:22px}.modal .button{font-size:13px}.modal code{font-family:Consolas,monospace;font-size:11px;overflow-wrap:anywhere}.formula{background:#edf0e8;padding:12px;border-radius:8px;line-height:2}.source-list{padding:0;list-style:none}.source-list li{padding:10px 0;border-bottom:1px solid var(--line)}.source-list small{display:block}.source-table-wrap{overflow-x:auto}.source-table{border-collapse:collapse;width:100%;font-size:11px;margin:15px 0}.source-table td,.source-table th{padding:9px 7px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;min-width:45px}.source-table th{font-weight:600;color:var(--green)}.source-table .en{display:block;color:var(--muted)}details{margin-top:16px}summary{cursor:pointer;font-size:13px;color:var(--green)}.copy-box{width:100%;height:260px;resize:vertical;border:1px solid var(--line);border-radius:8px;padding:12px;font-size:12px;color:var(--ink);background:var(--paper);line-height:1.8}.toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,12px);padding:11px 20px;background:#243f33;color:white;border-radius:12px;box-shadow:0 6px 30px #19342525;max-width:calc(100% - 30px);width:max-content;text-align:center;font-size:12px;opacity:0;transition:all .2s;pointer-events:none;z-index:20}.toast.visible{opacity:1;transform:translate(-50%,0)}.noscript{padding:30px;text-align:center}.notice-inline{font-size:12px;padding:12px 15px;background:var(--orange-soft);border-radius:9px;color:#714d37;margin:15px 0}.confirm-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:25px}
-@media(min-width:1400px){.site-shell{max-width:1280px}.hero{padding-top:75px;padding-bottom:55px}.hero h1{font-size:56px}}
-@media(max-width:900px){.site-shell{padding:0 28px}.hero{gap:20px;padding-top:50px}.hero h1{font-size:41px}.atlas{max-width:350px}.intro-grid{gap:26px}.stat{padding-left:20px;gap:10px}.result-intro{gap:25px}.result-summary-box{padding-left:25px}.result-lower{gap:16px}}
-@media(max-width:650px){body{font-size:14px}.site-shell{padding:0 20px}.site-header{height:80px}.brand{font-size:21px;gap:10px}.brand-en{font-size:8px}.site-header nav{gap:16px}.site-header .text-button{font-size:11px}.hero{display:flex;flex-direction:column;align-items:stretch;gap:22px;padding:36px 0 30px}.hero h1{font-size:38px;letter-spacing:-1.8px;margin-top:15px;margin-bottom:17px}.hero-copy{font-size:13px;margin-bottom:18px;max-width:none}.instrument-label{margin-bottom:19px;font-size:10px}.hero .button.primary{flex:1;max-width:270px}.hero-settings{margin-top:18px}.hero .atlas{width:210px;height:200px;align-self:center;order:-1;margin-bottom:7px}.atlas-note{font-size:9px}.atlas-grid{gap:6px}.petal span{font-size:22px}.petal:before{inset:10px}.petal:after{inset:20px}.atlas-center{width:40px;height:40px;font-size:20px}.atlas-star{font-size:18px}.stats-row{padding:21px 0}.stat{flex-direction:column;gap:8px;align-items:flex-start;padding-left:14px}.stat-value{font-size:26px}.stat-label{font-size:11px}.stat-label span{font-size:9px}.intro-grid{grid-template-columns:1fr;gap:25px;margin-top:28px}.boundary-note{padding:22px}.site-footer{flex-direction:column;gap:7px;margin-top:35px;padding:20px 0;font-size:10px}.steps{gap:7px;margin:25px 0 27px;font-size:10px}.step{gap:4px}.step-line{width:20px}.step i{width:18px;height:18px;font-size:9px}.assessment-top{font-size:11px}.assessment-top strong{font-size:12px}.question-card{padding:19px 16px 24px;margin-top:18px;border-radius:18px;min-height:340px}.question-meta{margin-bottom:22px;gap:8px}.question-tools{gap:12px}.question-tools button{font-size:10px}.question-title{font-size:17px}.question-help{font-size:11px;margin-bottom:28px}.poles{gap:10px;margin-bottom:23px}.pole{font-size:17px;line-height:1.65}.pole-en{font-size:10px}.versus{font-size:15px}.choices{gap:6px}.choice{border-radius:10px;padding:14px 2px 10px;gap:8px}.choice-text{font-size:9px;letter-spacing:-.3px;white-space:nowrap}.choice-circle{width:32px;height:32px}.choice:nth-child(2) .choice-circle,.choice:nth-child(4) .choice-circle{width:28px;height:28px;margin:2px}.choice:nth-child(3) .choice-circle{width:22px;height:22px;margin:5px}.question-footnote{font-size:10px;margin-top:18px}.question-bottom{flex-wrap:wrap;margin-top:17px;gap:15px}.question-bottom>.settings-line{width:100%;font-size:11px}.bottom-actions{width:100%;justify-content:space-between}.bottom-actions .button{flex:1;padding:11px 10px}.keyboard-hint{display:none}.draft-line{margin-top:15px;font-size:10px}.review-header h1{font-size:28px}.review-header p{font-size:12px}.review-toolbar{flex-wrap:wrap}.filter-tabs{width:100%;justify-content:space-between}.filter-tabs button{font-size:11px;padding:7px 12px}.review-count{margin-left:auto}.review-list{grid-template-columns:1fr}.review-item{padding:12px 14px;min-height:74px}.review-sticky{align-items:stretch;flex-direction:column;gap:10px;padding-bottom:13px}.review-sticky .button{width:100%}.review-sticky p{text-align:center;font-size:11px}.result-intro{grid-template-columns:1fr;gap:23px}.result-type{justify-content:center;gap:8px;margin:22px 0}.result-profile{text-align:center}.letter-tile{width:65px;height:81px;font-size:43px}.result-subtitle{font-size:22px}.result-summary-box{border-left:0;border-top:1px solid var(--line);padding:22px 0 0}.result-facts{justify-content:center}.dimension-grid{grid-template-columns:1fr;gap:12px}.dimension-card{padding:22px}.result-lower{grid-template-columns:1fr}.panel{padding:23px}.score-explainer{font-size:10px;margin-top:12px}.modal{padding:20px 21px 25px;border-radius:17px}.modal-top{top:-20px}.modal h2{font-size:23px}.modal p,.modal li{font-size:12px}.palette-grid{gap:7px}.palette-grid button{font-size:12px}.toast{bottom:20px;font-size:11px}.eyebrow{font-size:10px}.review-sticky{padding-bottom:max(13px,env(safe-area-inset-bottom))}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.button:hover,.choice:hover,.choice:has(input:checked){transform:none}}
-@media print{.site-header nav,.actions,.steps,.result-bottom,.export-panel,.site-footer,.note-field,.toast,.skip-link{display:none!important}.site-shell{padding:0}.site-header{height:65px}body{background:white}.view{animation:none}.result-intro{margin-top:25px}.dimension-card,.panel{break-inside:avoid}.result-lower{display:block}.dimension-grid{display:grid;grid-template-columns:1fr 1fr}.result-type{justify-content:flex-start}.result-profile{text-align:left}.result-intro{grid-template-columns:1fr 1fr}.result-summary-box{border-top:0;padding-top:0}h2,h3{break-after:avoid}}
+
+:root {
+  --paper:#f5f3ee;
+  --card:#fffefa;
+  --ink:#242c29;
+  --muted:#66706a;
+  --line:#dcdfd7;
+  --green:#234f43;
+  --green-soft:#e7eee6;
+  --purple:#776aab;
+  --purple-soft:#e9e4f3;
+  --orange:#b6673e;
+  --orange-soft:#f3e2d4;
+  --blue:#527a8e;
+  --blue-soft:#dfeaf0;
+  --shadow:0 16px 50px #293d2e08;
+  --radius:24px;
+  font-family:Inter,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  color:var(--ink);
+  background:var(--paper);
+  font-synthesis:none
+}
+
+* {
+  box-sizing:border-box
+}
+body {
+  margin:0;
+  font-size:15px;
+  line-height:1.7
+}
+button,input,textarea {
+  font:inherit
+}
+button,a,input,textarea {
+  -webkit-tap-highlight-color:transparent
+}
+button {
+  cursor:pointer;
+  color:inherit
+}
+button:disabled {
+  cursor:not-allowed;
+  opacity:.4
+}
+a {
+  color:var(--green);
+  text-underline-offset:4px
+}
+button {
+  border:0;
+  background:none
+}
+button:focus-visible,a:focus-visible,summary:focus-visible,textarea:focus-visible,input:focus-visible {
+  outline:3px solid #7965ad;
+  outline-offset:4px
+}
+button,a {
+  touch-action:manipulation
+}
+::selection {
+  background:#d8e6d4
+}
+h1,h2,h3,p {
+  margin-top:0
+}
+h1,h2,h3 {
+  line-height:1.3
+}
+h2 {
+  font-size:28px;
+  letter-spacing:-.7px
+}
+h3 {
+  font-size:17px
+}
+small {
+  font-size:12px
+}
+.site-shell {
+  max-width:1240px;
+  margin:auto;
+  padding:0 48px
+}
+.site-header {
+  height:100px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid var(--line)
+}
+.brand {
+  display:flex;
+  gap:12px;
+  align-items:center;
+  padding:0;
+  text-align:left;
+  font-size:23px;
+  font-weight:650;
+  line-height:1.2;
+  letter-spacing:2px
+}
+.brand-en {
+  display:block;
+  font-size:9px;
+  letter-spacing:2.4px;
+  font-weight:500;
+  margin-top:6px
+}
+.brand-mark {
+  display:grid;
+  grid-template-columns:repeat(2,12px);
+  gap:3px;
+  transform:rotate(-8deg)
+}
+.brand-mark i {
+  width:12px;
+  height:12px;
+  border-radius:3px;
+  background:var(--green)
+}
+.brand-mark i:nth-child(2) {
+  background:#b5a9d2
+}
+.brand-mark i:nth-child(3) {
+  background:#dda57b
+}
+.brand-mark i:nth-child(4) {
+  background:#8ba6b2
+}
+.site-header nav {
+  display:flex;
+  gap:28px
+}
+.text-button {
+  font-size:13px;
+  padding:8px 0;
+  color:var(--muted)
+}
+.text-button:hover {
+  color:var(--green)
+}
+.site-footer {
+  border-top:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  padding:24px 0 30px;
+  font-size:11px;
+  color:var(--muted);
+  margin-top:56px
+}
+.footer-dot {
+  padding:0 8px
+}
+.eyebrow {
+  font-size:11px;
+  font-weight:650;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--green)
+}
+.muted {
+  color:var(--muted)
+}
+.skip-link {
+  position:fixed;
+  left:20px;
+  top:-100px;
+  background:var(--card);
+  padding:10px;
+  z-index:100
+}
+.skip-link:focus {
+  top:10px
+}
+#main:focus {
+  outline:0
+}
+.view {
+  animation:arrive .34s ease both
+}
+@keyframes arrive {
+  from {
+    opacity:0;
+    transform:translateY(9px)
+  }
+  to {
+    opacity:1;
+    transform:translateY(0)
+  }
+}
+.hero {
+  display:grid;
+  grid-template-columns:1.1fr 1fr;
+  align-items:center;
+  gap:70px;
+  padding:68px 0 46px
+}
+.hero h1 {
+  font-size:52px;
+  letter-spacing:-2.6px;
+  line-height:1.35;
+  font-weight:600;
+  margin:18px 0 22px
+}
+.hero h1 em {
+  font-style:normal;
+  color:var(--green);
+  position:relative;
+  white-space:nowrap
+}
+.hero-copy {
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.9;
+  max-width:445px;
+  margin-bottom:25px
+}
+.instrument-label {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  font-size:11px;
+  border:1px solid var(--line);
+  padding:5px 10px;
+  border-radius:30px;
+  color:var(--muted);
+  margin-bottom:24px
+}
+.instrument-label:before {
+  content:"";
+  width:6px;
+  height:6px;
+  background:#6c8568;
+  border-radius:50%
+}
+.button {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  min-height:48px;
+  border-radius:10px;
+  padding:12px 22px;
+  font-weight:600;
+  font-size:14px;
+  transition:background .15s,transform .15s,box-shadow .15s;
+  text-decoration:none;
+  border:1px solid transparent
+}
+.button:hover {
+  transform:translateY(-1px)
+}
+.button:active {
+  transform:translateY(0)
+}
+.primary {
+  background:var(--green);
+  color:white;
+  box-shadow:0 5px 12px #234f4314
+}
+.primary:hover {
+  background:#193f34;
+  box-shadow:0 7px 20px #234f4320
+}
+.secondary {
+  background:var(--card);
+  border-color:var(--line)
+}
+.secondary:hover {
+  background:#eeeee7
+}
+.ghost {
+  color:var(--muted)
+}
+.arrow {
+  font-size:20px;
+  font-weight:400;
+  line-height:1
+}
+.actions {
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap
+}
+.hero-foot {
+  font-size:11px;
+  color:var(--muted);
+  margin:14px 0 0
+}
+.atlas {
+  position:relative;
+  width:100%;
+  aspect-ratio:1.05;
+  max-width:440px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:center
+}
+.atlas:before {
+  content:"";
+  position:absolute;
+  inset:12%;
+  border:1px dashed #c9cec4;
+  border-radius:50%
+}
+.atlas:after {
+  content:"";
+  position:absolute;
+  inset:2%;
+  border:1px solid #d9ded4;
+  border-radius:50%
+}
+.atlas-grid {
+  position:relative;
+  width:70%;
+  height:72%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  transform:rotate(-9deg)
+}
+.petal {
+  border-radius:60% 40% 30% 40%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden
+}
+.petal:before,.petal:after {
+  content:"";
+  position:absolute;
+  inset:16px;
+  border:1px solid #ffffff8c;
+  border-radius:inherit
+}
+.petal:after {
+  inset:32px
+}
+.petal:nth-child(1) {
+  background:#ceddc5;
+  border-radius:85% 35% 20% 35%
+}
+.petal:nth-child(2) {
+  background:#d6c9e8;
+  border-radius:35% 85% 35% 20%
+}
+.petal:nth-child(3) {
+  background:#edcaac;
+  border-radius:35% 20% 35% 85%
+}
+.petal:nth-child(4) {
+  background:#c1d5dd;
+  border-radius:20% 35% 85% 35%
+}
+.petal span {
+  transform:rotate(9deg);
+  font-family:Georgia,serif;
+  font-size:33px;
+  color:#3c493d;
+  position:relative;
+  z-index:1
+}
+.atlas-center {
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:64px;
+  height:64px;
+  display:grid;
+  place-items:center;
+  background:var(--card);
+  border-radius:50%;
+  font-size:28px;
+  color:var(--green);
+  box-shadow:0 2px 18px #27382c0c;
+  z-index:2
+}
+.atlas-note {
+  position:absolute;
+  background:var(--paper);
+  padding:2px 8px;
+  font-size:11px;
+  color:var(--muted);
+  z-index:2;
+  letter-spacing:1px
+}
+.atlas-note.top {
+  top:0
+}
+.atlas-note.bottom {
+  bottom:0
+}
+.atlas-star {
+  position:absolute;
+  right:8%;
+  top:13%;
+  font-size:25px;
+  color:var(--purple);
+  z-index:2
+}
+.stats-row {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  padding:25px 0
+}
+.stat {
+  display:flex;
+  align-items:center;
+  gap:15px;
+  padding-left:30px;
+  border-left:1px solid var(--line)
+}
+.stat:first-child {
+  padding-left:0;
+  border-left:0
+}
+.stat-value {
+  font-family:Georgia,serif;
+  font-size:31px;
+  line-height:1;
+  color:var(--green)
+}
+.stat-label {
+  font-size:12px;
+  line-height:1.6
+}
+.stat-label span {
+  display:block;
+  color:var(--muted);
+  font-size:11px
+}
+.intro-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:55px;
+  margin-top:37px
+}
+.section-kicker {
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:1px;
+  margin-bottom:15px
+}
+.principles {
+  display:flex;
+  flex-direction:column;
+  gap:18px
+}
+.principle {
+  display:flex;
+  gap:14px
+}
+.principle-num {
+  font-size:11px;
+  font-family:monospace;
+  color:var(--green);
+  background:var(--green-soft);
+  width:28px;
+  height:28px;
+  flex-shrink:0;
+  border-radius:50%;
+  display:grid;
+  place-items:center
+}
+.principle strong {
+  font-size:13px;
+  display:block;
+  font-weight:600
+}
+.principle p {
+  font-size:12px;
+  color:var(--muted);
+  margin:4px 0 0;
+  line-height:1.8
+}
+.boundary-note {
+  background:#ebece3;
+  padding:25px 28px;
+  border-radius:16px
+}
+.boundary-note h3 {
+  font-size:14px;
+  margin-bottom:10px
+}
+.boundary-note p {
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.85;
+  margin-bottom:12px
+}
+.boundary-note a {
+  font-size:12px
+}
+.settings-line {
+  display:flex;
+  align-items:flex-start;
+  gap:9px;
+  font-size:12px;
+  color:var(--muted);
+  cursor:pointer
+}
+.settings-line input {
+  accent-color:var(--green);
+  width:16px;
+  height:16px;
+  flex-shrink:0;
+  margin:3px 0 0
+}
+.hero-settings {
+  margin-top:20px;
+  max-width:460px
+}
+.resume-note {
+  padding:12px 16px;
+  background:var(--green-soft);
+  border-radius:12px;
+  font-size:12px;
+  margin-bottom:16px
+}
+.steps {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  justify-content:center;
+  margin:34px 0 35px;
+  color:#81887e;
+  font-size:12px
+}
+.step {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  white-space:nowrap
+}
+.step i {
+  display:grid;
+  place-items:center;
+  font-style:normal;
+  border:1px solid var(--line);
+  width:21px;
+  height:21px;
+  border-radius:50%;
+  font-size:10px
+}
+.step.active {
+  color:var(--green);
+  font-weight:600
+}
+.step.active i {
+  background:var(--green);
+  color:white;
+  border-color:var(--green)
+}
+.step.done i {
+  background:var(--green-soft);
+  border-color:var(--green-soft);
+  color:var(--green)
+}
+.step-line {
+  width:50px;
+  height:1px;
+  background:var(--line)
+}
+.assessment-layout {
+  max-width:880px;
+  margin:auto
+}
+.assessment-top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:12px;
+  margin-bottom:12px
+}
+.assessment-top strong {
+  font-size:14px;
+  color:var(--green)
+}
+.progress {
+  height:4px;
+  border-radius:5px;
+  background:#e0e5db;
+  overflow:hidden
+}
+.progress span {
+  display:block;
+  height:100%;
+  background:var(--green);
+  border-radius:5px;
+  transition:width .3s
+}
+.question-card {
+  margin-top:22px;
+  background:var(--card);
+  border:1px solid #e1e4da;
+  box-shadow:var(--shadow);
+  border-radius:var(--radius);
+  padding:28px 40px 34px;
+  min-height:372px
+}
+.question-meta {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:27px
+}
+.question-number {
+  font-family:Georgia,serif;
+  color:var(--green);
+  font-size:16px
+}
+.question-tools {
+  display:flex;
+  gap:16px
+}
+.question-tools button {
+  font-size:11px;
+  color:var(--muted);
+  padding:6px 0
+}
+.question-tools button[aria-pressed=true] {
+  color:var(--orange)
+}
+.question-title {
+  font-size:19px;
+  font-weight:500;
+  text-align:center;
+  margin-bottom:8px;
+  letter-spacing:.2px
+}
+.question-help {
+  font-size:12px;
+  color:var(--muted);
+  text-align:center;
+  margin-bottom:32px
+}
+.poles {
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:24px;
+  align-items:center;
+  margin:0 0 25px
+}
+.pole {
+  font-size:21px;
+  line-height:1.6;
+  font-weight:600
+}
+.pole.left {
+  color:var(--green);
+  text-align:left
+}
+.pole.right {
+  color:#756090;
+  text-align:right
+}
+.pole-en {
+  display:block;
+  font-size:12px;
+  line-height:1.6;
+  font-weight:400;
+  margin-top:7px;
+  color:var(--muted);
+  letter-spacing:0
+}
+.versus {
+  font-family:Georgia,serif;
+  font-size:18px;
+  font-style:italic;
+  color:#949a91;
+  font-weight:400
+}
+.scale-fieldset {
+  border:0;
+  padding:0;
+  margin:0;
+  min-width:0
+}
+.sr-only {
+  position:absolute;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap
+}
+.choices {
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px
+}
+.choice {
+  position:relative;
+  text-align:center;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  flex-direction:column;
+  gap:8px;
+  border-radius:13px;
+  border:1px solid #e2e5dc;
+  padding:17px 5px 12px;
+  background:#fbfcf7;
+  transition:border-color .15s,background .15s,transform .15s
+}
+.choice:nth-child(n+4) {
+  background:#fbf9fd
+}
+.choice:hover {
+  border-color:#879b7e;
+  transform:translateY(-2px)
+}
+.choice input {
+  position:absolute;
+  opacity:0;
+  width:100%;
+  height:100%;
+  inset:0;
+  margin:0;
+  cursor:pointer
+}
+.choice:has(input:focus-visible) {
+  outline:3px solid #7965ad;
+  outline-offset:4px
+}
+.choice-circle {
+  height:36px;
+  width:36px;
+  border-radius:50%;
+  border:1.5px solid #97aa92;
+  display:grid;
+  place-items:center;
+  color:#66815e;
+  font-size:12px;
+  transition:all .18s
+}
+.choice:nth-child(2) .choice-circle,.choice:nth-child(4) .choice-circle {
+  height:30px;
+  width:30px;
+  margin:3px
+}
+.choice:nth-child(3) .choice-circle {
+  height:24px;
+  width:24px;
+  margin:6px;
+  border-color:#acb2a8;
+  color:#798173
+}
+.choice:nth-child(n+4) .choice-circle {
+  color:#89729f;
+  border-color:#baa8cb
+}
+.choice-text {
+  font-size:11px;
+  color:var(--muted)
+}
+.choice:has(input:checked) {
+  background:var(--green-soft);
+  border-color:var(--green);
+  transform:translateY(-2px)
+}
+.choice:has(input:checked) .choice-circle {
+  background:var(--green);
+  color:white;
+  border-color:var(--green)
+}
+.choice:nth-child(n+4):has(input:checked) {
+  background:var(--purple-soft);
+  border-color:var(--purple)
+}
+.choice:nth-child(n+4):has(input:checked) .choice-circle {
+  background:var(--purple);
+  border-color:var(--purple)
+}
+.choice:nth-child(3):has(input:checked) {
+  background:#eceee8;
+  border-color:#747d6b
+}
+.choice:nth-child(3):has(input:checked) .choice-circle {
+  background:#747d6b;
+  border-color:#747d6b
+}
+.question-footnote {
+  font-size:11px;
+  color:var(--muted);
+  margin:20px 0 0;
+  text-align:center
+}
+.question-bottom {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:20px;
+  gap:15px
+}
+.bottom-actions {
+  display:flex;
+  gap:10px;
+  align-items:center
+}
+.question-bottom .button {
+  min-width:106px
+}
+.keyboard-hint {
+  text-align:center;
+  color:#8b9186;
+  font-size:11px;
+  margin:23px 0 0
+}
+kbd {
+  font-family:inherit;
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:0 5px;
+  background:var(--card);
+  font-size:10px
+}
+.draft-line {
+  font-size:11px;
+  color:var(--muted);
+  margin:10px 0 0
+}
+.palette-grid {
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  gap:9px;
+  margin:20px 0
+}
+.palette-grid button {
+  border:1px solid var(--line);
+  border-radius:9px;
+  aspect-ratio:1;
+  background:var(--card);
+  font-size:13px;
+  position:relative
+}
+.palette-grid button.answered {
+  background:var(--green-soft);
+  color:var(--green);
+  border-color:#b8cdb4
+}
+.palette-grid button.flagged:after {
+  content:"";
+  width:6px;
+  height:6px;
+  position:absolute;
+  right:5px;
+  top:5px;
+  background:var(--orange);
+  border-radius:50%
+}
+.palette-grid button.current {
+  outline:2px solid var(--green);
+  outline-offset:2px
+}
+.review-header,.result-header {
+  text-align:center;
+  margin:0 auto 30px;
+  max-width:650px
+}
+.review-header p,.result-header p {
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.9
+}
+.review-header h1 {
+  font-size:34px;
+  margin:10px 0 14px
+}
+.review-toolbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:18px
+}
+.filter-tabs {
+  display:flex;
+  background:#e9ece4;
+  padding:4px;
+  border-radius:10px;
+  gap:3px
+}
+.filter-tabs button {
+  font-size:12px;
+  padding:7px 13px;
+  border-radius:7px
+}
+.filter-tabs button.active {
+  background:var(--card);
+  box-shadow:0 2px 5px #223d2310
+}
+.review-count {
+  font-size:11px;
+  color:var(--muted)
+}
+.review-list {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px
+}
+.review-item {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  text-align:left;
+  padding:14px 18px;
+  display:flex;
+  gap:14px;
+  align-items:center;
+  min-height:82px
+}
+.review-item:hover {
+  border-color:#8caa88
+}
+.review-item-num {
+  color:#7a8374;
+  font-family:Georgia,serif;
+  font-size:14px;
+  flex-shrink:0;
+  width:18px
+}
+.review-item-main {
+  flex:1;
+  min-width:0
+}
+.review-item-title {
+  display:block;
+  font-size:12px;
+  line-height:1.6;
+  word-break:break-word
+}
+.review-item-answer {
+  display:block;
+  font-size:11px;
+  color:var(--green);
+  margin-top:4px
+}
+.review-item.flagged .review-item-answer {
+  color:var(--orange)
+}
+.review-sticky {
+  position:sticky;
+  bottom:0;
+  background:#f5f3eef2;
+  backdrop-filter:blur(12px);
+  padding:18px 0 10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  border-top:1px solid var(--line);
+  margin-top:25px
+}
+.review-sticky p {
+  font-size:12px;
+  color:var(--muted);
+  margin:0
+}
+.empty-state {
+  text-align:center;
+  padding:40px;
+  color:var(--muted);
+  grid-column:1/-1
+}
+.result-intro {
+  display:grid;
+  grid-template-columns:1fr 1.1fr;
+  gap:60px;
+  align-items:center;
+  margin:10px 0 35px
+}
+.result-type {
+  display:flex;
+  gap:9px;
+  margin:18px 0 22px
+}
+.letter-tile {
+  font-family:Georgia,serif;
+  font-size:48px;
+  width:73px;
+  height:91px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  background:var(--green-soft);
+  color:var(--green)
+}
+.letter-tile:nth-child(2) {
+  background:var(--purple-soft);
+  color:var(--purple)
+}
+.letter-tile:nth-child(3) {
+  background:var(--orange-soft);
+  color:var(--orange)
+}
+.letter-tile:nth-child(4) {
+  background:var(--blue-soft);
+  color:var(--blue)
+}
+.letter-tile.unclear {
+  background:transparent;
+  border:1px dashed #a9b0a1;
+  color:#7c8474
+}
+.result-subtitle {
+  font-size:22px;
+  margin:0 0 12px
+}
+.result-lead {
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.9;
+  margin-bottom:18px
+}
+.result-summary-box {
+  border-left:1px solid var(--line);
+  padding-left:40px
+}
+.result-summary-box h3 {
+  font-size:16px
+}
+.result-summary-box p {
+  font-size:12px;
+  color:var(--muted);
+  margin:12px 0
+}
+.result-facts {
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:20px
+}
+.fact {
+  background:#e9ece3;
+  border-radius:6px;
+  padding:5px 9px;
+  font-size:10px;
+  color:var(--muted)
+}
+.dimension-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px
+}
+.dimension-card {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:24px
+}
+.dimension-title {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:17px
+}
+.dimension-title h3 {
+  font-size:14px;
+  margin:0;
+  font-weight:500
+}
+.score-tag {
+  font-size:11px;
+  color:var(--muted);
+  white-space:nowrap
+}
+.dimension-poles {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:12px
+}
+.dimension-poles b {
+  font-size:18px;
+  margin-right:5px;
+  font-family:Georgia,serif;
+  font-weight:400
+}
+.track {
+  height:9px;
+  border-radius:10px;
+  position:relative;
+  margin:16px 5px 9px;
+  background:linear-gradient(90deg,#dbe8d6,#ebeee6 50%,#ddd3ea)
+}
+.track:before {
+  content:"";
+  position:absolute;
+  top:-4px;
+  bottom:-4px;
+  left:50%;
+  width:1px;
+  background:#a3aa9c
+}
+.track-marker {
+  position:absolute;
+  top:50%;
+  width:17px;
+  height:17px;
+  background:var(--green);
+  border:3px solid var(--card);
+  box-shadow:0 0 0 1px var(--green);
+  border-radius:50%;
+  transform:translate(-50%,-50%)
+}
+.track-labels {
+  display:flex;
+  justify-content:space-between;
+  font-size:9px;
+  color:#899181;
+  margin-bottom:18px
+}
+.dimension-meaning {
+  font-size:12px;
+  margin:0;
+  color:var(--muted);
+  line-height:1.85
+}
+.boundary-tag {
+  display:inline-block;
+  color:#956342;
+  font-size:10px;
+  padding:2px 6px;
+  background:#f5e8da;
+  border-radius:5px;
+  margin-right:6px
+}
+.score-explainer {
+  font-size:11px;
+  color:var(--muted);
+  margin:15px 0 30px
+}
+.result-lower {
+  display:grid;
+  grid-template-columns:1.1fr 1fr;
+  gap:25px;
+  margin-top:30px
+}
+.panel {
+  border:1px solid var(--line);
+  background:var(--card);
+  padding:26px;
+  border-radius:17px
+}
+.panel h3 {
+  margin-bottom:10px;
+  font-size:16px
+}
+.panel p {
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.9
+}
+.note-field {
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  margin:15px 0 0;
+  font-size:12px
+}
+.note-field textarea {
+  width:100%;
+  resize:vertical;
+  min-height:94px;
+  border:1px solid var(--line);
+  background:#fafbf7;
+  border-radius:9px;
+  padding:11px 12px;
+  font-size:12px;
+  line-height:1.8;
+  color:var(--ink)
+}
+.dimension-reading {
+  font-size:12px;
+  margin:0 0 10px;
+  color:var(--muted);
+  line-height:1.85
+}
+.strength-tag {
+  display:inline-block;
+  font-size:10px;
+  padding:2px 7px;
+  border-radius:5px;
+  margin-right:7px;
+  color:#4d6249;
+  background:#e3ebdc
+}
+.strength-tag.balanced {
+  color:#8a613f;
+  background:#f5e8da
+}
+.strength-tag.strong {
+  color:#4a3f66;
+  background:#e6e0f0
+}
+.score-line {
+  font-size:10px;
+  color:#899181;
+  margin:0
+}
+.interpretation-block {
+  margin-top:40px
+}
+.interpretation-block h2 {
+  font-size:22px;
+  margin:0 0 18px
+}
+.interaction-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px
+}
+.interaction-card {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:22px 24px
+}
+.interaction-card h3 {
+  font-size:14px;
+  font-weight:500;
+  margin:0 0 10px
+}
+.interaction-card p {
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.85;
+  margin:0
+}
+.reflection-panel {
+  border-left:2px solid #b9c8ae;
+  padding-left:24px
+}
+.reflection-panel ol {
+  margin:0;
+  padding-left:18px
+}
+.reflection-panel li {
+  font-size:13px;
+  color:var(--ink);
+  line-height:1.9;
+  margin:0 0 9px
+}
+.reflection-panel li:last-child {
+  margin-bottom:0
+}
+.note-panel {
+  margin-top:18px
+}
+.note-privacy {
+  font-size:10px !important;
+  margin:9px 0 0 !important
+}
+.caveat-panel {
+  background:#f1f0e9;
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:24px 26px
+}
+.caveat-panel h2 {
+  font-size:18px;
+  margin-bottom:12px
+}
+.caveat-panel ul {
+  margin:0;
+  padding-left:18px
+}
+.caveat-panel li {
+  font-size:11px;
+  color:var(--muted);
+  line-height:1.85;
+  margin-bottom:7px
+}
+.caveat-panel li:last-child {
+  margin-bottom:0
+}
+.result-bottom {
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-top:30px
+}
+.result-bottom .button {
+  font-size:12px;
+  min-height:41px
+}
+.modal {
+  border:1px solid var(--line);
+  border-radius:22px;
+  background:var(--card);
+  color:var(--ink);
+  padding:25px 32px 32px;
+  width:min(720px,calc(100% - 28px));
+  max-height:85dvh;
+  box-shadow:0 30px 100px #16251835
+}
+.modal::backdrop {
+  background:#1b2e255c;
+  backdrop-filter:blur(5px)
+}
+.modal-top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+  position:sticky;
+  top:-25px;
+  background:var(--card);
+  padding-top:3px;
+  z-index:1
+}
+.icon-button {
+  font-size:26px;
+  line-height:1;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  color:var(--muted)
+}
+.icon-button:hover {
+  background:var(--green-soft)
+}
+.modal h2 {
+  font-size:25px;
+  margin-bottom:20px
+}
+.modal h3 {
+  font-size:15px;
+  margin:23px 0 10px
+}
+.modal p,.modal li {
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.9
+}
+.modal ul {
+  padding-left:22px
+}
+.modal .button {
+  font-size:13px
+}
+.modal code {
+  font-family:Consolas,monospace;
+  font-size:11px;
+  overflow-wrap:anywhere
+}
+.formula {
+  background:#edf0e8;
+  padding:12px;
+  border-radius:8px;
+  line-height:2
+}
+.source-list {
+  padding:0;
+  list-style:none
+}
+.source-list li {
+  padding:10px 0;
+  border-bottom:1px solid var(--line)
+}
+.source-list small {
+  display:block
+}
+.source-table-wrap {
+  overflow-x:auto
+}
+.source-table {
+  border-collapse:collapse;
+  width:100%;
+  font-size:11px;
+  margin:15px 0
+}
+.source-table td,.source-table th {
+  padding:9px 7px;
+  text-align:left;
+  border-bottom:1px solid var(--line);
+  vertical-align:top;
+  min-width:45px
+}
+.source-table th {
+  font-weight:600;
+  color:var(--green)
+}
+.source-table .en {
+  display:block;
+  color:var(--muted)
+}
+details {
+  margin-top:16px
+}
+summary {
+  cursor:pointer;
+  font-size:13px;
+  color:var(--green)
+}
+.toast {
+  position:fixed;
+  bottom:26px;
+  left:50%;
+  transform:translate(-50%,12px);
+  padding:11px 20px;
+  background:#243f33;
+  color:white;
+  border-radius:12px;
+  box-shadow:0 6px 30px #19342525;
+  max-width:calc(100% - 30px);
+  width:max-content;
+  text-align:center;
+  font-size:12px;
+  opacity:0;
+  transition:all .2s;
+  pointer-events:none;
+  z-index:20
+}
+.toast.visible {
+  opacity:1;
+  transform:translate(-50%,0)
+}
+.noscript {
+  padding:30px;
+  text-align:center
+}
+.notice-inline {
+  font-size:12px;
+  padding:12px 15px;
+  background:var(--orange-soft);
+  border-radius:9px;
+  color:#714d37;
+  margin:15px 0
+}
+.confirm-actions {
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:25px
+}
+
+@media(min-width:1400px) {
+  .site-shell {
+    max-width:1280px
+  }
+  .hero {
+    padding-top:75px;
+    padding-bottom:55px
+  }
+  .hero h1 {
+    font-size:56px
+  }
+}
+
+@media(max-width:900px) {
+  .site-shell {
+    padding:0 28px
+  }
+  .hero {
+    gap:20px;
+    padding-top:50px
+  }
+  .hero h1 {
+    font-size:41px
+  }
+  .atlas {
+    max-width:350px
+  }
+  .intro-grid {
+    gap:26px
+  }
+  .stat {
+    padding-left:20px;
+    gap:10px
+  }
+  .result-intro {
+    gap:25px
+  }
+  .result-summary-box {
+    padding-left:25px
+  }
+  .result-lower {
+    gap:16px
+  }
+}
+
+@media(max-width:650px) {
+  body {
+    font-size:14px
+  }
+  .site-shell {
+    padding:0 20px
+  }
+  .site-header {
+    height:80px
+  }
+  .brand {
+    font-size:21px;
+    gap:10px
+  }
+  .brand-en {
+    font-size:8px
+  }
+  .site-header nav {
+    gap:16px
+  }
+  .site-header .text-button {
+    font-size:11px
+  }
+  .hero {
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:22px;
+    padding:36px 0 30px
+  }
+  .hero h1 {
+    font-size:38px;
+    letter-spacing:-1.8px;
+    margin-top:15px;
+    margin-bottom:17px
+  }
+  .hero-copy {
+    font-size:13px;
+    margin-bottom:18px;
+    max-width:none
+  }
+  .instrument-label {
+    margin-bottom:19px;
+    font-size:10px
+  }
+  .hero .button.primary {
+    flex:1;
+    max-width:270px
+  }
+  .hero-settings {
+    margin-top:18px
+  }
+  .hero .atlas {
+    width:210px;
+    height:200px;
+    align-self:center;
+    order:-1;
+    margin-bottom:7px
+  }
+  .atlas-note {
+    font-size:9px
+  }
+  .atlas-grid {
+    gap:6px
+  }
+  .petal span {
+    font-size:22px
+  }
+  .petal:before {
+    inset:10px
+  }
+  .petal:after {
+    inset:20px
+  }
+  .atlas-center {
+    width:40px;
+    height:40px;
+    font-size:20px
+  }
+  .atlas-star {
+    font-size:18px
+  }
+  .stats-row {
+    padding:21px 0
+  }
+  .stat {
+    flex-direction:column;
+    gap:8px;
+    align-items:flex-start;
+    padding-left:14px
+  }
+  .stat-value {
+    font-size:26px
+  }
+  .stat-label {
+    font-size:11px
+  }
+  .stat-label span {
+    font-size:9px
+  }
+  .intro-grid {
+    grid-template-columns:1fr;
+    gap:25px;
+    margin-top:28px
+  }
+  .boundary-note {
+    padding:22px
+  }
+  .site-footer {
+    flex-direction:column;
+    gap:7px;
+    margin-top:35px;
+    padding:20px 0;
+    font-size:10px
+  }
+  .steps {
+    gap:7px;
+    margin:25px 0 27px;
+    font-size:10px
+  }
+  .step {
+    gap:4px
+  }
+  .step-line {
+    width:20px
+  }
+  .step i {
+    width:18px;
+    height:18px;
+    font-size:9px
+  }
+  .assessment-top {
+    font-size:11px
+  }
+  .assessment-top strong {
+    font-size:12px
+  }
+  .question-card {
+    padding:19px 16px 24px;
+    margin-top:18px;
+    border-radius:18px;
+    min-height:340px
+  }
+  .question-meta {
+    margin-bottom:22px;
+    gap:8px
+  }
+  .question-tools {
+    gap:12px
+  }
+  .question-tools button {
+    font-size:10px
+  }
+  .question-title {
+    font-size:17px
+  }
+  .question-help {
+    font-size:11px;
+    margin-bottom:28px
+  }
+  .poles {
+    gap:10px;
+    margin-bottom:23px
+  }
+  .pole {
+    font-size:17px;
+    line-height:1.65
+  }
+  .pole-en {
+    font-size:10px
+  }
+  .versus {
+    font-size:15px
+  }
+  .choices {
+    gap:6px
+  }
+  .choice {
+    border-radius:10px;
+    padding:14px 2px 10px;
+    gap:8px
+  }
+  .choice-text {
+    font-size:9px;
+    letter-spacing:-.3px;
+    white-space:nowrap
+  }
+  .choice-circle {
+    width:32px;
+    height:32px
+  }
+  .choice:nth-child(2) .choice-circle,.choice:nth-child(4) .choice-circle {
+    width:28px;
+    height:28px;
+    margin:2px
+  }
+  .choice:nth-child(3) .choice-circle {
+    width:22px;
+    height:22px;
+    margin:5px
+  }
+  .question-footnote {
+    font-size:10px;
+    margin-top:18px
+  }
+  .question-bottom {
+    flex-wrap:wrap;
+    margin-top:17px;
+    gap:15px
+  }
+  .question-bottom>.settings-line {
+    width:100%;
+    font-size:11px
+  }
+  .bottom-actions {
+    width:100%;
+    justify-content:space-between
+  }
+  .bottom-actions .button {
+    flex:1;
+    padding:11px 10px
+  }
+  .keyboard-hint {
+    display:none
+  }
+  .draft-line {
+    margin-top:15px;
+    font-size:10px
+  }
+  .review-header h1 {
+    font-size:28px
+  }
+  .review-header p {
+    font-size:12px
+  }
+  .review-toolbar {
+    flex-wrap:wrap
+  }
+  .filter-tabs {
+    width:100%;
+    justify-content:space-between
+  }
+  .filter-tabs button {
+    font-size:11px;
+    padding:7px 12px
+  }
+  .review-count {
+    margin-left:auto
+  }
+  .review-list {
+    grid-template-columns:1fr
+  }
+  .review-item {
+    padding:12px 14px;
+    min-height:74px
+  }
+  .review-sticky {
+    align-items:stretch;
+    flex-direction:column;
+    gap:10px;
+    padding-bottom:13px
+  }
+  .review-sticky .button {
+    width:100%
+  }
+  .review-sticky p {
+    text-align:center;
+    font-size:11px
+  }
+  .result-intro {
+    grid-template-columns:1fr;
+    gap:23px
+  }
+  .result-type {
+    justify-content:center;
+    gap:8px;
+    margin:22px 0
+  }
+  .result-profile {
+    text-align:center
+  }
+  .letter-tile {
+    width:65px;
+    height:81px;
+    font-size:43px
+  }
+  .result-subtitle {
+    font-size:22px
+  }
+  .result-summary-box {
+    border-left:0;
+    border-top:1px solid var(--line);
+    padding:22px 0 0
+  }
+  .result-facts {
+    justify-content:center
+  }
+  .dimension-grid {
+    grid-template-columns:1fr;
+    gap:12px
+  }
+  .dimension-card {
+    padding:22px
+  }
+  .interaction-grid {
+    grid-template-columns:1fr;
+    gap:12px
+  }
+  .reflection-panel {
+    padding-left:18px
+  }
+  .result-lower {
+    grid-template-columns:1fr
+  }
+  .panel {
+    padding:23px
+  }
+  .score-explainer {
+    font-size:10px;
+    margin-top:12px
+  }
+  .modal {
+    padding:20px 21px 25px;
+    border-radius:17px
+  }
+  .modal-top {
+    top:-20px
+  }
+  .modal h2 {
+    font-size:23px
+  }
+  .modal p,.modal li {
+    font-size:12px
+  }
+  .palette-grid {
+    gap:7px
+  }
+  .palette-grid button {
+    font-size:12px
+  }
+  .toast {
+    bottom:20px;
+    font-size:11px
+  }
+  .eyebrow {
+    font-size:10px
+  }
+  .review-sticky {
+    padding-bottom:max(13px,env(safe-area-inset-bottom))
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  *,*:before,*:after {
+    animation:none!important;
+    transition:none!important;
+    scroll-behavior:auto!important
+  }
+  .button:hover,.choice:hover,.choice:has(input:checked) {
+    transform:none
+  }
+}
+
+@media print {
+  .site-header nav,.actions,.steps,.result-bottom,.site-footer,.note-field,.note-privacy,.toast,.skip-link {
+    display:none!important
+  }
+  .site-shell {
+    padding:0
+  }
+  .site-header {
+    height:65px
+  }
+  body {
+    background:white
+  }
+  .view {
+    animation:none
+  }
+  .result-intro {
+    margin-top:25px
+  }
+  .dimension-card,.panel,.interaction-card,.caveat-panel {
+    break-inside:avoid
+  }
+  .result-lower {
+    display:block
+  }
+  .dimension-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr
+  }
+  .result-type {
+    justify-content:flex-start
+  }
+  .result-profile {
+    text-align:left
+  }
+  .result-intro {
+    grid-template-columns:1fr 1fr
+  }
+  .result-summary-box {
+    border-top:0;
+    padding-top:0
+  }
+  h2,h3 {
+    break-after:avoid
+  }
+}
 
 </style>
 </head>
@@ -31,7 +1927,8 @@
   <dialog id="infoDialog" class="modal"><div class="modal-top"><span class="eyebrow">SELF ATLAS / REFERENCE</span><button class="icon-button" id="closeDialog" aria-label="关闭对话框">×</button></div><div id="dialogContent"></div></dialog>
   <div id="toast" role="status" aria-live="polite" class="toast"></div>
   <noscript><p class="noscript">请启用 JavaScript 后使用此测评。页面计算在你的浏览器内完成。</p></noscript>
-  <script>window.QUESTION_BANK={"version":"OEJTS 1.2 · 中文试译 1.0","source":"https://openpsychometrics.org/tests/OJTS/development/OEJTS1.2.pdf","license":"CC BY-NC-SA 4.0 · https://creativecommons.org/licenses/by-nc-sa/4.0/ · Eric Jorgenson (2015) · 中文试译为本项目改编，未获独立心理测量验证","items":[{"id":1,"leftEn":"makes lists","rightEn":"relies on memory","leftZh":"列清单","rightZh":"依靠记忆"},{"id":2,"leftEn":"sceptical","rightEn":"wants to believe","leftZh":"心存怀疑","rightZh":"愿意相信"},{"id":3,"leftEn":"bored by time alone","rightEn":"needs time alone","leftZh":"独处时感到无聊","rightZh":"需要独处的时间"},{"id":4,"leftEn":"accepts things as they are","rightEn":"unsatisfied with the ways things are","leftZh":"接受事物的现状","rightZh":"对事物的现状感到不满"},{"id":5,"leftEn":"keeps a clean room","rightEn":"just puts stuff where ever","leftZh":"保持房间整洁","rightZh":"东西随手放置"},{"id":6,"leftEn":"thinks \"robotic\" is an insult","rightEn":"strives to have a mechanical mind","leftZh":"认为被说“像机器人”是一种冒犯","rightZh":"追求像机器般运作的思维"},{"id":7,"leftEn":"energetic","rightEn":"mellow","leftZh":"精力充沛","rightZh":"平和舒缓"},{"id":8,"leftEn":"prefer to take multiple choice test","rightEn":"prefer essay answers","leftZh":"偏好做选择题","rightZh":"偏好做论述题"},{"id":9,"leftEn":"chaotic","rightEn":"organized","leftZh":"杂乱无章","rightZh":"有条有理"},{"id":10,"leftEn":"easily hurt","rightEn":"thick-skinned","leftZh":"容易受到伤害","rightZh":"不容易被冒犯或伤害"},{"id":11,"leftEn":"works best in groups","rightEn":"works best alone","leftZh":"合作时表现最好","rightZh":"独自做事时表现最好"},{"id":12,"leftEn":"focused on the present","rightEn":"focused on the future","leftZh":"关注当下","rightZh":"关注未来"},{"id":13,"leftEn":"plans far ahead","rightEn":"plans at the last minute","leftZh":"早早做好计划","rightZh":"到最后一刻才做计划"},{"id":14,"leftEn":"wants people's respect","rightEn":"wants their love","leftZh":"希望得到他人的尊重","rightZh":"希望得到他人的喜爱"},{"id":15,"leftEn":"gets worn out by parties","rightEn":"gets fired up by parties","leftZh":"聚会让自己疲惫","rightZh":"聚会让自己振奋"},{"id":16,"leftEn":"fits in","rightEn":"stands out","leftZh":"融入群体","rightZh":"显得与众不同"},{"id":17,"leftEn":"keeps options open","rightEn":"commits","leftZh":"保留各种选择","rightZh":"作出决定并投入"},{"id":18,"leftEn":"wants to be good at fixing things","rightEn":"wants to be good at fixing people","leftZh":"希望擅长修理物品","rightZh":"希望擅长帮助人解决自身问题"},{"id":19,"leftEn":"talks more","rightEn":"listens more","leftZh":"说得更多","rightZh":"听得更多"},{"id":20,"leftEn":"when describing an event, will tell people what happened","rightEn":"when describing an event, will tell people what it meant","leftZh":"描述事件时，讲述发生了什么","rightZh":"描述事件时，讲述它意味着什么"},{"id":21,"leftEn":"gets work done right away","rightEn":"procrastinates","leftZh":"立即把事情做完","rightZh":"拖延着再做"},{"id":22,"leftEn":"follows the heart","rightEn":"follows the head","leftZh":"听从内心感受","rightZh":"听从理性思考"},{"id":23,"leftEn":"stays at home","rightEn":"goes out on the town","leftZh":"待在家里","rightZh":"外出娱乐"},{"id":24,"leftEn":"wants the big picture","rightEn":"wants the details","leftZh":"想了解整体情况","rightZh":"想了解具体细节"},{"id":25,"leftEn":"improvises","rightEn":"prepares","leftZh":"临场发挥","rightZh":"事先准备"},{"id":26,"leftEn":"bases morality on justice","rightEn":"bases morality on compassion","leftZh":"以公正为道德判断的基础","rightZh":"以同情关怀为道德判断的基础"},{"id":27,"leftEn":"finds it difficult to yell very loudly","rightEn":"yelling to others when they are far away comes naturally","leftZh":"觉得很难大声喊叫","rightZh":"向远处的人大声喊话很自然"},{"id":28,"leftEn":"theoretical","rightEn":"empirical","leftZh":"偏重理论","rightZh":"偏重实证经验"},{"id":29,"leftEn":"works hard","rightEn":"plays hard","leftZh":"努力工作","rightZh":"尽情玩乐"},{"id":30,"leftEn":"uncomfortable with emotions","rightEn":"values emotions","leftZh":"面对情绪感到不自在","rightZh":"重视情绪感受"},{"id":31,"leftEn":"likes to perform in front of other people","rightEn":"avoids public speaking","leftZh":"喜欢在他人面前表演","rightZh":"回避公开发言"},{"id":32,"leftEn":"likes to know \"who?\", \"what?\", \"when?\"","rightEn":"likes to know \"why?\"","leftZh":"喜欢了解“谁、什么、何时”","rightZh":"喜欢了解“为什么”"}],"translationNotes":[{"id":2,"note":"wants to believe 含有希望相信的意愿，译为“愿意相信”；不是对诚实、智力或轻信程度的道德评价。"},{"id":6,"note":"robotic 与 mechanical mind 带有评价色彩且难直译；保留“机器人/机器般运作”的原始比喻，不额外加入“理性更优”等价值判断。"},{"id":7,"note":"mellow 可含平和、柔和、放松等意思，“平和舒缓”只是近似表达，并不表示精力不足。"},{"id":10,"note":"thick-skinned 直译“脸皮厚”在中文带较强贬义；译为“不容易被冒犯或伤害”，含义接近但语义未验证。"},{"id":16,"note":"fits in / stands out 受到文化与环境影响；译文保留“融入群体/与众不同”，不将其中任一侧解释为优劣。"},{"id":18,"note":"fixing people 字面为“修复人”，此处译为“帮助人解决自身问题”；没有暗示他人有缺陷，且文化语义可能不完全等同。"},{"id":23,"note":"goes out on the town 偏向外出娱乐，原题可能受到行动条件、生活阶段和文化影响。"},{"id":26,"note":"justice 与 compassion 分别译为“公正”和“同情关怀”；二者并非现实生活中必然对立的道德品质。"},{"id":27,"note":"大声喊话也可能受到身体、语言、场景或文化条件影响；不应单凭此题推断人格。"},{"id":29,"note":"works hard / plays hard 是原题提供的对照，译为“努力工作/尽情玩乐”；现实中两者可以并存，不据此推断勤奋或品德。"},{"id":31,"note":"表演与公开发言并非完全对称的活动，中文保留原文这一差异，不自行改成同义反向题。"},{"id":null,"note":"所有中文题目均为项目试译；未完成专业回译、跨文化等值检验或中文常模验证。原题与五点作答格式保留用于核对，不将译文称为官方中文版。"}]};</script>
+  <script>window.APP_CONFIG={"appVersion":"1.2.0","storageSchemaVersion":2,"translationVersion":"1.0"};</script>
+  <script>window.QUESTION_BANK={"instrument":"Open Extended Jungian Type Scales","version":"1.2","author":"Eric Jorgenson","published":"2015-03-03","sourceUrl":"https://openpsychometrics.org/tests/OJTS/development/OEJTS1.2.pdf","developmentUrl":"https://openpsychometrics.org/tests/OJTS/development/","retrieved":"2026-10-15","license":"CC BY-NC-SA 4.0","licenseUrl":"https://creativecommons.org/licenses/by-nc-sa/4.0/","adaptation":"中文译文为本项目翻译，未经独立跨文化或心理测量验证；英文与原 PDF 一一对应。OEJTS 并非官方 MBTI，也不隶属于其发行方。","translationVersion":"1.0","itemCount":32,"responseScale":{"min":1,"max":5,"midpoint":3,"direction":"1 最接近左侧，5 最接近右侧，3 两侧大致相当。没有正确或错误答案。"},"scales":{"IE":{"constant":30,"low":"I","high":"E"},"SN":{"constant":12,"low":"S","high":"N"},"FT":{"constant":30,"low":"F","high":"T"},"JP":{"constant":18,"low":"J","high":"P"}},"scoring":{"min":8,"max":40,"threshold":24,"highWhen":"score > 24","originalTieRule":"score == 24 时，原 PDF 分别归为 I、S、F、J。临界结果不等于已确定偏好。","displayPositionMeaning":"仅为量表位置，不是概率、百分位、准确率或人格强度。"},"items":[{"id":1,"leftEn":"makes lists","rightEn":"relies on memory","leftZh":"列清单","rightZh":"依靠记忆","scale":"JP","coefficient":1},{"id":2,"leftEn":"sceptical","rightEn":"wants to believe","leftZh":"心存怀疑","rightZh":"愿意相信","scale":"FT","coefficient":-1},{"id":3,"leftEn":"bored by time alone","rightEn":"needs time alone","leftZh":"独处时感到无聊","rightZh":"需要独处的时间","scale":"IE","coefficient":-1},{"id":4,"leftEn":"accepts things as they are","rightEn":"unsatisfied with the ways things are","leftZh":"接受事物的现状","rightZh":"对事物的现状感到不满","scale":"SN","coefficient":1},{"id":5,"leftEn":"keeps a clean room","rightEn":"just puts stuff where ever","leftZh":"保持房间整洁","rightZh":"东西随手放置","scale":"JP","coefficient":1},{"id":6,"leftEn":"thinks \"robotic\" is an insult","rightEn":"strives to have a mechanical mind","leftZh":"认为被说“像机器人”是一种冒犯","rightZh":"追求像机器般运作的思维","scale":"FT","coefficient":1},{"id":7,"leftEn":"energetic","rightEn":"mellow","leftZh":"精力充沛","rightZh":"平和舒缓","scale":"IE","coefficient":-1},{"id":8,"leftEn":"prefer to take multiple choice test","rightEn":"prefer essay answers","leftZh":"偏好做选择题","rightZh":"偏好做论述题","scale":"SN","coefficient":1},{"id":9,"leftEn":"chaotic","rightEn":"organized","leftZh":"杂乱无章","rightZh":"有条有理","scale":"JP","coefficient":-1},{"id":10,"leftEn":"easily hurt","rightEn":"thick-skinned","leftZh":"容易受到伤害","rightZh":"不容易被冒犯或伤害","scale":"FT","coefficient":1},{"id":11,"leftEn":"works best in groups","rightEn":"works best alone","leftZh":"合作时表现最好","rightZh":"独自做事时表现最好","scale":"IE","coefficient":-1},{"id":12,"leftEn":"focused on the present","rightEn":"focused on the future","leftZh":"关注当下","rightZh":"关注未来","scale":"SN","coefficient":1},{"id":13,"leftEn":"plans far ahead","rightEn":"plans at the last minute","leftZh":"早早做好计划","rightZh":"到最后一刻才做计划","scale":"JP","coefficient":1},{"id":14,"leftEn":"wants people's respect","rightEn":"wants their love","leftZh":"希望得到他人的尊重","rightZh":"希望得到他人的喜爱","scale":"FT","coefficient":-1},{"id":15,"leftEn":"gets worn out by parties","rightEn":"gets fired up by parties","leftZh":"聚会让自己疲惫","rightZh":"聚会让自己振奋","scale":"IE","coefficient":1},{"id":16,"leftEn":"fits in","rightEn":"stands out","leftZh":"融入群体","rightZh":"显得与众不同","scale":"SN","coefficient":1},{"id":17,"leftEn":"keeps options open","rightEn":"commits","leftZh":"保留各种选择","rightZh":"作出决定并投入","scale":"JP","coefficient":-1},{"id":18,"leftEn":"wants to be good at fixing things","rightEn":"wants to be good at fixing people","leftZh":"希望擅长修理物品","rightZh":"希望擅长帮助人解决自身问题","scale":"FT","coefficient":-1},{"id":19,"leftEn":"talks more","rightEn":"listens more","leftZh":"说得更多","rightZh":"听得更多","scale":"IE","coefficient":-1},{"id":20,"leftEn":"when describing an event, will tell people what happened","rightEn":"when describing an event, will tell people what it meant","leftZh":"描述事件时，讲述发生了什么","rightZh":"描述事件时，讲述它意味着什么","scale":"SN","coefficient":1},{"id":21,"leftEn":"gets work done right away","rightEn":"procrastinates","leftZh":"立即把事情做完","rightZh":"拖延着再做","scale":"JP","coefficient":1},{"id":22,"leftEn":"follows the heart","rightEn":"follows the head","leftZh":"听从内心感受","rightZh":"听从理性思考","scale":"FT","coefficient":1},{"id":23,"leftEn":"stays at home","rightEn":"goes out on the town","leftZh":"待在家里","rightZh":"外出娱乐","scale":"IE","coefficient":1},{"id":24,"leftEn":"wants the big picture","rightEn":"wants the details","leftZh":"想了解整体情况","rightZh":"想了解具体细节","scale":"SN","coefficient":-1},{"id":25,"leftEn":"improvises","rightEn":"prepares","leftZh":"临场发挥","rightZh":"事先准备","scale":"JP","coefficient":-1},{"id":26,"leftEn":"bases morality on justice","rightEn":"bases morality on compassion","leftZh":"以公正为道德判断的基础","rightZh":"以同情关怀为道德判断的基础","scale":"FT","coefficient":-1},{"id":27,"leftEn":"finds it difficult to yell very loudly","rightEn":"yelling to others when they are far away comes naturally","leftZh":"觉得很难大声喊叫","rightZh":"向远处的人大声喊话很自然","scale":"IE","coefficient":1},{"id":28,"leftEn":"theoretical","rightEn":"empirical","leftZh":"偏重理论","rightZh":"偏重实证经验","scale":"SN","coefficient":-1},{"id":29,"leftEn":"works hard","rightEn":"plays hard","leftZh":"努力工作","rightZh":"尽情玩乐","scale":"JP","coefficient":1},{"id":30,"leftEn":"uncomfortable with emotions","rightEn":"values emotions","leftZh":"面对情绪感到不自在","rightZh":"重视情绪感受","scale":"FT","coefficient":-1},{"id":31,"leftEn":"likes to perform in front of other people","rightEn":"avoids public speaking","leftZh":"喜欢在他人面前表演","rightZh":"回避公开发言","scale":"IE","coefficient":-1},{"id":32,"leftEn":"likes to know \"who?\", \"what?\", \"when?\"","rightEn":"likes to know \"why?\"","leftZh":"喜欢了解“谁、什么、何时”","rightZh":"喜欢了解“为什么”","scale":"SN","coefficient":1}],"translationNotes":[{"id":2,"note":"wants to believe 含有希望相信的意愿，译为“愿意相信”；不是对诚实、智力或轻信程度的道德评价。"},{"id":6,"note":"robotic 与 mechanical mind 带有评价色彩且难直译；保留“机器人/机器般运作”的原始比喻，不额外加入“理性更优”等价值判断。"},{"id":7,"note":"mellow 可含平和、柔和、放松等意思，“平和舒缓”只是近似表达，并不表示精力不足。"},{"id":10,"note":"thick-skinned 直译“脸皮厚”在中文带较强贬义；译为“不容易被冒犯或伤害”，含义接近但语义未验证。"},{"id":16,"note":"fits in / stands out 受到文化与环境影响；译文保留“融入群体/与众不同”，不将其中任一侧解释为优劣。"},{"id":18,"note":"fixing people 字面为“修复人”，此处译为“帮助人解决自身问题”；没有暗示他人有缺陷，且文化语义可能不完全等同。"},{"id":23,"note":"goes out on the town 偏向外出娱乐，原题可能受到行动条件、生活阶段和文化影响。"},{"id":26,"note":"justice 与 compassion 分别译为“公正”和“同情关怀”；二者并非现实生活中必然对立的道德品质。"},{"id":27,"note":"大声喊话也可能受到身体、语言、场景或文化条件影响；不应单凭此题推断人格。"},{"id":29,"note":"works hard / plays hard 是原题提供的对照，译为“努力工作/尽情玩乐”；现实中两者可以并存，不据此推断勤奋或品德。"},{"id":31,"note":"表演与公开发言并非完全对称的活动，中文保留原文这一差异，不自行改成同义反向题。"},{"id":null,"note":"所有中文题目均为项目试译；未完成专业回译、跨文化等值检验或中文常模验证。原题与五点作答格式保留用于核对，不将译文称为官方中文版。"}]};</script>
   <script>
 /*
  * Open Extended Jungian Type Scales, version 1.2 (OEJTS1.2).
@@ -42,37 +1939,116 @@
 (function (root, factory) {
   "use strict";
   if (typeof module === "object" && module.exports) {
-    module.exports = factory();
+    module.exports = factory(require("../sources/oejts-1.2.json"));
   } else {
-    root.MBTICore = factory();
+    root.MBTICore = factory(root.QUESTION_BANK);
   }
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (bank) {
   "use strict";
 
-  var SOURCE = "https://openpsychometrics.org/tests/OJTS/development/OEJTS1.2.pdf";
-  var VERSION = "OEJTS1.2";
-  var FORMULAS = Object.freeze({
-    IE: "30-Q3-Q7-Q11+Q15-Q19+Q23+Q27-Q31",
-    SN: "12+Q4+Q8+Q12+Q16+Q20-Q24-Q28+Q32",
-    FT: "30-Q2+Q6+Q10-Q14-Q18+Q22-Q26-Q30",
-    JP: "18+Q1+Q5-Q9+Q13-Q17+Q21-Q25+Q29"
+  var SCALE_KEYS = ["IE", "SN", "FT", "JP"];
+  // Display convention only: answers whose scale position falls in this band are
+  // shown as X. It is not a confidence interval or a probability.
+  var REVIEW_ZONE = Object.freeze({ minPercent: 45, maxPercent: 55 });
+
+  function formulaFor(data, key) {
+    return String(data.scales[key].constant) + data.items.filter(function (item) {
+      return item.scale === key;
+    }).map(function (item) {
+      return (item.coefficient === 1 ? "+Q" : "-Q") + item.id;
+    }).join("");
+  }
+
+  // The same validation runs in the browser, Node, and the build. Item directions
+  // are stored only on the items; formulas and arithmetic are derived from them.
+  function validateQuestionBank(data) {
+    function fail(message) { throw new TypeError("Invalid questionnaire: " + message); }
+    function nonempty(value) { return typeof value === "string" && value.trim().length > 0; }
+    if (!data || typeof data !== "object") fail("missing question bank");
+    ["instrument", "version", "sourceUrl", "license", "licenseUrl", "adaptation"].forEach(function (field) {
+      if (!nonempty(data[field])) fail("missing " + field);
+    });
+    if (typeof data.translationVersion !== "string" || !/^\d+\.\d+(?:\.\d+)?$/.test(data.translationVersion)) fail("invalid translationVersion");
+    if (data.itemCount !== 32 || !Array.isArray(data.items) || data.items.length !== data.itemCount) fail("expected 32 items");
+    if (!data.scales || Object.keys(data.scales).join(",") !== SCALE_KEYS.join(",")) fail("expected IE, SN, FT, JP scale order");
+    var response = data.responseScale;
+    var scoring = data.scoring;
+    if (!response || response.min !== 1 || response.max !== 5 || response.midpoint !== 3) fail("expected the original 1–5 response scale");
+    if (!scoring || scoring.min !== 8 || scoring.max !== 40 || scoring.threshold !== 24) fail("expected OEJTS 1.2 scoring bounds 8/40/24");
+    if (scoring.highWhen !== undefined && scoring.highWhen !== "score > " + scoring.threshold) fail("inconsistent highWhen");
+    data.items.forEach(function (item, index) {
+      if (!item || item.id !== index + 1) fail("invalid item order at Q" + (index + 1));
+      ["leftEn", "rightEn", "leftZh", "rightZh"].forEach(function (field) {
+        if (!nonempty(item[field])) fail("Q" + item.id + " is missing " + field);
+      });
+      if (SCALE_KEYS.indexOf(item.scale) < 0) fail("Q" + item.id + " has an invalid scale");
+      if (item.coefficient !== -1 && item.coefficient !== 1) fail("Q" + item.id + " has an invalid coefficient");
+    });
+    SCALE_KEYS.forEach(function (key) {
+      var scale = data.scales[key];
+      if (!scale || !Number.isInteger(scale.constant) || scale.low !== key[0] || scale.high !== key[1]) fail("invalid " + key + " metadata");
+      var terms = data.items.filter(function (item) { return item.scale === key; });
+      if (terms.length !== 8) fail(key + " must contain exactly eight items");
+      var minimum = scale.constant;
+      var maximum = scale.constant;
+      var midpoint = scale.constant;
+      terms.forEach(function (item) {
+        minimum += item.coefficient * (item.coefficient === 1 ? response.min : response.max);
+        maximum += item.coefficient * (item.coefficient === 1 ? response.max : response.min);
+        midpoint += item.coefficient * response.midpoint;
+      });
+      if (minimum !== scoring.min || maximum !== scoring.max || midpoint !== scoring.threshold) fail("inconsistent " + key + " constant or bounds");
+      // If legacy reference metadata is supplied, it must agree with the item key.
+      if (scale.formula !== undefined && (typeof scale.formula !== "string" || scale.formula.replace(/\s/g, "") !== formulaFor(data, key))) fail("inconsistent " + key + " formula");
+      [["positive", 1], ["negative", -1]].forEach(function (entry) {
+        var listed = scale[entry[0]];
+        if (listed === undefined) return;
+        var expected = terms.filter(function (item) { return item.coefficient === entry[1]; }).map(function (item) { return item.id; });
+        if (!Array.isArray(listed) || listed.some(function (id) { return !Number.isInteger(id); }) ||
+            listed.slice().sort(function (a, b) { return a - b; }).join(",") !== expected.join(",")) fail("inconsistent " + key + " " + entry[0] + " items");
+      });
+    });
+    if (!Array.isArray(data.translationNotes) || data.translationNotes.length === 0) fail("translationNotes must be a non-empty array");
+    var noteIds = [];
+    data.translationNotes.forEach(function (note) {
+      if (!note || (note.id !== null && (!Number.isInteger(note.id) || note.id < 1 || note.id > data.itemCount)) || !nonempty(note.note)) fail("invalid translation note");
+      if (noteIds.indexOf(note.id) !== -1) fail("duplicate translation note");
+      noteIds.push(note.id);
+    });
+    return true;
+  }
+
+  validateQuestionBank(bank);
+  var SOURCE = bank.sourceUrl;
+  var VERSION = "OEJTS" + bank.version;
+  var ITEM_COUNT = bank.itemCount;
+  var RESPONSE_MIN = bank.responseScale.min;
+  var RESPONSE_MAX = bank.responseScale.max;
+  var SCORE_MIN = bank.scoring.min;
+  var SCORE_MAX = bank.scoring.max;
+  var THRESHOLD = bank.scoring.threshold;
+  var formulas = {};
+  var SCALES = SCALE_KEYS.map(function (key) {
+    var scale = bank.scales[key];
+    formulas[key] = formulaFor(bank, key);
+    return {
+      key: key, low: scale.low, high: scale.high, constant: scale.constant,
+      terms: bank.items.filter(function (item) { return item.scale === key; }).map(function (item) {
+        return { index: item.id - 1, coefficient: item.coefficient };
+      })
+    };
   });
-  var SCALES = [
-    { key: "IE", low: "I", high: "E" },
-    { key: "SN", low: "S", high: "N" },
-    { key: "FT", low: "F", high: "T" },
-    { key: "JP", low: "J", high: "P" }
-  ];
+  var FORMULAS = Object.freeze(formulas);
 
   // A partial response is still a dense, 32-entry array; only null means unanswered.
   // Do not use Array#every here: it skips holes in a sparse array.
   function validateAnswers(answers, complete) {
-    if (!Array.isArray(answers) || answers.length !== 32) return false;
-    for (var i = 0; i < 32; i += 1) {
+    if (!Array.isArray(answers) || answers.length !== ITEM_COUNT) return false;
+    for (var i = 0; i < ITEM_COUNT; i += 1) {
       if (!Object.prototype.hasOwnProperty.call(answers, i)) return false;
       var value = answers[i];
       if (value === null && !complete) continue;
-      if (!Number.isInteger(value) || value < 1 || value > 5) return false;
+      if (!Number.isInteger(value) || value < RESPONSE_MIN || value > RESPONSE_MAX) return false;
     }
     return true;
   }
@@ -81,35 +2057,28 @@
     if (!validateAnswers(answers, true)) {
       throw new TypeError("Expected a complete, dense array of 32 integer answers from 1 to 5.");
     }
-    // Q uses the source's one-based item numbers to keep transcription reviewable.
-    function Q(number) { return answers[number - 1]; }
-    var rawScores = [
-      30 - Q(3) - Q(7) - Q(11) + Q(15) - Q(19) + Q(23) + Q(27) - Q(31),
-      12 + Q(4) + Q(8) + Q(12) + Q(16) + Q(20) - Q(24) - Q(28) + Q(32),
-      30 - Q(2) + Q(6) + Q(10) - Q(14) - Q(18) + Q(22) - Q(26) - Q(30),
-      18 + Q(1) + Q(5) - Q(9) + Q(13) - Q(17) + Q(21) - Q(25) + Q(29)
-    ];
-    var dimensions = SCALES.map(function (scale, index) {
-      var raw = rawScores[index];
-      var distance = Math.abs(raw - 24);
+    var dimensions = SCALES.map(function (scale) {
+      var raw = scale.terms.reduce(function (sum, term) { return sum + term.coefficient * answers[term.index]; }, scale.constant);
+      var distance = Math.abs(raw - THRESHOLD);
+      // Graph coordinate only; never a likelihood, percentile, or accuracy estimate.
+      var position = (raw - SCORE_MIN) / (SCORE_MAX - SCORE_MIN) * 100;
       return {
         key: scale.key,
         low: scale.low,
         high: scale.high,
         score: raw,
-        letter: raw === 24 ? "X" : (raw < 24 ? scale.low : scale.high),
+        letter: raw === THRESHOLD ? "X" : (raw < THRESHOLD ? scale.low : scale.high),
         distance: distance,
-        // This ±2 review zone is a page convention, not a validated confidence interval.
-        borderline: distance <= 2,
-        // Graph coordinate only; never a likelihood, percentile, or accuracy estimate.
-        position: (raw - 8) / 32 * 100
+        // 45%–55% of the 8–40 scale is the page's review band (23–25 points).
+        borderline: position >= REVIEW_ZONE.minPercent && position <= REVIEW_ZONE.maxPercent,
+        position: position
       };
     });
     return {
       dimensions: dimensions,
       // Preserve the original PDF's tie convention separately from the cautious display.
       originalType: dimensions.map(function (dimension) {
-        return dimension.score > 24 ? dimension.high : dimension.low;
+        return dimension.score > THRESHOLD ? dimension.high : dimension.low;
       }).join(""),
       type: dimensions.map(function (dimension) { return dimension.letter; }).join(""),
       cautiousType: dimensions.map(function (dimension) {
@@ -140,9 +2109,256 @@
     SOURCE: SOURCE,
     VERSION: VERSION,
     FORMULAS: FORMULAS,
+    REVIEW_ZONE: REVIEW_ZONE,
+    validateQuestionBank: validateQuestionBank,
     validateAnswers: validateAnswers,
     score: score,
     candidates: candidates
+  });
+});
+
+</script>
+  <script>
+/*
+ * Local, deterministic interpretation rules for the OEJTS 1.2 result page.
+ * These texts are explanatory prompts, not a diagnosis, a probability, or a
+ * validated type description.
+ */
+(function (root, factory) {
+  "use strict";
+  if (typeof module === "object" && module.exports) {
+    module.exports = factory();
+  } else {
+    root.MBTIInterpretation = factory();
+  }
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  "use strict";
+
+  var DIMENSIONS = Object.freeze({
+    IE: Object.freeze({
+      name: "与外界的互动", low: "I", high: "E", lowLabel: "内向", highLabel: "外向",
+      lowText: "本次回答偏向独处、倾听和独立活动。可以结合社交后自己的实际感受来理解。",
+      highText: "本次回答偏向交流、群体活动和向外表达。可以结合不同社交场景来理解。",
+      balancedText: "在独处与交往之间，你可能更看场景和当天状态。可以回想：哪些活动结束后让你更有能量？",
+      prompt: "与人相处之后，你通常想继续交流，还是需要一段独处？"
+    }),
+    SN: Object.freeze({
+      name: "关注信息的方式", low: "S", high: "N", lowLabel: "实感", highLabel: "直觉",
+      lowText: "本次回答偏向具体事实、细节和已有经验。并不意味着缺乏想象力。",
+      highText: "本次回答偏向可能性、整体含义和理论。并不意味着忽视现实。",
+      balancedText: "你可能在具体细节与整体可能性之间来回切换。可以留意：新任务里你先抓住的是事实，还是方向？",
+      prompt: "学习新事物时，你更自然地从具体实例入手，还是先寻找整体规律？"
+    }),
+    FT: Object.freeze({
+      name: "判断时的侧重", low: "F", high: "T", lowLabel: "情感", highLabel: "思考",
+      lowText: "本次回答偏向感受、关怀和人际考虑。并不意味着不善于逻辑思考。",
+      highText: "本次回答偏向理性分析、公正和一致的标准。并不意味着缺少共情。",
+      balancedText: "做判断时，你可能同时考虑感受与原则，比例取决于事情本身。可以回想一次两难决定。",
+      prompt: "遇到有争议的决定时，你最先想到的理由是什么？请举一个真实例子。"
+    }),
+    JP: Object.freeze({
+      name: "安排生活的方式", low: "J", high: "P", lowLabel: "判断", highLabel: "知觉",
+      lowText: "本次回答偏向计划、准备和明确安排。并不等同于更自律或更优秀。",
+      highText: "本次回答偏向灵活、临场调整和保留选择。并不等同于没有责任心。",
+      balancedText: "你可能既享受计划，也需要留出调整空间。可以留意：什么样的安排让你最安心？",
+      prompt: "没有外部期限要求时，你通常提前定好安排，还是保留调整空间？"
+    })
+  });
+
+  var ORDER = Object.freeze(["IE", "SN", "FT", "JP"]);
+
+  var STRENGTHS = Object.freeze({
+    balanced: Object.freeze({ label: "中间带", text: "两侧得分接近，单次回答不足以判定方向。" }),
+    slight: Object.freeze({ label: "轻微", text: "有一点倾向，但还很灵活，换一个场景可能就会不同。" }),
+    clear: Object.freeze({ label: "明显", text: "倾向比较清楚，通常能在多个场景中感觉到。" }),
+    strong: Object.freeze({ label: "很强", text: "倾向很强，但它描述的是偏好，不是能力或固定标签。" })
+  });
+
+  var INTERACTION_PAIRS = Object.freeze([
+    Object.freeze({
+      keys: Object.freeze(["SN", "FT"]),
+      title: "信息与判断：你怎样把观察变成决定",
+      texts: Object.freeze({
+        "low,low": "你更容易先接住具体事实与人的感受，再作决定。优势是贴近现场；压力下可能忽略长期模式或一致标准。",
+        "low,high": "你倾向于依据具体证据和一致标准判断。优势是可检验；压力下可能低估情绪与人际成本。",
+        "high,low": "你倾向于先看可能性与人的处境，再作决定。优势是看见潜力；压力下可能忽略执行细节。",
+        "high,high": "你倾向于从整体模式与原则出发判断。优势是抓住结构；压力下可能离具体经验太远。"
+      })
+    }),
+    Object.freeze({
+      keys: Object.freeze(["IE", "JP"]),
+      title: "能量与节奏：你怎样安排一天",
+      texts: Object.freeze({
+        "low,low": "你常先在心里想清楚，再按计划推进。留出独处和准备时间，通常能发挥得更好。",
+        "low,high": "你偏好保留空间、按状态调整，同时需要独处恢复。完全排满的日程可能让你疲惫。",
+        "high,low": "你从互动中获得能量，也喜欢把安排定下来。注意给自己留一点不被打断的缓冲。",
+        "high,high": "你在交流与变化中比较自在，计划更像起点而非约束。需要交付时，外部节点会有帮助。"
+      })
+    }),
+    Object.freeze({
+      keys: Object.freeze(["IE", "FT"]),
+      title: "关系中的关心方式",
+      texts: Object.freeze({
+        "low,low": "你常以安静、具体的方式关心别人，未必直接说出来。对方不一定能自动读懂。",
+        "low,high": "你更习惯用分析或解决问题来表达关心，可能需要说明“我在意你”本身。",
+        "high,low": "你容易在交流中直接回应情绪，也承担较多关系里的情绪劳动。记得区分哪些是自己的责任。",
+        "high,high": "你会把关心放进讨论与建议里。先确认对方需要倾听还是方案，会更贴合。"
+      })
+    })
+  ]);
+
+  var GENERIC_QUESTIONS = Object.freeze([
+    "回想最近一周：哪些场景让你觉得自己更像左边，哪些更像右边？",
+    "在压力很大或很放松时，你的表现会和这次回答不同吗？",
+    "有没有一个你欣赏的人，他的偏好与你相反？你如何看待这种差异？"
+  ]);
+
+  var CAVEATS = Object.freeze([
+    "以上文字由页面内置的固定规则根据分数生成，不是 AI 推断，也不是心理诊断或能力评价。",
+    "刻度位置是原始分在 8–40 量表上的线性位置，不是人群百分位、准确率或成为某类型的概率。",
+    "中文题目为未经心理测量验证的试译；X 只表示 45%–55% 中间带，不表示“混合类型”，也不表示人格无法判断。"
+  ]);
+
+  function fail(message) { throw new TypeError("Invalid scoring result: " + message); }
+
+  function validate(scoreResult) {
+    if (!scoreResult || typeof scoreResult !== "object" || !Array.isArray(scoreResult.dimensions)) fail("missing dimensions");
+    if (scoreResult.dimensions.length !== ORDER.length) fail("expected four dimensions");
+    scoreResult.dimensions.forEach(function (dimension, index) {
+      var key = ORDER[index];
+      if (!dimension || dimension.key !== key) fail("unexpected dimension order");
+      if (!Number.isInteger(dimension.score) || dimension.score < 8 || dimension.score > 40) fail("invalid score for " + key);
+      if (typeof dimension.position !== "number" || !Number.isFinite(dimension.position)) fail("invalid position for " + key);
+      if (typeof dimension.distance !== "number" || !Number.isFinite(dimension.distance)) fail("invalid distance for " + key);
+      if (typeof dimension.borderline !== "boolean") fail("invalid borderline flag for " + key);
+    });
+    if (typeof scoreResult.cautiousType !== "string" || !/^[IXE][SXN][FXT][JXP]$/.test(scoreResult.cautiousType)) fail("invalid cautiousType");
+    if (typeof scoreResult.originalType !== "string" || !/^[IE][SN][FT][JP]$/.test(scoreResult.originalType)) fail("invalid originalType");
+  }
+
+  function sideOf(dimension) {
+    return dimension.borderline ? "balanced" : dimension.score > 24 ? "high" : "low";
+  }
+
+  function strengthOf(dimension) {
+    if (dimension.borderline) return "balanced";
+    if (dimension.distance <= 4) return "slight";
+    if (dimension.distance <= 9) return "clear";
+    return "strong";
+  }
+
+  function directionLabel(key, side) {
+    var meta = DIMENSIONS[key];
+    if (side === "balanced") return "中间带";
+    return side === "low" ? meta.low + " · " + meta.lowLabel : meta.high + " · " + meta.highLabel;
+  }
+
+  function interpretationText(key, side, strength) {
+    var meta = DIMENSIONS[key];
+    if (side === "balanced") return meta.balancedText;
+    var base = side === "low" ? meta.lowText : meta.highText;
+    return base + " " + STRENGTHS[strength].text;
+  }
+
+  function scoreLine(dimension) {
+    var line = "原始分 " + dimension.score + " / 40 · 刻度位置 " + dimension.position.toFixed(1) + "%";
+    return dimension.borderline ? line + " · 中间带 45%–55%" : line;
+  }
+
+  function buildSummary(result, dimensions, balancedCount, candidateCount) {
+    var resolvedCount = dimensions.length - balancedCount;
+    var summary = [];
+    if (balancedCount === 0) {
+      summary.push("四个维度都位于 45%–55% 的中间带之外，因此本次回答可以读作 " + result.cautiousType + "。这只是此刻的偏好轮廓，不是固定人格。");
+    } else if (resolvedCount === 0) {
+      summary.push("四个维度都落在 45%–55% 的中间带内，因此本次回答没有足够依据判定任何一侧。");
+    } else {
+      summary.push(resolvedCount + " 个维度有较明确方向，" + balancedCount + " 个位于 45%–55% 中间带，暂时用 X 表示。");
+    }
+    var counts = { strong: 0, clear: 0, slight: 0 };
+    dimensions.forEach(function (dimension) { if (dimension.strength !== "balanced") counts[dimension.strength] += 1; });
+    if (resolvedCount > 0) {
+      var parts = [];
+      if (counts.strong) parts.push(counts.strong + " 个很强");
+      if (counts.clear) parts.push(counts.clear + " 个明显");
+      if (counts.slight) parts.push(counts.slight + " 个轻微");
+      summary.push("在已有方向的维度中，" + parts.join("、") + "。强度只描述这次回答偏离中点的幅度，不代表能力高低。");
+    }
+    if (balancedCount > 0) {
+      summary.push("若把每个中间带的两种方向都算上，会展开为 " + candidateCount + " 种四字母组合；这里不排序、不预测，也不把它们当作可能性评分。");
+    }
+    summary.push("原量表在恰好 24 分时归入低侧字母；本页把 23–25 分都视为中间带，并保留原规则结果 " + result.originalType + " 供对照。");
+    return summary;
+  }
+
+  function buildInteractions(dimensionsByKey) {
+    var interactions = [];
+    INTERACTION_PAIRS.forEach(function (pair) {
+      if (interactions.length >= 2) return;
+      var first = dimensionsByKey[pair.keys[0]];
+      var second = dimensionsByKey[pair.keys[1]];
+      if (first.side === "balanced" || second.side === "balanced") return;
+      interactions.push({ title: pair.title, text: pair.texts[first.side + "," + second.side] });
+    });
+    return interactions;
+  }
+
+  function buildReflection(scoreResult, dimensions) {
+    var sourceDistance = {};
+    scoreResult.dimensions.forEach(function (dimension) { sourceDistance[dimension.key] = dimension.distance; });
+    var questions = [];
+    function add(question) {
+      if (questions.length < 3 && questions.indexOf(question) === -1) questions.push(question);
+    }
+    dimensions.forEach(function (dimension) { if (dimension.side === "balanced") add(DIMENSIONS[dimension.key].prompt); });
+    dimensions.slice().sort(function (a, b) {
+      return sourceDistance[a.key] - sourceDistance[b.key];
+    }).forEach(function (dimension) {
+      if (dimension.side !== "balanced") add(DIMENSIONS[dimension.key].prompt);
+    });
+    GENERIC_QUESTIONS.forEach(add);
+    return questions;
+  }
+
+  function interpret(scoreResult) {
+    validate(scoreResult);
+    var dimensionsByKey = {};
+    var dimensions = scoreResult.dimensions.map(function (dimension) {
+      var side = sideOf(dimension);
+      var strength = strengthOf(dimension);
+      var item = {
+        key: dimension.key,
+        name: DIMENSIONS[dimension.key].name,
+        side: side,
+        directionLabel: directionLabel(dimension.key, side),
+        strength: strength,
+        strengthLabel: STRENGTHS[strength].label,
+        text: interpretationText(dimension.key, side, strength),
+        scoreLine: scoreLine(dimension)
+      };
+      dimensionsByKey[dimension.key] = item;
+      return item;
+    });
+    var balancedCount = dimensions.filter(function (dimension) { return dimension.side === "balanced"; }).length;
+    var candidateCount = Math.pow(2, balancedCount);
+    var interactions = buildInteractions(dimensionsByKey);
+    var headline = balancedCount === 0
+      ? "你的回答整体偏向 " + scoreResult.cautiousType
+      : "你的回答目前呈现为 " + scoreResult.cautiousType;
+    return Object.freeze({
+      headline: headline,
+      summary: Object.freeze(buildSummary(scoreResult, dimensions, balancedCount, candidateCount)),
+      dimensions: Object.freeze(dimensions),
+      interactions: Object.freeze(interactions),
+      reflection: Object.freeze(buildReflection(scoreResult, dimensions)),
+      caveats: CAVEATS,
+      candidateCount: candidateCount
+    });
+  }
+
+  return Object.freeze({
+    DIMENSIONS: DIMENSIONS,
+    interpret: interpret
   });
 });
 
@@ -154,18 +2370,18 @@
   const Bank = window.QUESTION_BANK;
   const items = Bank.items;
   const STORAGE_KEY = 'self-atlas.oejts12.zh.v1';
-  const APP_VERSION = '1.0.0';
+  const Config = window.APP_CONFIG || {};
+  const APP_VERSION = Config.appVersion || 'development';
+  const STORAGE_SCHEMA_VERSION = Config.storageSchemaVersion || 2;
   const main = document.getElementById('main');
+  const persistenceNotice = document.createElement('p');
+  persistenceNotice.id = 'storageConflict'; persistenceNotice.className = 'notice-inline'; persistenceNotice.hidden = true;
+  persistenceNotice.setAttribute('role', 'alert');
+  main.before(persistenceNotice);
   const dialog = document.getElementById('infoDialog');
   const dialogContent = document.getElementById('dialogContent');
   const labels = ['很像左边', '偏向左边', '中间 / 都像', '偏向右边', '很像右边'];
-  const metadata = {
-    IE: { name: '与外界的互动', low: '内向', high: '外向', lowText: '本次回答偏向独处、倾听和独立活动。可以结合社交后自己的实际感受来理解。', highText: '本次回答偏向交流、群体活动和向外表达。可以结合不同社交场景来理解。', prompt: '与人相处之后，你通常想继续交流，还是需要一段独处？' },
-    SN: { name: '关注信息的方式', low: '实感', high: '直觉', lowText: '本次回答偏向具体事实、细节和已有经验。并不意味着缺乏想象力。', highText: '本次回答偏向可能性、整体含义和理论。并不意味着忽视现实。', prompt: '学习新事物时，你更自然地从具体实例入手，还是先寻找整体规律？' },
-    FT: { name: '判断时的侧重', low: '情感', high: '思考', lowText: '本次回答偏向感受、关怀和人际考虑。并不意味着不善于逻辑思考。', highText: '本次回答偏向理性分析、公正和一致的标准。并不意味着缺少共情。', prompt: '遇到有争议的决定时，你最先想到的理由是什么？请举一个真实例子。' },
-    JP: { name: '安排生活的方式', low: '判断', high: '知觉', lowText: '本次回答偏向计划、准备和明确安排。并不等同于更自律或更优秀。', highText: '本次回答偏向灵活、临场调整和保留选择。并不等同于没有责任心。', prompt: '没有外部期限要求时，你通常提前定好安排，还是保留调整空间？' }
-  };
-  function freshState() { return { version: APP_VERSION, answers: Array(32).fill(null), flags: [], index: 0, view: 'welcome', autoNext: true, english: false, remember: false, notes: '', startedAt: null, completedAt: null, activeMs: 0 }; }
+  function freshState() { return { answers: Array(32).fill(null), flags: [], index: 0, view: 'welcome', autoNext: true, english: false, remember: false, notes: '', startedAt: null, completedAt: null, activeMs: 0 }; }
   let state = freshState();
   let recovered = false;
   let storageWorking = true;
@@ -175,7 +2391,10 @@
   let activeStart = null;
   let pointerChoice = false;
   let returnToReview = false;
-  let sessionEpoch = 0;
+  let storageSnapshot = null;
+  let storageSession = null;
+  let storageRevision = 0;
+  let persistenceInvalidated = false;
   const esc = value => String(value).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
   function count() { return state.answers.filter(Number.isInteger).length; }
   function pad(n) { return String(n).padStart(2, '0'); }
@@ -192,18 +2411,55 @@
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => box.classList.remove('visible'), 3200);
   }
+  function newSessionId() { return window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`; }
+  function saveStatusText() { return state.remember && storageWorking ? '● 进度自动保存在此设备' : persistenceInvalidated ? '○ 保存会话已失效；当前回答仅保留在此页面' : '○ 仅保留在当前页面，关闭或刷新会丢失'; }
+  function updateSaveStatus() { const status = main.querySelector('[data-save-status]'); if (status) status.textContent = saveStatusText(); }
+  function invalidatePersistence(quiet = false) {
+    state.remember = false;
+    persistenceInvalidated = true;
+    cancelNext();
+    persistenceNotice.textContent = '此页面的保存会话已失效：其他页面已清空、关闭保存或更新了草稿。当前回答仅保留在此页面，不会覆盖其他页面的数据。请刷新页面载入最新草稿；若草稿已被清空，需要重新开始一份回答。';
+    persistenceNotice.hidden = false;
+    if (!quiet) {
+      dialogContent.innerHTML = '<h2>此页面的保存会话已失效</h2><p class="notice-inline" role="alert">其他页面已清空、关闭保存或更新了草稿。当前回答仅保留在此页面，后续操作不会覆盖其他页面的数据。</p><p>请刷新页面载入最新草稿；若草稿已被清空，需要重新开始一份回答。</p><div class="confirm-actions"><button class="button secondary" data-action="cancelReset">保留此页面的回答</button></div>';
+      dialog.setAttribute('aria-label', '保存会话已失效');
+      if (!dialog.open) dialog.showModal();
+    }
+    // Do not redraw: a storage event may arrive while someone is typing notes.
+    for (const id of ['remember', 'rememberDialog']) { const checkbox = document.getElementById(id); if (checkbox) checkbox.checked = false; }
+    updateSaveStatus();
+  }
   function save() {
     checkpoint();
-    if (!state.remember) return;
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); storageWorking = true; }
-    catch (_) { if (storageWorking) notice('浏览器未能保存进度；请保持页面打开，并及时导出结果。'); storageWorking = false; }
+    if (!state.remember) return false;
+    try {
+      // storage events are asynchronous; always verify the persisted identity before writing.
+      if (localStorage.getItem(STORAGE_KEY) !== storageSnapshot) { invalidatePersistence(); return false; }
+      const revision = storageRevision + 1;
+      const text = JSON.stringify({ ...state, storageSchemaVersion: STORAGE_SCHEMA_VERSION, appVersion: APP_VERSION, sessionId: storageSession, revision });
+      localStorage.setItem(STORAGE_KEY, text);
+      storageSnapshot = text; storageRevision = revision; storageWorking = true;
+      updateSaveStatus();
+      return true;
+    }
+    catch (_) { if (storageWorking) notice('浏览器未能保存进度；请保持页面打开，关闭或刷新后这份回答会丢失。'); storageWorking = false; updateSaveStatus(); return false; }
+  }
+  function patchState(patch) {
+    Object.assign(state, patch);
+    save();
   }
   function load() {
     try {
       const text = localStorage.getItem(STORAGE_KEY);
+      storageSnapshot = text;
       if (!text) return;
       const draft = JSON.parse(text);
-      if (draft.version !== APP_VERSION || draft.remember !== true || !Core.validateAnswers(draft.answers)) return;
+      const legacy = draft.storageSchemaVersion === undefined && draft.version === '1.0.0';
+      if ((!legacy && draft.storageSchemaVersion !== STORAGE_SCHEMA_VERSION) || draft.remember !== true || !Core.validateAnswers(draft.answers) || (!legacy && (typeof draft.sessionId !== 'string' || !draft.sessionId || !Number.isSafeInteger(draft.revision) || draft.revision < 1))) {
+        incompatibleDraft(); return;
+      }
+      storageSession = legacy ? newSessionId() : draft.sessionId;
+      storageRevision = legacy ? 0 : draft.revision;
       state.answers = draft.answers;
       state.flags = Array.isArray(draft.flags) ? [...new Set(draft.flags.filter(n => Number.isInteger(n) && n >= 1 && n <= 32))] : [];
       state.index = Number.isInteger(draft.index) && draft.index >= 0 && draft.index < 32 ? draft.index : 0;
@@ -215,8 +2471,18 @@
       state.completedAt = typeof draft.completedAt === 'string' && Number.isFinite(Date.parse(draft.completedAt)) && count() === 32 ? draft.completedAt : null;
       state.activeMs = Number.isFinite(draft.activeMs) && draft.activeMs >= 0 ? Math.min(draft.activeMs, 31536000000) : 0;
       recovered = count() > 0;
-    } catch (_) { storageWorking = false; }
+    } catch (error) {
+      if (error instanceof SyntaxError || error.name === 'SyntaxError' || error.name === 'TypeError') incompatibleDraft();
+      else storageWorking = false;
+    }
   }
+  function incompatibleDraft() {
+    for (const id of ['remember', 'rememberDialog']) { const checkbox = document.getElementById(id); if (checkbox) checkbox.checked = false; }
+    dialogContent.innerHTML = '<h2>保存的草稿无法载入</h2><p class="notice-inline" role="alert">此草稿使用了不兼容的存储格式，或内容已经损坏。原数据仍保留在此设备，没有被覆盖。</p><p>请使用兼容版本打开，或确认不再需要后清空并重新开始。</p><div class="confirm-actions"><button class="button secondary" data-action="cancelReset">保留原草稿</button><button class="button primary" data-action="reset">清空并重新开始</button></div>';
+    dialog.setAttribute('aria-label', '草稿格式不兼容');
+    if (!dialog.open) dialog.showModal();
+  }
+  function renderKeepingFocus(selector) { render(); const target = main.querySelector(selector); if (target) target.focus({ preventScroll: true }); }
   function setView(view, focus = true) {
     cancelNext(); checkpoint(); state.view = view; checkpoint(); save();
     render();
@@ -243,7 +2509,7 @@
         <label class="settings-line hero-settings"><input type="checkbox" id="remember" ${state.remember ? 'checked' : ''}><span>在此设备保存进度，以便下次继续。<br><small>共用设备建议关闭；默认仅在当前页面内保留。</small></span></label>
       </div><div class="atlas" role="img" aria-label="由内外倾向、信息、判断和生活方式组成的四维偏好图案"><span class="atlas-note top">FOUR DIMENSIONS · ONE YOU</span><div class="atlas-grid"><div class="petal"><span>I / E</span></div><div class="petal"><span>S / N</span></div><div class="petal"><span>F / T</span></div><div class="petal"><span>J / P</span></div></div><div class="atlas-center" aria-hidden="true">✳</div><span class="atlas-star" aria-hidden="true">✧</span><span class="atlas-note bottom">每一种偏好，都有它的位置</span></div></div>
       <div class="stats-row"><div class="stat"><span class="stat-value">32</span><span class="stat-label">完整原版题目<span>保留原顺序与五点选项</span></span></div><div class="stat"><span class="stat-value">04</span><span class="stat-label">连续偏好维度<span>展示原始分数与边界</span></span></div><div class="stat"><span class="stat-value">Local</span><span class="stat-label">浏览器内计算<span>你的答案不会自动上传</span></span></div></div>
-      <div class="intro-grid"><div><div class="section-kicker">开始前，给自己三个提醒</div><div class="principles"><div class="principle"><span class="principle-num">01</span><div><strong>选平常的自己，不是理想的自己</strong><p>结合平时多个场景回答，尽量避免只依据今天的心情或一段特殊经历。</p></div></div><div class="principle"><span class="principle-num">02</span><div><strong>没有正确答案，也没有更好的类型</strong><p>两侧都像可以选中间；不理解或难以判断时，先标记“待复核”。</p></div></div><div class="principle"><span class="principle-num">03</span><div><strong>完成之后，再看整体</strong><p>所有题目均可修改。复制完整结果给我时，会一并带上原始答案和边界提示。</p></div></div></div></div>
+      <div class="intro-grid"><div><div class="section-kicker">开始前，给自己三个提醒</div><div class="principles"><div class="principle"><span class="principle-num">01</span><div><strong>选平常的自己，不是理想的自己</strong><p>结合平时多个场景回答，尽量避免只依据今天的心情或一段特殊经历。</p></div></div><div class="principle"><span class="principle-num">02</span><div><strong>没有正确答案，也没有更好的类型</strong><p>两侧都像可以选中间；不理解或难以判断时，先标记“待复核”。</p></div></div><div class="principle"><span class="principle-num">03</span><div><strong>完成之后，再看整体</strong><p>所有题目均可修改。结果页会按内置规则给出四维解读、维度互动与反思问题，供你结合真实经历核对。</p></div></div></div></div>
       <aside class="boundary-note"><h3>一份透明的探索工具</h3><p>这是开放的荣格类型量表，不是官方 MBTI®。原作者不保证其信度或准确性；本中文试译也未经心理测量验证，不能承诺适用于所有文化与年龄。</p><p>适合能理解题意的成人自我探索。结果不用于诊断、招聘筛选或能力评价。需要正式 MBTI 时，请使用官方授权测评与反馈流程。</p><a href="https://www.myersbriggs.org/my-mbti-personality-type/take-the-mbti-Instrument/" target="_blank" rel="noopener noreferrer">了解官方 MBTI 测评 ↗</a></aside></div>
     </section>`;
   }
@@ -260,15 +2526,14 @@
       <div class="choices">${labels.map((label, i) => `<label class="choice"><input type="radio" name="answer" value="${i + 1}" ${value === i + 1 ? 'checked' : ''} aria-label="${i + 1}，${label}"><span class="choice-circle" aria-hidden="true">${value === i + 1 ? '✓' : i + 1}</span><span class="choice-text">${label}</span></label>`).join('')}</div></fieldset>
       <p class="question-footnote">不确定或情境不适用？可以标记后再想一想；中间选项不等于无效答案。</p></article>
       <div class="question-bottom"><label class="settings-line"><input type="checkbox" id="autoNext" ${state.autoNext ? 'checked' : ''}><span>选后自动下一题</span></label><div class="bottom-actions"><button class="button secondary" data-action="prev" ${state.index === 0 ? 'disabled' : ''}>← 上一题</button><button class="button primary" data-action="next">${returnToReview ? '返回复核' : state.index === 31 ? '检查全部答案' : value === null ? '暂时跳过 →' : '下一题 →'}</button></div></div>
-      <p class="draft-line">${state.remember && storageWorking ? '● 进度自动保存在此设备' : '○ 仅保留在当前页面，关闭或刷新会丢失'} · <button class="text-button" data-dialog="privacy">管理保存方式</button></p>
-      <p class="keyboard-hint"><kbd>1</kbd> — <kbd>5</kbd> 选择　<kbd>Enter</kbd> 下一题　<kbd>←</kbd> 上一题　·　自动跳题可随时关闭</p>
+      <p class="draft-line"><span data-save-status>${saveStatusText()}</span> · <button class="text-button" data-dialog="privacy">管理保存方式</button></p>
+      <p class="keyboard-hint"><kbd>1</kbd> — <kbd>5</kbd> 选择　<kbd>Enter</kbd> 下一题　·　选项内方向键切换答案，题目区域 <kbd>←</kbd> / <kbd>→</kbd> 翻题</p>
     </div></section>`;
   }
   function updateSelection(value, allowAdvance) {
     cancelNext();
     state.answers[state.index] = value;
-    state.completedAt = null;
-    save();
+    patchState({ completedAt: null });
     main.querySelectorAll('input[name="answer"]').forEach(input => {
       input.checked = Number(input.value) === value;
       input.closest('.choice').querySelector('.choice-circle').textContent = input.checked ? '✓' : input.value;
@@ -297,17 +2562,19 @@
   function results() {
     if (!Core.validateAnswers(state.answers, true)) { state.view = 'review'; review(); return; }
     const result = Core.score(state.answers);
-    const uncertain = result.dimensions.filter(d => d.borderline);
+    const reading = window.MBTIInterpretation.interpret(result);
+    const readings = {};
+    reading.dimensions.forEach(item => { readings[item.key] = item; });
+    const uncertain = reading.dimensions.filter(d => d.side === 'balanced');
     const neutral = state.answers.filter(n => n === 3).length;
-    const candidates = Core.candidates(result);
-    const prompt = (uncertain.length ? uncertain : result.dimensions).map(d => metadata[d.key].prompt).join('\n');
-    main.innerHTML = `<section class="view">${steps(3)}<div class="result-intro"><div class="result-profile"><div class="eyebrow">YOUR PREFERENCE ATLAS</div><h1 class="sr-only" data-focus>你的偏好轮廓：${result.cautiousType}</h1><div class="result-type" aria-label="偏好轮廓 ${result.cautiousType}">${result.cautiousType.split('').map(letter => `<span class="letter-tile ${letter === 'X' ? 'unclear' : ''}" aria-hidden="true">${letter}</span>`).join('')}</div><h2 class="result-subtitle">${uncertain.length ? '有些偏好，值得继续观察。' : '这是你此刻的偏好轮廓。'}</h2><p class="result-lead">${uncertain.length ? `有 ${uncertain.length} 个维度接近中点，暂以 X 留白。<br>不急着从几个字母中，决定自己是谁。` : '四个维度都落在本页面的中点复核区之外。<br>这反映本次回答的倾向，不证明类型永远不变。'}</p></div>
-      <div class="result-summary-box"><h3>先看分数，再读字母。</h3><p>按原量表规则得到 <strong>${result.originalType}</strong>。原规则把恰好 24 分分到 I / S / F / J，本页不会把这一规则当作明确偏好。</p><p>本页将距中点 ≤ 2 分的维度标为 X，提醒你结合真实经历复核。这是透明的阅读约定，<strong>不是经过验证的置信区间</strong>，也不表示你拥有某个固定的“混合类型”。</p><div class="result-facts"><span class="fact">已完成 32 / 32</span><span class="fact">中间选项 ${neutral} 题</span><span class="fact">待复核 ${state.flags.length} 题</span></div></div></div>
-      <div class="dimension-grid">${result.dimensions.map(d => { const m = metadata[d.key]; return `<article class="dimension-card"><div class="dimension-title"><h3>${m.name}</h3><span class="score-tag">${d.score} 分 · ${d.letter === 'X' ? '恰在中点' : `偏 ${d.letter}`}</span></div><div class="dimension-poles"><span><b>${d.low}</b> ${m.low}</span><span>${m.high} <b>${d.high}</b></span></div><div class="track" role="img" aria-label="${d.key} 原始分数 ${d.score}，范围8到40，中点24"><span class="track-marker" style="left:${d.position}%"></span></div><div class="track-labels"><span>8</span><span>24 · 中点</span><span>40</span></div><p class="dimension-meaning">${d.borderline ? '<span class="boundary-tag">建议复核</span>该维度接近分界，不宜据此确定一侧。可以结合下方反思问题继续观察。' : d.score < 24 ? m.lowText : m.highText}</p></article>`; }).join('')}</div>
-      <p class="score-explainer">所有分数范围均为 8–40，24 为分界。横向位置只是原始分数的线性展示，不是人群百分位、准确率或成为某类型的概率。单次回答无法估计个体测量误差。</p>
-      ${uncertain.length ? `<div class="candidate-box"><strong>可以进一步对照的组合</strong> · 仅展开 X 的两种方向，不按可能性排序<div class="candidate-list">${candidates.map(type => `<span class="candidate-chip">${type}</span>`).join('')}</div></div>` : ''}
-      <div class="result-lower"><div class="panel"><h3>补上真实生活里的你</h3><p>${esc(prompt).replace(/\n/g, '<br>')}</p><label class="note-field">可选：记录一两个例子，或解释难以判断的题目<textarea id="reflection" maxlength="2000" placeholder="例如：在熟人中我常主动说话，但大型陌生聚会后需要独处……">${esc(state.notes)}</textarea></label><p style="margin:9px 0 0;font-size:10px">不参与计分；只随你主动复制或下载的结果分享。请避免填写敏感身份信息。</p></div>
-      <div class="panel export-panel"><div class="eyebrow" style="color:#c4d4bc">KEEP THE WHOLE PICTURE</div><h3 style="margin-top:14px">把完整结果，带回对话。</h3><p>复制内容包含四维分数、原始答案、待复核题号、反思笔记及来源。粘贴给我，就能继续做有依据的分析。</p><button class="button primary" data-action="copy">复制完整结果 <span aria-hidden="true">↗</span></button><div class="actions"><button class="button secondary" data-action="downloadText">下载文本</button><button class="button secondary" data-action="downloadJson">下载 JSON</button></div><p class="export-note">没有服务器接收答案。你点击复制或下载后，才会生成相应内容。不要只分享四个字母。</p></div></div>
+    main.innerHTML = `<section class="view">${steps(3)}<div class="result-intro"><div class="result-profile"><div class="eyebrow">YOUR PREFERENCE ATLAS</div><h1 class="sr-only" data-focus>你的偏好轮廓：${esc(result.cautiousType)}</h1><div class="result-type" aria-label="偏好轮廓 ${esc(result.cautiousType)}">${result.cautiousType.split('').map(letter => `<span class="letter-tile ${letter === 'X' ? 'unclear' : ''}" aria-hidden="true">${esc(letter)}</span>`).join('')}</div><h2 class="result-subtitle">${esc(reading.headline)}</h2><p class="result-lead">${uncertain.length ? `${uncertain.length} 个维度位于 45%–55% 中间带，以 X 留白。<br>下面从方向、强度、维度互动和反思问题四个层次展开。` : '四个维度都落在 45%–55% 中间带之外。<br>这反映本次回答的倾向，不证明类型永远不变。'}</p></div>
+      <div class="result-summary-box"><h3>先看整体，再读每一个维度。</h3>${reading.summary.map(paragraph => `<p>${esc(paragraph)}</p>`).join('')}<div class="result-facts"><span class="fact">已完成 32 / 32</span><span class="fact">中间选项 ${neutral} 题</span><span class="fact">待复核 ${state.flags.length} 题</span></div></div></div>
+      <div class="dimension-grid">${result.dimensions.map(d => { const item = readings[d.key]; return `<article class="dimension-card"><div class="dimension-title"><h3>${item.name}</h3><span class="score-tag">${d.score} 分 · ${esc(item.directionLabel)}</span></div><div class="dimension-poles"><span><b>${d.low}</b> ${item.side === 'low' ? esc(item.directionLabel.split(' · ')[1]) : ''}</span><span>${item.side === 'high' ? esc(item.directionLabel.split(' · ')[1]) : ''} <b>${d.high}</b></span></div><div class="track" role="img" aria-label="${d.key} 原始分数 ${d.score}，范围8到40，中点24，刻度位置 ${d.position.toFixed(1)}%"><span class="track-marker" style="left:${d.position}%"></span></div><div class="track-labels"><span>8</span><span>24 · 中点</span><span>40</span></div><p class="dimension-reading"><span class="strength-tag ${item.strength}">${esc(item.strengthLabel)}</span>${esc(item.text)}</p><p class="score-line">${esc(item.scoreLine)}</p></article>`; }).join('')}</div>
+      <p class="score-explainer">所有分数范围均为 8–40，24 为分界。横向位置只是原始分数的线性展示，不是人群百分位、准确率或成为某类型的概率。单次回答无法估计个体测量误差。X 仅表示刻度位置在 45%–55% 之间，不是一种人格类型。</p>
+      ${reading.interactions.length ? `<section class="interpretation-block"><div class="section-kicker">维度之间</div><h2>两个维度放在一起看</h2><div class="interaction-grid">${reading.interactions.map(item => `<article class="interaction-card"><h3>${esc(item.title)}</h3><p>${esc(item.text)}</p></article>`).join('')}</div></section>` : ''}
+      <section class="interpretation-block"><div class="section-kicker">把结果放回生活</div><h2>可以带着这些问题继续观察</h2><div class="reflection-panel"><ol>${reading.reflection.map(question => `<li>${esc(question)}</li>`).join('')}</ol></div>
+      <div class="panel note-panel"><h3>补上真实生活里的你</h3><p>规则生成的解读只是起点。记录具体场景，能帮助你判断哪些描述贴切、哪些不贴切。</p><label class="note-field">可选：记下让你想到的具体例子<textarea id="reflection" maxlength="2000" placeholder="例如：在熟人中我常主动说话，但大型陌生聚会后需要独处……">${esc(state.notes)}</textarea></label><p class="note-privacy">只保存在此设备；不参与计分，也不会上传。开启“保存进度”时会写入浏览器本地存储。请避免填写敏感身份信息。</p></div></section>
+      <section class="interpretation-block caveat-panel"><div class="section-kicker">边界说明</div><h2>这份解读能做什么，不能做什么</h2><ul>${reading.caveats.map(caveat => `<li>${esc(caveat)}</li>`).join('')}</ul></section>
       <div class="result-bottom"><button class="button secondary" data-action="review">返回检查答案</button><button class="button secondary" data-dialog="method">查看来源与计算过程</button><button class="button ghost" data-action="reset">换一位 / 重新开始</button></div>
     </section>`;
   }
@@ -317,9 +2584,10 @@
       <h3>它与官方 MBTI、16Personalities 的关系</h3><p>OEJTS 是开放的荣格类型替代量表，不是 Myers-Briggs 官方题库。官方 MBTI 题目与材料受许可限制；16Personalities 也使用自己的 NERIS 模型，不能将它的分数或 A/T 后缀混入本量表。</p>
       <h3>能支持什么，不能证明什么</h3><p>开发者根据自报已知类型的人群筛选题项。这不能等同于独立的官方 MBTI 效标验证。原 PDF 明确不保证信度或准确性；这里的中文为项目试译，未完成专业回译、中文常模或跨文化等值验证。更完整的解释需要生活实例，正式 MBTI 结果还应通过其反馈流程核实。</p>
       <h3>回答选项与计分键</h3><p>每题 Qn 是题号 n 的答案：1 = 很像左边，2 = 偏向左边，3 = 中间 / 都像，4 = 偏向右边，5 = 很像右边。没有“标准正确答案”。缺题时不出结果，不自动填补。</p>
-      <div class="formula">${Object.entries(Core.FORMULAS).map(([key, formula]) => `<div><code>${key} = ${formula}</code></div>`).join('')}</div>
+      <div class="formula">${Object.entries(Core.FORMULAS).map(([key, formula]) => `<div><code>${esc(key)} = ${esc(formula)}</code></div>`).join('')}</div>
       <p>四维分数均在 8–40。原规则：IE &gt; 24 为 E，否则 I；SN &gt; 24 为 N，否则 S；FT &gt; 24 为 T，否则 F；JP &gt; 24 为 P，否则 J。字母排成 I/E、S/N、T/F、J/P 的通常次序，F/T 轴的低分一侧是 F。</p>
-      <p>页面新增：距 24 不超过 2 分（22–26）的维度用 X 提醒复核；这个范围是页面阅读规则，不来自原量表，也不是统计置信区间。原规则结果同时保留，避免隐藏差异。中间选项数、作答时长和标记数只描述过程，不据此宣称回答有效或无效。</p>
+      <p>页面新增：原始分换算为 8–40 刻度上的位置，落在 45%–55%（整数分 23–25）的维度用 X 提醒复核；这个范围是页面阅读约定，不来自原量表，也不是统计置信区间。原规则结果同时保留，避免隐藏差异。中间选项数、作答时长和标记数只描述过程，不据此宣称回答有效或无效。</p>
+      <p>结果页的解读文字由页面内置的固定规则根据四维分数生成，不调用 AI，也不改变计分。它提供观察角度与反思问题，不是心理诊断、能力评价或经过验证的类型描述。</p>
       <h3>适用范围与共享许可</h3><p>面向能理解题意的成人自我探索。部分原题涉及外出、说话方式或工作习惯，可能受身体条件、文化与生活阶段影响；难以判断可标记并在结果中说明。不能承诺所有人的测量等值，也不据此评价能力、品德或心理健康。</p><p>原题作者：Eric Jorgenson。题库与本中文改编按 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a> 非商业、署名、相同方式共享。中文翻译、界面与边界提示为本项目改编；不得声称原作者或 MBTI 官方为其背书。核对日期：2026-10-15。</p>
       <ul class="source-list"><li><a href="${Core.SOURCE}" target="_blank" rel="noopener noreferrer">01 · OEJTS 1.2 原始题目、计分键与许可（PDF） ↗</a><small>题目与算法的一手来源，32题固定版本。</small></li><li><a href="https://openpsychometrics.org/tests/OJTS/development/" target="_blank" rel="noopener noreferrer">02 · OpenPsychometrics 开发说明 ↗</a><small>开发背景与限制；页面的不同题数叙述不作为本工具的题库。</small></li><li><a href="https://www.themyersbriggs.com/en-US/Support/Copyright-and-Permissions" target="_blank" rel="noopener noreferrer">03 · The Myers-Briggs Company：版权与许可 ↗</a></li><li><a href="https://www.myersbriggs.org/my-mbti-personality-type/take-the-mbti-Instrument/" target="_blank" rel="noopener noreferrer">04 · Myers & Briggs Foundation：正式测评入口 ↗</a></li><li><a href="https://www.16personalities.com/articles/our-theory" target="_blank" rel="noopener noreferrer">05 · 16Personalities：模型说明 ↗</a></li></ul>
       <details><summary>查看全部中英文题目（建议作答后查看）</summary><div class="source-table-wrap"><table class="source-table"><thead><tr><th>题号</th><th>左侧（1）</th><th>右侧（5）</th></tr></thead><tbody>${items.map(q => `<tr><td>${q.id}</td><td>${esc(q.leftZh)}<span class="en" lang="en">${esc(q.leftEn)}</span></td><td>${esc(q.rightZh)}<span class="en" lang="en">${esc(q.rightEn)}</span></td></tr>`).join('')}</tbody></table></div></details>
@@ -328,7 +2596,7 @@
   function openDialog(kind) {
     cancelNext();
     if (kind === 'method') dialogContent.innerHTML = methodContent();
-    else if (kind === 'privacy') dialogContent.innerHTML = `<h2>你的回答，留在你的浏览器里。</h2><p>本页面不加载统计脚本、外部字体或远程服务，不会自动上传回答、笔记和结果。点击外部资料链接才会打开相应网站。</p><h3>当前保存方式</h3><label class="settings-line"><input type="checkbox" id="rememberDialog" ${state.remember ? 'checked' : ''}><span>在此设备保存进度与笔记</span></label><p>开启后，数据保存在本浏览器的 localStorage 中，直到你关闭此选项或选择“换一位 / 重新开始”。这不是加密保险箱，共用设备请关闭。关闭后只保留当前页面内存中的回答，刷新或关闭页面就会丢失。</p><p>浏览器可能限制本地 HTML 的持久存储；如保存失败，页面会提示。不会在不同浏览器、设备或文件地址之间自动同步。</p><h3>主动分享</h3><p>“复制完整结果”和下载会包含全部答案及你填写的笔记，请自行决定分享对象。另存的报告文件和已复制的内容不会因页面重置而被删除。</p><button class="button secondary" data-action="reset">清空本工具数据 / 换一位</button>`;
+    else if (kind === 'privacy') dialogContent.innerHTML = `<h2>你的回答，留在你的浏览器里。</h2><p>本页面不加载统计脚本、外部字体或远程服务，不会自动上传回答、笔记和结果。点击外部资料链接才会打开相应网站。</p><h3>当前保存方式</h3><label class="settings-line"><input type="checkbox" id="rememberDialog" ${state.remember ? 'checked' : ''}><span>在此设备保存进度与笔记</span></label><p>开启后，数据保存在本浏览器的 localStorage 中，直到你关闭此选项或选择“换一位 / 重新开始”。这不是加密保险箱，共用设备请关闭。关闭后只保留当前页面内存中的回答，刷新或关闭页面就会丢失。</p><p>浏览器可能限制本地 HTML 的持久存储；如保存失败，页面会提示。不会在不同浏览器、设备或文件地址之间自动同步。</p><h3>解读如何生成</h3><p>结果页的四维解读、维度互动和反思问题，由本页面内置的固定规则根据分数在本地生成，不会把答案发送给任何服务。X 只表示刻度位置处于 45%–55% 中间带，不是一种人格类型，也不代表测量结论。</p><button class="button secondary" data-action="reset">清空本工具数据 / 换一位</button>`;
     else if (kind === 'palette') dialogContent.innerHTML = `<h2>你的答题进度</h2><p>已答 ${count()} / 32 · 绿色表示已答，橙色小点表示待复核。点击题号跳转。</p><div class="palette-grid">${items.map(q => `<button class="${state.answers[q.id - 1] !== null ? 'answered' : ''} ${state.flags.includes(q.id) ? 'flagged' : ''} ${q.id - 1 === state.index ? 'current' : ''}" data-question="${q.id - 1}" aria-label="第${q.id}题，${state.answers[q.id - 1] !== null ? '已答' : '未答'}${state.flags.includes(q.id) ? '，待复核' : ''}">${q.id}</button>`).join('')}</div><button class="button primary" data-action="review">进入答案复核 →</button>`;
     else return;
     dialog.setAttribute('aria-label', kind === 'method' ? '来源与计分' : kind === 'privacy' ? '隐私说明' : '答题总览');
@@ -337,22 +2605,36 @@
   }
   function confirmReset() {
     cancelNext();
-    dialogContent.innerHTML = '<h2>开始一份全新的回答？</h2><p>这会清空本工具在当前页面与此浏览器中保存的答案、笔记和进度，方便下一位使用。已经下载的报告不受影响。如需保留当前结果，请先导出。</p><div class="confirm-actions"><button class="button secondary" data-action="cancelReset">先保留</button><button class="button primary" data-action="confirmReset">清空并重新开始</button></div>';
+    dialogContent.innerHTML = '<h2>开始一份全新的回答？</h2><p>这会清空本工具在当前页面与此浏览器中保存的答案、笔记和进度，方便下一位使用。清空后无法恢复，如需保留当前结果，请先自行记录。</p><div class="confirm-actions"><button class="button secondary" data-action="cancelReset">先保留</button><button class="button primary" data-action="confirmReset">清空并重新开始</button></div>';
     dialog.setAttribute('aria-label', '清空并重新开始');
     if (!dialog.open) dialog.showModal();
   }
   function setRemember(value) {
-    state.remember = value;
     if (value) {
-      save();
-      if (storageWorking) notice('已开启此设备的进度保存。');
-      else {
+      if (persistenceInvalidated) { invalidatePersistence(); return; }
+      try {
+        const current = localStorage.getItem(STORAGE_KEY);
+        if (current !== storageSnapshot) { invalidatePersistence(); return; }
+        if (current !== null && !storageSession) { incompatibleDraft(); return; }
+        if (!storageSession) storageSession = newSessionId();
+        state.remember = true;
+        if (save()) notice('已开启此设备的进度保存。');
+        else if (persistenceInvalidated) return;
+        else throw new Error('Storage unavailable');
+      } catch (_) {
         state.remember = false;
+        storageWorking = false;
         notice('无法开启保存：浏览器拒绝了存储。进度仅保留在当前页面。');
       }
     }
     else {
-      try { localStorage.removeItem(STORAGE_KEY); notice('已移除本地草稿；当前页面中的回答仍然保留。'); }
+      try {
+        if (localStorage.getItem(STORAGE_KEY) !== storageSnapshot) { invalidatePersistence(); return; }
+        localStorage.removeItem(STORAGE_KEY);
+        if (localStorage.getItem(STORAGE_KEY) !== null) throw new Error('Draft was not removed');
+        storageSnapshot = null; storageSession = null; storageRevision = 0; state.remember = false;
+        notice('已移除本地草稿；当前页面中的回答仍然保留。');
+      }
       catch (_) {
         state.remember = true;
         storageError('浏览器拒绝清除草稿，保存选项尚未关闭。旧回答可能仍在此设备上；请先在浏览器设置中清除此页面的站点数据，再交给下一位使用。');
@@ -367,104 +2649,71 @@
     dialog.setAttribute('aria-label', '本地草稿清除失败');
     if (!dialog.open) dialog.showModal();
   }
-  function resultPayload() {
-    save();
-    const result = Core.score(state.answers);
-    return {
-      schema: 'self-atlas-result-v1', appVersion: APP_VERSION, instrument: 'OEJTS 1.2', translation: '中文试译 1.0（未经心理测量验证）', author: 'Eric Jorgenson (2015)', source: Core.SOURCE,
-      license: 'CC BY-NC-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
-      startedAt: state.startedAt, completedAt: state.completedAt, activeSeconds: Math.round(state.activeMs / 1000),
-      originalType: result.originalType, midpointAwareType: result.type, cautiousType: result.cautiousType,
-      dimensions: result.dimensions.map(d => ({ key: d.key, low: d.low, high: d.high, score: d.score, midpoint: 24, min: 8, max: 40, distanceFromMidpoint: d.distance, borderline: d.borderline })),
-      scoringFormulas: Core.FORMULAS, reviewRule: '|score - 24| <= 2 is shown as X; a display convention, not a validated confidence interval',
-      responseScale: Object.fromEntries(labels.map((label, i) => [i + 1, label])),
-      answers: state.answers.map((value, i) => ({ id: i + 1, value })), flaggedItemIds: [...state.flags].sort((a, b) => a - b), midpointAnswerCount: state.answers.filter(n => n === 3).length,
-      reflection: state.notes, limitations: ['Not the official MBTI instrument.', 'Chinese translation is unvalidated.', 'No individual accuracy, confidence, percentile, diagnosis or employment inference.']
-    };
-  }
-  function reportText() {
-    const p = resultPayload();
-    const scores = p.dimensions.map(d => `${d.key}（低侧 ${d.low} / 高侧 ${d.high}）：${d.score} 分；距24中点 ${d.distanceFromMidpoint} 分${d.borderline ? '；在页面复核区' : ''}`).join('\n');
-    return `【见己 · OEJTS 1.2 完整结果】\n这是开放荣格类型量表的中文试译结果，不是官方 MBTI。\n\n保留边界的偏好轮廓：${p.cautiousType}\n仅将精确中点留白的轮廓：${p.midpointAwareType}\n原量表规则结果：${p.originalType}（原规则24归I/S/F/J）\n\n${scores}\n每维范围8–40，中点24。距中点≤2用X提醒复核，是页面自定义规则，不是统计置信区间。没有准确率、概率或常模百分位。\n\n完成时间：${p.completedAt}\n前台作答与复核时间约：${p.activeSeconds} 秒（仅描述过程，不用于判定有效性）\n已答：32/32；中间选项：${p.midpointAnswerCount}题\n待复核题号：${p.flaggedItemIds.join('、') || '无'}\n回答编码：1很像左边 / 2偏向左边 / 3中间或都像 / 4偏向右边 / 5很像右边\n原始答案（原PDF顺序Q1–Q32）：\n${p.answers.map(a => `Q${a.id}=${a.value}`).join(', ')}\n\n我的补充实例与说明：\n${p.reflection || '未填写'}\n\n请结合原始答案、临界维度、待复核题与生活实例分析；不要仅凭四字母定型，不要推导认知功能堆栈、疾病、能力或职业胜任力。\n\n原作者：Eric Jorgenson (2015)\n来源：${p.source}\n许可：CC BY-NC-SA 4.0（${p.licenseUrl}）\n版本：${p.instrument} / ${p.translation} / 页面${p.appVersion}\n\n【结构化数据，供复算】\n${JSON.stringify(p, null, 2)}`;
-  }
-  async function copyReport() {
-    const copyEpoch = sessionEpoch;
-    const text = reportText();
-    try {
-      if (!navigator.clipboard || !navigator.clipboard.writeText) throw new Error('Clipboard unavailable');
-      await navigator.clipboard.writeText(text);
-      if (copyEpoch !== sessionEpoch) return;
-      notice('完整结果已复制，回到对话粘贴即可。');
-    } catch (_) {
-      if (copyEpoch !== sessionEpoch) return;
-      dialogContent.innerHTML = '<h2>复制完整结果</h2><p>浏览器未允许直接复制。内容已选中，请按 Ctrl+C（Mac 为 ⌘C），或长按选择复制。</p><textarea id="manualCopy" class="copy-box" readonly aria-label="完整结果"></textarea><div class="confirm-actions"><button class="button primary" data-action="selectReport">全选内容</button></div>';
-      document.getElementById('manualCopy').value = text;
-      dialog.setAttribute('aria-label', '手动复制结果');
-      if (!dialog.open) dialog.showModal();
-      const box = document.getElementById('manualCopy'); box.focus(); box.select();
-    }
-  }
-  function download(content, extension, mime) {
-    const blob = new Blob([extension === 'txt' ? '\uFEFF' : '', content], { type: mime });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `见己-OEJTS12-${new Date().toISOString().replace(/[:.]/g, '-')}.${extension}`;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
-    notice('已生成报告文件；请查看浏览器的下载记录。');
-  }
-  document.addEventListener('click', event => {
-    const button = event.target.closest('button');
-    if (!button || button.disabled) return;
-    if (button.dataset.dialog) { openDialog(button.dataset.dialog); return; }
-    if (button.dataset.question !== undefined) { if (dialog.open) dialog.close(); openQuestion(Number(button.dataset.question), button.dataset.fromReview === 'true'); return; }
-    if (button.dataset.filter) { filter = button.dataset.filter; review(); return; }
-    const action = button.dataset.action;
-    if (!action) return;
-    if (['prev', 'next', 'english', 'flag', 'review'].includes(action)) cancelNext();
-    if (action === 'start') {
+  const actionHandlers = {
+    start() {
       if (!state.startedAt) state.startedAt = new Date().toISOString();
       recovered = false;
       if (state.completedAt && count() === 32) setView('results');
       else if (count() === 32) setView('review');
       else { if (state.answers[state.index] !== null) state.index = state.answers.indexOf(null); setView('question'); }
-    } else if (action === 'prev') { if (state.index > 0) openQuestion(state.index - 1, returnToReview); }
-    else if (action === 'next') nextQuestion();
-    else if (action === 'english') { state.english = !state.english; save(); question(); }
-    else if (action === 'flag') {
+    },
+    prev() { if (state.index > 0) openQuestion(state.index - 1, returnToReview); },
+    next: nextQuestion,
+    english() { patchState({ english: !state.english }); renderKeepingFocus('[data-action="english"]'); },
+    flag() {
       const id = state.index + 1;
-      state.flags = state.flags.includes(id) ? state.flags.filter(n => n !== id) : [...state.flags, id];
-      save(); question(); notice(state.flags.includes(id) ? '已标记，最后可以集中复核。' : '已取消待复核标记。');
-    } else if (action === 'review') { if (dialog.open) dialog.close(); filter = 'all'; returnToReview = false; setView('review'); }
-    else if (action === 'firstMissing') openQuestion(state.answers.indexOf(null), true);
-    else if (action === 'finish') { if (count() < 32) return; checkpoint(); state.completedAt = new Date().toISOString(); setView('results'); }
-    else if (action === 'reset') confirmReset();
-    else if (action === 'cancelReset') dialog.close();
-    else if (action === 'confirmReset') {
-      try { localStorage.removeItem(STORAGE_KEY); }
+      const flagged = state.flags.includes(id);
+      patchState({ flags: flagged ? state.flags.filter(n => n !== id) : [...state.flags, id] });
+      renderKeepingFocus('[data-action="flag"]'); notice(flagged ? '已取消待复核标记。' : '已标记，最后可以集中复核。');
+    },
+    review() { if (dialog.open) dialog.close(); filter = 'all'; returnToReview = false; setView('review'); },
+    firstMissing() { openQuestion(state.answers.indexOf(null), true); },
+    finish() { if (count() < 32) return; checkpoint(); state.completedAt = new Date().toISOString(); setView('results'); },
+    reset: confirmReset,
+    cancelReset() { dialog.close(); },
+    confirmReset() {
+      try {
+        const current = localStorage.getItem(STORAGE_KEY);
+        if (current !== null && current !== storageSnapshot) { invalidatePersistence(); return; }
+        localStorage.removeItem(STORAGE_KEY);
+        if (localStorage.getItem(STORAGE_KEY) !== null) throw new Error('Draft was not removed');
+      }
       catch (_) { storageError('浏览器未允许清除本地草稿，因此没有开始新的回答。请先清除此页面的站点数据，再换人使用，避免刷新后恢复上一位的回答。'); return; }
-      sessionEpoch++;
+      storageSnapshot = null; storageSession = null; storageRevision = 0; persistenceInvalidated = false;
+      persistenceNotice.hidden = true; persistenceNotice.textContent = '';
       cancelNext(); state = freshState(); activeStart = null; recovered = false; returnToReview = false; filter = 'all'; dialog.close(); dialogContent.innerHTML = ''; setView('welcome');
-    } else if (action === 'copy') copyReport();
-    else if (action === 'selectReport') { const box = document.getElementById('manualCopy'); box.focus(); box.select(); }
-    else if (action === 'downloadText') download(reportText(), 'txt', 'text/plain;charset=utf-8');
-    else if (action === 'downloadJson') download(JSON.stringify(resultPayload(), null, 2), 'json', 'application/json;charset=utf-8');
+    }
+  };
+  const ACTION_WITH_CANCEL = new Set(['prev', 'next', 'english', 'flag', 'review']);
+  document.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button || button.disabled) return;
+    if (button.dataset.dialog) { openDialog(button.dataset.dialog); return; }
+    if (button.dataset.question !== undefined) { if (dialog.open) dialog.close(); openQuestion(Number(button.dataset.question), button.dataset.fromReview === 'true'); return; }
+    if (button.dataset.filter) { filter = button.dataset.filter; renderKeepingFocus(`[data-filter="${filter}"]`); return; }
+    const action = button.dataset.action;
+    if (!action) return;
+    if (ACTION_WITH_CANCEL.has(action)) cancelNext();
+    const handler = actionHandlers[action];
+    if (handler) handler();
   });
   document.addEventListener('pointerdown', event => { pointerChoice = !!event.target.closest('.choice'); });
   document.addEventListener('change', event => {
     const target = event.target;
     if (target.name === 'answer') { updateSelection(Number(target.value), pointerChoice); pointerChoice = false; }
-    else if (target.id === 'autoNext') { cancelNext(); state.autoNext = target.checked; save(); }
+    else if (target.id === 'autoNext') { cancelNext(); patchState({ autoNext: target.checked }); }
     else if (target.id === 'remember' || target.id === 'rememberDialog') setRemember(target.checked);
   });
-  document.addEventListener('input', event => { if (event.target.id === 'reflection') { state.notes = event.target.value.slice(0, 2000); save(); } });
+  document.addEventListener('input', event => { if (event.target.id === 'reflection') patchState({ notes: event.target.value.slice(0, 2000) }); });
   document.addEventListener('keydown', event => {
     pointerChoice = false;
     if (state.view !== 'question' || dialog.open || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
     const target = event.target;
     if (target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || (target.tagName === 'INPUT' && target.type !== 'radio')) return;
+    if (target.tagName === 'INPUT' && target.type === 'radio' && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
     if (/^[1-5]$/.test(event.key)) { event.preventDefault(); updateSelection(Number(event.key), true); }
     else if (event.key === 'Enter' && target.tagName !== 'BUTTON') { event.preventDefault(); nextQuestion(); }
+    else if (event.key === 'ArrowRight' && target.tagName !== 'BUTTON') { event.preventDefault(); nextQuestion(); }
     else if (event.key === 'ArrowLeft' && target.tagName !== 'INPUT' && state.index > 0) { event.preventDefault(); openQuestion(state.index - 1, returnToReview); }
   });
   document.getElementById('homeButton').addEventListener('click', () => setView('welcome'));
@@ -472,6 +2721,11 @@
   dialog.addEventListener('click', event => { if (event.target === dialog) { const rect = dialog.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close(); } });
   document.addEventListener('visibilitychange', () => { cancelNext(); checkpoint(); save(); });
   window.addEventListener('pagehide', () => { cancelNext(); save(); });
+  window.addEventListener('storage', event => {
+    if (!state.remember || (event.key !== STORAGE_KEY && event.key !== null)) return;
+    try { if (localStorage.getItem(STORAGE_KEY) !== storageSnapshot) invalidatePersistence(true); }
+    catch (_) { storageWorking = false; updateSaveStatus(); notice('无法核对本地草稿；当前页面暂时不能保存进度。'); }
+  });
   window.addEventListener('beforeunload', event => { if (count() > 0 && (!state.remember || !storageWorking) && !state.completedAt) { event.preventDefault(); event.returnValue = ''; } });
   load(); render();
 })();

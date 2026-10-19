@@ -5,44 +5,63 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const Core = require('../src/core.js');
-const bank = require('../sources/items.json');
+const Interpretation = require('../src/interpret.js');
+const bank = require('../sources/oejts-1.2.json');
 const source = fs.readFileSync(path.join(__dirname, '../src/app.js'), 'utf8');
 const KEY = 'self-atlas.oejts12.zh.v1';
 
-// These tests exercise app event handlers against storage/clipboard failures;
-// they do not replace real-browser layout and interaction verification.
+// These tests exercise app event handlers against storage failures and render
+// states; they do not replace real-browser layout and interaction verification.
 function harness(options = {}) {
   const handlers = {};
+  const windowHandlers = {};
   const elements = new Map();
+  let focused = null;
   function element(id) {
     if (!elements.has(id)) elements.set(id, {
       innerHTML: '', textContent: '', value: '', checked: false, open: false,
       classList: { add() {}, remove() {} },
-      addEventListener() {}, setAttribute() {}, focus() {}, select() {},
+      firstElementChild: { style: {} },
+      addEventListener(name, handler) { (handlers[`${id}:${name}`] ||= []).push(handler); }, setAttribute() {}, focus() { focused = id; }, select() {}, before() {},
       showModal() { this.open = true; }, close() { this.open = false; },
-      querySelector() { return { setAttribute() {}, focus() {} }; }
+      querySelector(selector) { return element(selector); },
+      querySelectorAll() { return []; }
     });
     return elements.get(id);
   }
-  const store = new Map(options.draft ? [[KEY, JSON.stringify(options.draft)]] : []);
+  const store = options.store || new Map(options.draft ? [[KEY, JSON.stringify(options.draft)]] : []);
   const document = {
     hidden: false,
     getElementById: element,
+    createElement() { const node = element(`created-${elements.size}`); Object.defineProperty(node, 'id', { set(value) { elements.set(value, node); } }); return node; },
     addEventListener(name, handler) { (handlers[name] ||= []).push(handler); }
   };
-  const window = { MBTICore: Core, QUESTION_BANK: bank, addEventListener() {}, scrollTo() {} };
+  const window = { MBTICore: Core, MBTIInterpretation: Interpretation, QUESTION_BANK: bank,
+    APP_CONFIG: { appVersion: options.appVersion || '1.1.0', storageSchemaVersion: 2, translationVersion: '1.0' },
+    addEventListener(name, handler) { (windowHandlers[name] ||= []).push(handler); }, scrollTo() {} };
   const localStorage = {
     getItem(key) { if (options.denyRead) throw new Error('denied read'); return store.get(key) || null; },
     setItem(key, value) { if (options.denyWrite) throw new Error('denied write'); store.set(key, value); },
-    removeItem(key) { if (options.denyRemove) throw new Error('denied remove'); store.delete(key); }
+    removeItem(key) { if (options.denyRemove) throw new Error('denied remove'); if (!options.ignoreRemove) store.delete(key); }
   };
   vm.runInNewContext(source, { window, document, localStorage,
-    navigator: { clipboard: options.clipboard }, Date, setTimeout() { return 1; }, clearTimeout() {},
-    console, Blob, URL });
-  function emit(name, target) { for (const handler of handlers[name] || []) handler({ target }); }
+    Date, setTimeout() { return 1; }, clearTimeout() {}, console });
+  function emit(name, target, extra = {}) {
+    const event = { target, prevented: false, preventDefault() { this.prevented = true; }, ...extra };
+    for (const handler of handlers[name] || []) handler(event);
+    return event;
+  }
   return { elements, store, element,
+    get focused() { return focused; },
     click(action) { emit('click', { closest() { return { dataset: { action }, disabled: false }; } }); },
-    change(id, checked) { emit('change', { id, checked }); }
+    filter(value) { emit('click', { closest() { return { dataset: { filter: value }, disabled: false }; } }); },
+    change(id, checked) { emit('change', { id, checked }); },
+    key(key, target = { tagName: 'H1' }) { return emit('keydown', target, { key }); },
+    input(id, value) { emit('input', { id, value }); },
+    hide() { emit('visibilitychange', document); },
+    home() { emit('homeButton:click', element('homeButton')); },
+    storage() { for (const handler of windowHandlers.storage || []) handler({ key: KEY }); },
+    pagehide() { for (const handler of windowHandlers.pagehide || []) handler(); }
   };
 }
 function draft(complete = false) {
@@ -87,23 +106,152 @@ test('successful participant reset clears persisted answers and reflection', () 
   assert.equal(app.element('dialogContent').innerHTML, '');
 });
 
-test('a rejected clipboard request cannot reopen the previous participant report after reset', async () => {
-  let rejectCopy;
-  const app = harness({ draft: draft(true), clipboard: { writeText() { return new Promise((resolve, reject) => { rejectCopy = reject; }); } } });
-  app.click('start'); app.click('copy');
-  app.click('reset'); app.click('confirmReset');
-  rejectCopy(new Error('permission denied'));
-  await new Promise(resolve => setImmediate(resolve));
-  assert.equal(app.element('infoDialog').open, false);
-  assert.equal(app.element('dialogContent').innerHTML, '');
-  assert.equal(app.element('manualCopy').value, '');
+test('the result page renders local interpretation and offers no export controls', () => {
+  const app = harness({ draft: draft(true) });
+  app.click('start');
+  const html = app.element('main').innerHTML;
+  assert.match(html, /45%–55% 中间带/);
+  assert.match(html, /可以带着这些问题继续观察/);
+  assert.match(html, /这份解读能做什么，不能做什么/);
+  assert.match(html, /上一位的测试笔记/);
+  assert.doesNotMatch(html, /复制完整结果|下载文本|下载 JSON|data-action="copy"|data-action="download/);
 });
 
-test('unavailable clipboard offers an explicit full-text fallback for the current participant', () => {
-  const app = harness({ draft: draft(true) });
-  app.click('start'); app.click('copy');
+test('legacy draft migrates to an independently versioned storage envelope on save', () => {
+  const app = harness({ draft: draft(), appVersion: '2.7.3' });
+  assert.match(app.element('main').innerHTML, /已答 1 \/ 32/);
+  app.click('start');
+  const saved = JSON.parse(app.store.get(KEY));
+  assert.equal(saved.storageSchemaVersion, 2);
+  assert.equal(saved.appVersion, '2.7.3');
+  assert.equal(saved.version, undefined);
+  assert.equal(saved.answers[0], 5);
+  assert.equal(saved.notes, '上一位的测试笔记');
+  assert.equal(typeof saved.sessionId, 'string');
+  assert.equal(saved.revision, 1);
+  const updated = harness({ store: app.store, appVersion: '2.8.0' });
+  assert.match(updated.element('main').innerHTML, /已答 1 \/ 32/);
+});
+
+test('incompatible storage schema is visible and is not overwritten by enabling save', () => {
+  const incompatible = { ...draft(), storageSchemaVersion: 999, sessionId: 'future', revision: 1 };
+  const app = harness({ draft: incompatible });
+  const original = app.store.get(KEY);
   assert.equal(app.element('infoDialog').open, true);
-  assert.match(app.element('manualCopy').value, /Q32=3/);
-  assert.match(app.element('manualCopy').value, /上一位的测试笔记/);
-  assert.match(app.element('dialogContent').innerHTML, /Ctrl\+C/);
+  assert.match(app.element('dialogContent').innerHTML, /不兼容/);
+  app.change('remember', true);
+  app.click('start'); app.pagehide();
+  assert.equal(app.store.get(KEY), original);
+  app.click('reset'); app.click('confirmReset');
+  assert.equal(app.store.size, 0);
+});
+
+test('malformed stored data displays an explicit preservation notice', () => {
+  const store = new Map([[KEY, '{not-json']]);
+  const app = harness({ store });
+  assert.match(app.element('dialogContent').innerHTML, /内容已经损坏/);
+  assert.equal(app.store.get(KEY), '{not-json');
+});
+
+test('an older tab cannot resurrect a removed draft before storage events arrive', () => {
+  const store = new Map([[KEY, JSON.stringify(draft())]]);
+  const older = harness({ store });
+  const current = harness({ store });
+  current.click('reset'); current.click('confirmReset');
+  older.home(); older.hide(); older.pagehide();
+  assert.equal(store.size, 0);
+  assert.match(older.element('dialogContent').innerHTML, /保存会话已失效/);
+  assert.doesNotMatch(older.element('main').innerHTML, /id="remember" checked/);
+  older.change('remember', true);
+  assert.equal(store.size, 0);
+});
+
+test('an older tab cannot overwrite or delete a newer participant draft', () => {
+  const store = new Map([[KEY, JSON.stringify(draft())]]);
+  const older = harness({ store });
+  const current = harness({ store });
+  current.click('reset'); current.click('confirmReset'); current.change('remember', true);
+  const fresh = store.get(KEY);
+  older.click('reset'); older.click('confirmReset');
+  older.change('remember', false); older.hide(); older.pagehide();
+  assert.equal(store.get(KEY), fresh);
+  assert.match(older.element('dialogContent').innerHTML, /保存会话已失效/);
+  assert.match(older.element('main').innerHTML, /已答 1 \/ 32/);
+});
+
+test('opt-out from an older revision cannot remove another tab\'s saved edits', () => {
+  const first = harness({ draft: draft() });
+  first.click('start');
+  const older = harness({ store: first.store });
+  first.input('reflection', '另一个页面的新笔记');
+  const current = first.store.get(KEY);
+  older.change('remember', false);
+  assert.equal(first.store.get(KEY), current);
+  assert.match(older.element('dialogContent').innerHTML, /保存会话已失效/);
+});
+
+test('blocked reads during lifecycle save never write unchecked local answers', () => {
+  const options = { draft: draft() };
+  const app = harness(options);
+  const original = app.store.get(KEY);
+  options.denyRead = true;
+  app.input('reflection', '仅在内存中的笔记'); app.pagehide();
+  assert.equal(app.store.get(KEY), original);
+  assert.match(app.element('toast').textContent, /未能保存/);
+});
+
+test('a deletion that leaves stored data in place does not claim a successful reset', () => {
+  const app = harness({ draft: draft(), ignoreRemove: true });
+  app.click('reset'); app.click('confirmReset');
+  assert.match(app.element('dialogContent').innerHTML, /没有开始新的回答/);
+  assert.equal(JSON.parse(app.store.get(KEY)).answers[0], 5);
+  assert.match(app.element('main').innerHTML, /已答 1 \/ 32/);
+});
+
+test('concurrent updates are rejected by revision without discarding current in-memory notes', () => {
+  const first = harness({ draft: draft(true) });
+  first.click('start');
+  const other = harness({ store: first.store });
+  first.input('reflection', '最新保存的笔记');
+  const current = first.store.get(KEY);
+  other.input('reflection', '旧页正在输入的笔记');
+  assert.equal(first.store.get(KEY), current);
+  other.click('start');
+  assert.match(other.element('main').innerHTML, /旧页正在输入的笔记/);
+  assert.equal(JSON.parse(first.store.get(KEY)).notes, '最新保存的笔记');
+});
+
+test('storage invalidation preserves the current main view and blocks lifecycle saves', () => {
+  const first = harness({ draft: draft(true) });
+  first.click('start');
+  const other = harness({ store: first.store });
+  const mainBefore = first.element('main').innerHTML;
+  first.element('reflection').focus();
+  other.click('reset'); other.click('confirmReset');
+  first.storage(); first.pagehide();
+  assert.match(first.element('storageConflict').textContent, /保存会话已失效/);
+  assert.equal(first.element('storageConflict').hidden, false);
+  assert.equal(first.focused, 'reflection');
+  assert.equal(first.element('infoDialog').open, false);
+  assert.equal(first.store.size, 0);
+  assert.equal(first.element('main').innerHTML, mainBefore);
+});
+
+test('native radio arrow keys do not invoke question navigation', () => {
+  const app = harness({ draft: draft() });
+  app.click('start');
+  const radio = { tagName: 'INPUT', type: 'radio' };
+  const before = app.element('main').innerHTML;
+  for (const key of ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']) assert.equal(app.key(key, radio).prevented, false);
+  assert.equal(app.element('main').innerHTML, before);
+  assert.equal(app.key('ArrowRight').prevented, true);
+  assert.notEqual(app.element('main').innerHTML, before);
+});
+
+test('English toggle, flag and review filters preserve control focus after rendering', () => {
+  const app = harness({ draft: draft() });
+  app.click('start');
+  app.click('english'); assert.equal(app.focused, '[data-action="english"]');
+  app.click('flag'); assert.equal(app.focused, '[data-action="flag"]');
+  app.click('review'); app.filter('missing'); assert.equal(app.focused, '[data-filter="missing"]');
 });
