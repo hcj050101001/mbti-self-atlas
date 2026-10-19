@@ -57,7 +57,6 @@ function harness(options = {}) {
     filter(value) { emit('click', { closest() { return { dataset: { filter: value }, disabled: false }; } }); },
     change(id, checked) { emit('change', { id, checked }); },
     key(key, target = { tagName: 'H1' }) { return emit('keydown', target, { key }); },
-    input(id, value) { emit('input', { id, value }); },
     hide() { emit('visibilitychange', document); },
     home() { emit('homeButton:click', element('homeButton')); },
     storage() { for (const handler of windowHandlers.storage || []) handler({ key: KEY }); },
@@ -94,26 +93,47 @@ test('failed opt-out does not falsely advertise that saved answers were removed'
   assert.match(app.element('main').innerHTML, /id="remember" checked/);
   assert.match(app.element('dialogContent').innerHTML, /保存选项尚未关闭/);
   assert.equal(app.element('infoDialog').open, true);
-  assert.equal(JSON.parse(app.store.get(KEY)).notes, '上一位的测试笔记');
+  assert.equal(JSON.parse(app.store.get(KEY)).answers[0], 5);
 });
 
-test('successful participant reset clears persisted answers and reflection', () => {
+test('successful participant reset clears persisted answers', () => {
   const app = harness({ draft: draft(true) });
   app.click('reset'); app.click('confirmReset');
   assert.equal(app.store.size, 0);
-  assert.doesNotMatch(app.element('main').innerHTML, /继续上次作答|查看我的结果|上一位的测试笔记/);
+  assert.doesNotMatch(app.element('main').innerHTML, /继续上次作答|查看我的结果/);
   assert.equal(app.element('infoDialog').open, false);
   assert.equal(app.element('dialogContent').innerHTML, '');
 });
 
-test('the result page renders local interpretation and offers no export controls', () => {
+test('the result page renders sectioned local interpretation and offers no export controls', () => {
   const app = harness({ draft: draft(true) });
   app.click('start');
   const html = app.element('main').innerHTML;
   assert.match(html, /45%–55% 中间带/);
-  assert.match(html, /可以带着这些问题继续观察/);
+  assert.match(html, /<nav class="result-nav" aria-label="结果页章节">/);
+  for (const [label, target] of [
+    ['整体', 'result-overview'],
+    ['四个维度', 'result-dimensions'],
+    ['维度互动', 'result-interactions'],
+    ['场景建议', 'result-scenes']
+  ]) {
+    assert.match(html, new RegExp(`<a href="#${target}">${label}</a>`));
+    assert.match(html, new RegExp(`<section class="result-section" id="${target}"`));
+  }
+  assert.match(html, /把四个维度放在一起看/);
+  assert.match(html, /四个维度分别看/);
+  assert.match(html, /维度之间：组合起来的样子/);
+  assert.match(html, /放回生活：工作、关系与恢复/);
   assert.match(html, /这份解读能做什么，不能做什么/);
-  assert.match(html, /上一位的测试笔记/);
+  assert.equal((html.match(/class="dimension-card"/g) || []).length, 4);
+  assert.equal((html.match(/class="reading-block"/g) || []).length, 12);
+  assert.equal((html.match(/class="reading-label">通常表现<\/div>/g) || []).length, 4);
+  assert.equal((html.match(/class="reading-label">可以发挥的地方<\/div>/g) || []).length, 4);
+  assert.equal((html.match(/class="reading-label">压力下留意<\/div>/g) || []).length, 4);
+  assert.equal((html.match(/class="scene-card"/g) || []).length, 3);
+  assert.equal((html.match(/class="scene-item"/g) || []).length, 6);
+  assert.match(html, /class="interaction-empty"/);
+  assert.doesNotMatch(html, /result-reflection|补上真实生活里的你|继续观察|id="reflection"/);
   assert.doesNotMatch(html, /复制完整结果|下载文本|下载 JSON|data-action="copy"|data-action="download/);
 });
 
@@ -126,7 +146,7 @@ test('legacy draft migrates to an independently versioned storage envelope on sa
   assert.equal(saved.appVersion, '2.7.3');
   assert.equal(saved.version, undefined);
   assert.equal(saved.answers[0], 5);
-  assert.equal(saved.notes, '上一位的测试笔记');
+  assert.equal(saved.notes, undefined);
   assert.equal(typeof saved.sessionId, 'string');
   assert.equal(saved.revision, 1);
   const updated = harness({ store: app.store, appVersion: '2.8.0' });
@@ -183,10 +203,9 @@ test('opt-out from an older revision cannot remove another tab\'s saved edits', 
   const first = harness({ draft: draft() });
   first.click('start');
   const older = harness({ store: first.store });
-  first.input('reflection', '另一个页面的新笔记');
+  first.click('flag');
   const current = first.store.get(KEY);
-  older.change('remember', false);
-  assert.equal(first.store.get(KEY), current);
+  older.change('remember', false);  assert.equal(first.store.get(KEY), current);
   assert.match(older.element('dialogContent').innerHTML, /保存会话已失效/);
 });
 
@@ -195,7 +214,7 @@ test('blocked reads during lifecycle save never write unchecked local answers', 
   const app = harness(options);
   const original = app.store.get(KEY);
   options.denyRead = true;
-  app.input('reflection', '仅在内存中的笔记'); app.pagehide();
+  app.change('autoNext', true); app.pagehide();
   assert.equal(app.store.get(KEY), original);
   assert.match(app.element('toast').textContent, /未能保存/);
 });
@@ -208,17 +227,17 @@ test('a deletion that leaves stored data in place does not claim a successful re
   assert.match(app.element('main').innerHTML, /已答 1 \/ 32/);
 });
 
-test('concurrent updates are rejected by revision without discarding current in-memory notes', () => {
-  const first = harness({ draft: draft(true) });
+test('concurrent updates are rejected by revision without discarding current in-memory state', () => {
+  const first = harness({ draft: draft() });
   first.click('start');
   const other = harness({ store: first.store });
-  first.input('reflection', '最新保存的笔记');
+  first.click('flag');
   const current = first.store.get(KEY);
-  other.input('reflection', '旧页正在输入的笔记');
+  other.change('autoNext', true);
   assert.equal(first.store.get(KEY), current);
-  other.click('start');
-  assert.match(other.element('main').innerHTML, /旧页正在输入的笔记/);
-  assert.equal(JSON.parse(first.store.get(KEY)).notes, '最新保存的笔记');
+  other.click('next');
+  assert.match(other.element('main').innerHTML, /id="autoNext" checked/);
+  assert.equal(JSON.parse(first.store.get(KEY)).autoNext, false);
 });
 
 test('storage invalidation preserves the current main view and blocks lifecycle saves', () => {
@@ -226,12 +245,12 @@ test('storage invalidation preserves the current main view and blocks lifecycle 
   first.click('start');
   const other = harness({ store: first.store });
   const mainBefore = first.element('main').innerHTML;
-  first.element('reflection').focus();
+  first.element('main').focus();
   other.click('reset'); other.click('confirmReset');
   first.storage(); first.pagehide();
   assert.match(first.element('storageConflict').textContent, /保存会话已失效/);
   assert.equal(first.element('storageConflict').hidden, false);
-  assert.equal(first.focused, 'reflection');
+  assert.equal(first.focused, 'main');
   assert.equal(first.element('infoDialog').open, false);
   assert.equal(first.store.size, 0);
   assert.equal(first.element('main').innerHTML, mainBefore);

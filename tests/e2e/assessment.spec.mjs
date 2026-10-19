@@ -70,6 +70,32 @@ test('32 answers produce a local interpretation, and review changes update it wi
   await expect(page.getByRole('img', { name: 'JP 原始分数 20，范围8到40，中点24，刻度位置 37.5%' })).toBeVisible();
   await expect(page.getByText('原始分 20 / 40 · 刻度位置 37.5%')).toBeVisible();
 
+  const nav = page.locator('.result-nav a');
+  await expect(nav).toHaveCount(4);
+  await expect(page.locator('#result-overview')).toBeVisible();
+  await expect(page.locator('#result-dimensions')).toBeVisible();
+  await expect(page.locator('#result-interactions')).toBeVisible();
+  await expect(page.locator('#result-scenes')).toBeVisible();
+  await expect(page.locator('#result-reflection')).toHaveCount(0);
+  await expect(page.locator('.note-panel')).toHaveCount(0);
+  await expect(page.getByText('补上真实生活里的你')).toHaveCount(0);
+  await expect(page.locator('.dimension-card')).toHaveCount(4);
+  await expect(page.locator('.dimension-card .reading-block')).toHaveCount(12);
+  await expect(page.getByText('通常表现', { exact: true })).toHaveCount(4);
+  await expect(page.getByText('可以发挥的地方', { exact: true })).toHaveCount(4);
+  await expect(page.getByText('压力下留意', { exact: true })).toHaveCount(4);
+  await expect(page.locator('.interaction-card')).toHaveCount(3);
+  await expect(page.locator('.scene-card')).toHaveCount(3);
+  await expect(page.locator('.scene-item')).toHaveCount(6);
+  for (const title of ['工作与学习', '关系与沟通', '压力与恢复']) {
+    await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
+  }
+
+  await page.getByRole('link', { name: '场景建议', exact: true }).click();
+  await expect(page).toHaveURL(/#result-scenes$/);
+  await expect(page.locator('#result-scenes')).toBeInViewport();
+  await expectNoHorizontalOverflow(page);
+
   await page.getByRole('button', { name: '返回检查答案' }).click();
   await page.locator('.review-item').first().click();
   await expect(answer(page, 1)).toBeChecked();
@@ -82,10 +108,9 @@ test('32 answers produce a local interpretation, and review changes update it wi
   await expect(page.getByText('原始分 24 / 40 · 刻度位置 50.0% · 中间带 45%–55%')).toBeVisible();
   await expect(page.getByRole('heading', { name: '这份解读能做什么，不能做什么' })).toBeVisible();
 
-  const note = '熟人聚会时会主动交流，独处后恢复精力。';
-  const noteBox = page.getByRole('textbox', { name: /可选：记下让你想到的具体例子/ });
-  await noteBox.fill(note);
-  await expect(noteBox).toHaveValue(note);
+  await expect(page.getByRole('textbox', { name: /可选：记下让你想到的具体例子/ })).toHaveCount(0);
+  await expect(page.getByRole('textbox')).toHaveCount(0);
+  await expect(page.getByText('继续观察')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /复制完整结果|下载 JSON|下载文本/ })).toHaveCount(0);
 });
 

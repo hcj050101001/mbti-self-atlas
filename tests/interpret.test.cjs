@@ -35,30 +35,47 @@ function resultWith(offsets) {
   };
 }
 
-test("four balanced dimensions stay unresolved, list 16 candidates, and invent no interaction", () => {
+test("four balanced dimensions stay unresolved, list 16 candidates, and still explain every dimension", () => {
   const reading = interpretation.interpret(core.score(Array(32).fill(3)));
   assert.equal(reading.headline, "你的回答目前呈现为 XXXX");
   assert.equal(reading.candidateCount, 16);
   assert.equal(reading.interactions.length, 0);
-  assert.equal(reading.reflection.length, 3);
   assert.equal(reading.dimensions.length, 4);
+  assert.ok(reading.overall.length >= 3);
+  assert.match(reading.overall[0], /四个维度都落在 45%–55% 的中间带/);
   for (const dimension of reading.dimensions) {
     assert.equal(dimension.side, "balanced");
     assert.equal(dimension.strength, "balanced");
     assert.equal(dimension.strengthLabel, "中间带");
     assert.equal(dimension.directionLabel, "中间带");
     assert.match(dimension.scoreLine, /^原始分 24 \/ 40 · 刻度位置 50\.0% · 中间带 45%–55%$/);
-    assert.equal(dimension.text, interpretation.DIMENSIONS[dimension.key].balancedText);
+    const texts = interpretation.DIMENSIONS[dimension.key].texts.balanced;
+    assert.equal(dimension.expression, texts.expression);
+    assert.equal(dimension.upside, texts.upside);
+    assert.equal(dimension.watch, texts.watch);
+    assert.equal(dimension.strengthNote, interpretation.STRENGTHS.balanced.text);
+  }
+  assert.deepEqual(reading.scenes.map(scene => scene.title), ["工作与学习", "关系与沟通", "压力与恢复"]);
+  assert.deepEqual(reading.scenes.map(scene => scene.items.length), [2, 2, 2]);
+  for (const scene of reading.scenes) {
+    for (const item of scene.items) {
+      assert.equal(item.text, interpretation.DIMENSIONS[item.key].texts.balanced.scenes[scene.key]);
+    }
   }
   assert.ok(reading.summary.some(line => /16 种四字母组合/.test(line)));
   assert.ok(reading.summary.some(line => /23–25 分都视为中间带/.test(line)));
-  assert.equal(reading.caveats.length, 3);
+  assert.equal(reading.caveats.length, 4);
   assert.equal(Object.isFrozen(reading), true);
+  assert.equal(Object.isFrozen(reading.overall), true);
   assert.equal(Object.isFrozen(reading.caveats), true);
   assert.equal(Object.isFrozen(reading.dimensions), true);
+  assert.equal(Object.isFrozen(reading.dimensions[0]), true);
+  assert.equal(Object.isFrozen(reading.scenes), true);
+  assert.equal(Object.isFrozen(reading.scenes[0].items), true);
+  assert.equal(Object.isFrozen(reading.scenes[0].items[0]), true);
 });
 
-test("fully resolved extreme answers produce strong dimensions, two interactions, and one candidate", () => {
+test("fully resolved extreme answers produce strong dimensions, three interactions, and one candidate", () => {
   const reading = interpretation.interpret(resultWith([16, 16, 16, 16]));
   assert.equal(reading.headline, "你的回答整体偏向 ENTP");
   assert.equal(reading.candidateCount, 1);
@@ -66,14 +83,25 @@ test("fully resolved extreme answers produce strong dimensions, two interactions
   assert.deepEqual(reading.dimensions.map(dimension => dimension.directionLabel), ["E · 外向", "N · 直觉", "T · 思考", "P · 知觉"]);
   assert.deepEqual(reading.interactions.map(item => item.title), [
     "信息与判断：你怎样把观察变成决定",
-    "能量与节奏：你怎样安排一天"
+    "能量与节奏：你怎样安排一天",
+    "关系中的关心方式"
   ]);
-  assert.equal(reading.interactions.length, 2, "only the two highest-priority complete pairs are shown");
+  assert.deepEqual(reading.interactions.map(item => item.keys.join("×")), ["SN×FT", "IE×JP", "IE×FT"]);
+  const overallText = reading.overall.join("");
+  assert.ok(overallText.includes(interpretation.DIMENSIONS.IE.texts.high.clause));
+  assert.ok(overallText.includes(interpretation.DIMENSIONS.SN.texts.high.clause));
+  assert.ok(overallText.includes(interpretation.DIMENSIONS.FT.texts.high.clause));
+  assert.ok(overallText.includes(interpretation.DIMENSIONS.JP.texts.high.clause));
+  for (const scene of reading.scenes) {
+    for (const item of scene.items) {
+      assert.equal(item.text, interpretation.DIMENSIONS[item.key].texts.high.scenes[scene.key]);
+    }
+  }
   assert.ok(reading.summary.some(line => /4 个很强/.test(line)));
   assert.ok(reading.summary.some(line => /不是固定人格/.test(line)));
 });
 
-test("strength bands switch at the declared distance boundaries", () => {
+test("strength bands switch at the declared distance boundaries and only add a note", () => {
   const cases = [
     [-16, "strong", "很强"], [-10, "strong", "很强"],
     [-9, "clear", "明显"], [-5, "clear", "明显"],
@@ -89,10 +117,15 @@ test("strength bands switch at the declared distance boundaries", () => {
     assert.equal(reading.dimensions[0].strengthLabel, label, `offset ${offset}`);
     assert.equal(reading.dimensions[0].side, strength === "balanced" ? "balanced" : offset > 0 ? "high" : "low");
     assert.equal(reading.dimensions[0].scoreLine.includes("中间带 45%–55%"), strength === "balanced");
+    assert.equal(reading.dimensions[0].strengthNote, interpretation.STRENGTHS[strength].text);
+    const texts = interpretation.DIMENSIONS.IE.texts[reading.dimensions[0].side];
+    assert.equal(reading.dimensions[0].expression, texts.expression);
+    assert.equal(reading.dimensions[0].upside, texts.upside);
+    assert.equal(reading.dimensions[0].watch, texts.watch);
   }
 });
 
-test("interaction pairs appear only when both dimensions are resolved, in priority order", () => {
+test("interaction pairs appear only when both dimensions are resolved and rank by combined distance", () => {
   const snft = interpretation.interpret(resultWith([0, 3, 5, 0]));
   assert.deepEqual(snft.interactions.map(item => item.title), ["信息与判断：你怎样把观察变成决定"]);
 
@@ -102,38 +135,26 @@ test("interaction pairs appear only when both dimensions are resolved, in priori
   const all = interpretation.interpret(resultWith([3, 3, 5, 3]));
   assert.deepEqual(all.interactions.map(item => item.title), [
     "信息与判断：你怎样把观察变成决定",
+    "关系中的关心方式",
+    "决定与执行：你怎样把判断变成行动"
+  ]);
+
+  const ranked = interpretation.interpret(resultWith([2, 10, 2, 10]));
+  assert.deepEqual(ranked.interactions.map(item => item.title), [
+    "探索与收束：你怎样从想法走到完成",
+    "信息与判断：你怎样把观察变成决定",
     "能量与节奏：你怎样安排一天"
   ]);
 
   const ieft = interpretation.interpret(resultWith([3, 0, 5, 0]));
   assert.deepEqual(ieft.interactions.map(item => item.title), ["关系中的关心方式"]);
-  assert.match(ieft.interactions[0].text, /讨论与建议/);
+  assert.match(ieft.interactions[0].text, /讨论、建议和行动/);
 
-  const none = interpretation.interpret(resultWith([0, 3, 0, 3]));
+  const onePair = interpretation.interpret(resultWith([0, 3, 0, 3]));
+  assert.deepEqual(onePair.interactions.map(item => item.title), ["探索与收束：你怎样从想法走到完成"]);
+
+  const none = interpretation.interpret(resultWith([0, 3, 0, 0]));
   assert.equal(none.interactions.length, 0);
-});
-
-test("reflection questions take balanced dimensions first, then the closest resolved ones", () => {
-  const allBalanced = interpretation.interpret(resultWith([0, 0, 0, 0]));
-  assert.deepEqual(allBalanced.reflection, [
-    interpretation.DIMENSIONS.IE.prompt,
-    interpretation.DIMENSIONS.SN.prompt,
-    interpretation.DIMENSIONS.FT.prompt
-  ]);
-
-  const oneBalanced = interpretation.interpret(resultWith([0, 3, 5, 10]));
-  assert.deepEqual(oneBalanced.reflection, [
-    interpretation.DIMENSIONS.IE.prompt,
-    interpretation.DIMENSIONS.SN.prompt,
-    interpretation.DIMENSIONS.FT.prompt
-  ]);
-
-  const balancedLast = interpretation.interpret(resultWith([10, 5, 3, 0]));
-  assert.deepEqual(balancedLast.reflection, [
-    interpretation.DIMENSIONS.JP.prompt,
-    interpretation.DIMENSIONS.FT.prompt,
-    interpretation.DIMENSIONS.SN.prompt
-  ]);
 });
 
 test("public wording keeps its caveats and makes no probability, diagnosis, or fixed-type claim", () => {
@@ -141,9 +162,18 @@ test("public wording keeps its caveats and makes no probability, diagnosis, or f
   const allText = [
     reading.headline,
     ...reading.summary,
-    ...reading.dimensions.flatMap(dimension => [dimension.directionLabel, dimension.strengthLabel, dimension.text, dimension.scoreLine]),
+    ...reading.overall,
+    ...reading.dimensions.flatMap(dimension => [
+      dimension.directionLabel,
+      dimension.strengthLabel,
+      dimension.strengthNote,
+      dimension.expression,
+      dimension.upside,
+      dimension.watch,
+      dimension.scoreLine
+    ]),
     ...reading.interactions.flatMap(item => [item.title, item.text]),
-    ...reading.reflection,
+    ...reading.scenes.flatMap(scene => [scene.title, ...scene.items.flatMap(item => [item.name, item.label, item.text])]),
     ...reading.caveats
   ].join("\n");
   assert.doesNotMatch(allText, /你属于|你的类型是|正确率|匹配度|诊断(?:为|出)/);
@@ -151,6 +181,12 @@ test("public wording keeps its caveats and makes no probability, diagnosis, or f
   assert.match(allText, /不是 AI 推断/);
   assert.match(allText, /不是人群百分位/);
   assert.match(allText, /不表示人格无法判断/);
+});
+
+test("the same scoring result always produces identical text", () => {
+  const first = interpretation.interpret(resultWith([4, -6, 2, 8]));
+  const second = interpretation.interpret(resultWith([4, -6, 2, 8]));
+  assert.deepEqual(first, second);
 });
 
 test("invalid scoring results are rejected before any interpretation is built", () => {
@@ -189,6 +225,10 @@ test("the browser build attaches to the global object without a module loader", 
   assert.equal(Object.isFrozen(context.MBTIInterpretation), true);
   assert.equal(Object.isFrozen(context.MBTIInterpretation.DIMENSIONS), true);
   assert.equal(Object.isFrozen(context.MBTIInterpretation.DIMENSIONS.IE), true);
+  assert.equal(Object.isFrozen(context.MBTIInterpretation.DIMENSIONS.IE.texts), true);
+  assert.equal(Object.isFrozen(context.MBTIInterpretation.DIMENSIONS.IE.texts.high.scenes), true);
+  assert.equal(Object.isFrozen(context.MBTIInterpretation.INTERACTION_PAIRS), true);
+  assert.equal(Object.isFrozen(context.MBTIInterpretation.SCENE_GROUPS), true);
   const reading = context.MBTIInterpretation.interpret(context.MBTICore.score(Array(32).fill(3)));
   assert.equal(reading.candidateCount, 16);
 });

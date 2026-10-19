@@ -15,7 +15,7 @@
   const dialog = document.getElementById('infoDialog');
   const dialogContent = document.getElementById('dialogContent');
   const labels = ['很像左边', '偏向左边', '中间 / 都像', '偏向右边', '很像右边'];
-  function freshState() { return { answers: Array(32).fill(null), flags: [], index: 0, view: 'welcome', autoNext: true, english: false, remember: false, notes: '', startedAt: null, completedAt: null, activeMs: 0 }; }
+  function freshState() { return { answers: Array(32).fill(null), flags: [], index: 0, view: 'welcome', autoNext: true, english: false, remember: false, startedAt: null, completedAt: null, activeMs: 0 }; }
   let state = freshState();
   let recovered = false;
   let storageWorking = true;
@@ -59,7 +59,7 @@
       dialog.setAttribute('aria-label', '保存会话已失效');
       if (!dialog.open) dialog.showModal();
     }
-    // Do not redraw: a storage event may arrive while someone is typing notes.
+    // Do not redraw: a storage event may arrive during another interaction.
     for (const id of ['remember', 'rememberDialog']) { const checkbox = document.getElementById(id); if (checkbox) checkbox.checked = false; }
     updateSaveStatus();
   }
@@ -100,7 +100,6 @@
       state.autoNext = draft.autoNext !== false;
       state.english = draft.english === true;
       state.remember = true;
-      state.notes = typeof draft.notes === 'string' ? draft.notes.slice(0, 2000) : '';
       state.startedAt = typeof draft.startedAt === 'string' && Number.isFinite(Date.parse(draft.startedAt)) ? draft.startedAt : null;
       state.completedAt = typeof draft.completedAt === 'string' && Number.isFinite(Date.parse(draft.completedAt)) && count() === 32 ? draft.completedAt : null;
       state.activeMs = Number.isFinite(draft.activeMs) && draft.activeMs >= 0 ? Math.min(draft.activeMs, 31536000000) : 0;
@@ -143,7 +142,7 @@
         <label class="settings-line hero-settings"><input type="checkbox" id="remember" ${state.remember ? 'checked' : ''}><span>在此设备保存进度，以便下次继续。<br><small>共用设备建议关闭；默认仅在当前页面内保留。</small></span></label>
       </div><div class="atlas" role="img" aria-label="由内外倾向、信息、判断和生活方式组成的四维偏好图案"><span class="atlas-note top">FOUR DIMENSIONS · ONE YOU</span><div class="atlas-grid"><div class="petal"><span>I / E</span></div><div class="petal"><span>S / N</span></div><div class="petal"><span>F / T</span></div><div class="petal"><span>J / P</span></div></div><div class="atlas-center" aria-hidden="true">✳</div><span class="atlas-star" aria-hidden="true">✧</span><span class="atlas-note bottom">每一种偏好，都有它的位置</span></div></div>
       <div class="stats-row"><div class="stat"><span class="stat-value">32</span><span class="stat-label">完整原版题目<span>保留原顺序与五点选项</span></span></div><div class="stat"><span class="stat-value">04</span><span class="stat-label">连续偏好维度<span>展示原始分数与边界</span></span></div><div class="stat"><span class="stat-value">Local</span><span class="stat-label">浏览器内计算<span>你的答案不会自动上传</span></span></div></div>
-      <div class="intro-grid"><div><div class="section-kicker">开始前，给自己三个提醒</div><div class="principles"><div class="principle"><span class="principle-num">01</span><div><strong>选平常的自己，不是理想的自己</strong><p>结合平时多个场景回答，尽量避免只依据今天的心情或一段特殊经历。</p></div></div><div class="principle"><span class="principle-num">02</span><div><strong>没有正确答案，也没有更好的类型</strong><p>两侧都像可以选中间；不理解或难以判断时，先标记“待复核”。</p></div></div><div class="principle"><span class="principle-num">03</span><div><strong>完成之后，再看整体</strong><p>所有题目均可修改。结果页会按内置规则给出四维解读、维度互动与反思问题，供你结合真实经历核对。</p></div></div></div></div>
+      <div class="intro-grid"><div><div class="section-kicker">开始前，给自己三个提醒</div><div class="principles"><div class="principle"><span class="principle-num">01</span><div><strong>选平常的自己，不是理想的自己</strong><p>结合平时多个场景回答，尽量避免只依据今天的心情或一段特殊经历。</p></div></div><div class="principle"><span class="principle-num">02</span><div><strong>没有正确答案，也没有更好的类型</strong><p>两侧都像可以选中间；不理解或难以判断时，先标记“待复核”。</p></div></div><div class="principle"><span class="principle-num">03</span><div><strong>完成之后，再看整体</strong><p>所有题目均可修改。结果页会按内置规则给出四维解读、维度互动与场景建议，供你结合真实经历核对。</p></div></div></div></div>
       <aside class="boundary-note"><h3>一份透明的探索工具</h3><p>这是开放的荣格类型量表，不是官方 MBTI®。原作者不保证其信度或准确性；本中文试译也未经心理测量验证，不能承诺适用于所有文化与年龄。</p><p>适合能理解题意的成人自我探索。结果不用于诊断、招聘筛选或能力评价。需要正式 MBTI 时，请使用官方授权测评与反馈流程。</p><a href="https://www.myersbriggs.org/my-mbti-personality-type/take-the-mbti-Instrument/" target="_blank" rel="noopener noreferrer">了解官方 MBTI 测评 ↗</a></aside></div>
     </section>`;
   }
@@ -201,14 +200,23 @@
     reading.dimensions.forEach(item => { readings[item.key] = item; });
     const uncertain = reading.dimensions.filter(d => d.side === 'balanced');
     const neutral = state.answers.filter(n => n === 3).length;
-    main.innerHTML = `<section class="view">${steps(3)}<div class="result-intro"><div class="result-profile"><div class="eyebrow">YOUR PREFERENCE ATLAS</div><h1 class="sr-only" data-focus>你的偏好轮廓：${esc(result.cautiousType)}</h1><div class="result-type" aria-label="偏好轮廓 ${esc(result.cautiousType)}">${result.cautiousType.split('').map(letter => `<span class="letter-tile ${letter === 'X' ? 'unclear' : ''}" aria-hidden="true">${esc(letter)}</span>`).join('')}</div><h2 class="result-subtitle">${esc(reading.headline)}</h2><p class="result-lead">${uncertain.length ? `${uncertain.length} 个维度位于 45%–55% 中间带，以 X 留白。<br>下面从方向、强度、维度互动和反思问题四个层次展开。` : '四个维度都落在 45%–55% 中间带之外。<br>这反映本次回答的倾向，不证明类型永远不变。'}</p></div>
+    const overallCopy = reading.overall.map(paragraph => `<p>${esc(paragraph)}</p>`).join('');
+    const dimensionCards = result.dimensions.map(d => {
+      const item = readings[d.key];
+      return `<article class="dimension-card"><div class="dimension-title"><h3>${esc(item.name)}</h3><span class="score-tag">${d.score} 分 · ${esc(item.directionLabel)}</span></div><div class="dimension-poles"><span><b>${d.low}</b> ${item.side === 'low' ? esc(item.directionLabel.split(' · ')[1]) : ''}</span><span>${item.side === 'high' ? esc(item.directionLabel.split(' · ')[1]) : ''} <b>${d.high}</b></span></div><div class="track" role="img" aria-label="${d.key} 原始分数 ${d.score}，范围8到40，中点24，刻度位置 ${d.position.toFixed(1)}%"><span class="track-marker" style="left:${d.position}%"></span></div><div class="track-labels"><span>8</span><span>24 · 中点</span><span>40</span></div><p class="score-line">${esc(item.scoreLine)}</p><p class="dimension-strength"><span class="strength-tag ${item.strength}">${esc(item.strengthLabel)}</span><span>${esc(item.strengthNote)}</span></p><div class="reading-block"><div class="reading-label">通常表现</div><p class="reading-text">${esc(item.expression)}</p></div><div class="reading-block"><div class="reading-label">可以发挥的地方</div><p class="reading-text">${esc(item.upside)}</p></div><div class="reading-block"><div class="reading-label">压力下留意</div><p class="reading-text">${esc(item.watch)}</p></div></article>`;
+    }).join('');
+    const interactionCards = reading.interactions.length
+      ? `<div class="interaction-grid">${reading.interactions.map(item => `<article class="interaction-card"><div class="interaction-keys">${esc(item.keys.join(' × '))}</div><h3>${esc(item.title)}</h3><p>${esc(item.text)}</p></article>`).join('')}</div>`
+      : '<p class="interaction-empty">本次回答没有两个维度同时离开 45%–55% 中间带，因此不生成互动组合；这比硬凑一组描述更接近现有信息。</p>';
+    const sceneCards = reading.scenes.map(scene => `<article class="scene-card"><h3>${esc(scene.title)}</h3>${scene.items.map(item => `<div class="scene-item"><div class="scene-label">${esc(item.name)} · ${esc(item.label)}</div><p>${esc(item.text)}</p></div>`).join('')}</article>`).join('');
+    main.innerHTML = `<section class="view">${steps(3)}<div class="result-intro"><div class="result-profile"><div class="eyebrow">YOUR PREFERENCE ATLAS</div><h1 class="sr-only" data-focus>你的偏好轮廓：${esc(result.cautiousType)}</h1><div class="result-type" aria-label="偏好轮廓 ${esc(result.cautiousType)}">${result.cautiousType.split('').map(letter => `<span class="letter-tile ${letter === 'X' ? 'unclear' : ''}" aria-hidden="true">${esc(letter)}</span>`).join('')}</div><h2 class="result-subtitle">${esc(reading.headline)}</h2><p class="result-lead">${uncertain.length ? `${uncertain.length} 个维度位于 45%–55% 中间带，以 X 留白。<br>下面按整体、四个维度、维度互动和场景建议展开。` : '四个维度都落在 45%–55% 中间带之外。<br>下面按整体、四个维度、维度互动和场景建议展开；这反映本次回答的倾向，不证明类型永远不变。'}</p></div>
       <div class="result-summary-box"><h3>先看整体，再读每一个维度。</h3>${reading.summary.map(paragraph => `<p>${esc(paragraph)}</p>`).join('')}<div class="result-facts"><span class="fact">已完成 32 / 32</span><span class="fact">中间选项 ${neutral} 题</span><span class="fact">待复核 ${state.flags.length} 题</span></div></div></div>
-      <div class="dimension-grid">${result.dimensions.map(d => { const item = readings[d.key]; return `<article class="dimension-card"><div class="dimension-title"><h3>${item.name}</h3><span class="score-tag">${d.score} 分 · ${esc(item.directionLabel)}</span></div><div class="dimension-poles"><span><b>${d.low}</b> ${item.side === 'low' ? esc(item.directionLabel.split(' · ')[1]) : ''}</span><span>${item.side === 'high' ? esc(item.directionLabel.split(' · ')[1]) : ''} <b>${d.high}</b></span></div><div class="track" role="img" aria-label="${d.key} 原始分数 ${d.score}，范围8到40，中点24，刻度位置 ${d.position.toFixed(1)}%"><span class="track-marker" style="left:${d.position}%"></span></div><div class="track-labels"><span>8</span><span>24 · 中点</span><span>40</span></div><p class="dimension-reading"><span class="strength-tag ${item.strength}">${esc(item.strengthLabel)}</span>${esc(item.text)}</p><p class="score-line">${esc(item.scoreLine)}</p></article>`; }).join('')}</div>
-      <p class="score-explainer">所有分数范围均为 8–40，24 为分界。横向位置只是原始分数的线性展示，不是人群百分位、准确率或成为某类型的概率。单次回答无法估计个体测量误差。X 仅表示刻度位置在 45%–55% 之间，不是一种人格类型。</p>
-      ${reading.interactions.length ? `<section class="interpretation-block"><div class="section-kicker">维度之间</div><h2>两个维度放在一起看</h2><div class="interaction-grid">${reading.interactions.map(item => `<article class="interaction-card"><h3>${esc(item.title)}</h3><p>${esc(item.text)}</p></article>`).join('')}</div></section>` : ''}
-      <section class="interpretation-block"><div class="section-kicker">把结果放回生活</div><h2>可以带着这些问题继续观察</h2><div class="reflection-panel"><ol>${reading.reflection.map(question => `<li>${esc(question)}</li>`).join('')}</ol></div>
-      <div class="panel note-panel"><h3>补上真实生活里的你</h3><p>规则生成的解读只是起点。记录具体场景，能帮助你判断哪些描述贴切、哪些不贴切。</p><label class="note-field">可选：记下让你想到的具体例子<textarea id="reflection" maxlength="2000" placeholder="例如：在熟人中我常主动说话，但大型陌生聚会后需要独处……">${esc(state.notes)}</textarea></label><p class="note-privacy">只保存在此设备；不参与计分，也不会上传。开启“保存进度”时会写入浏览器本地存储。请避免填写敏感身份信息。</p></div></section>
-      <section class="interpretation-block caveat-panel"><div class="section-kicker">边界说明</div><h2>这份解读能做什么，不能做什么</h2><ul>${reading.caveats.map(caveat => `<li>${esc(caveat)}</li>`).join('')}</ul></section>
+      <nav class="result-nav" aria-label="结果页章节"><a href="#result-overview">整体</a><a href="#result-dimensions">四个维度</a><a href="#result-interactions">维度互动</a><a href="#result-scenes">场景建议</a></nav>
+      <section class="result-section" id="result-overview" aria-labelledby="result-overview-title"><div class="section-kicker">整体</div><h2 id="result-overview-title">把四个维度放在一起看</h2><p class="section-intro">以下四段由你的四个维度方向和强度按固定句式组合；同一组分数会得到同一段文字。</p><div class="overview-copy">${overallCopy}</div></section>
+      <section class="result-section" id="result-dimensions" aria-labelledby="result-dimensions-title"><div class="section-kicker">四个维度</div><h2 id="result-dimensions-title">四个维度分别看</h2><p class="section-intro">每张卡片先给出方向和强度，再从通常表现、可以发挥的地方、压力下留意三个角度展开。</p><div class="dimension-grid">${dimensionCards}</div><p class="score-explainer">所有分数范围均为 8–40，24 为分界。横向位置只是原始分数的线性展示，不是人群百分位、准确率或成为某类型的概率。单次回答无法估计个体测量误差。X 仅表示刻度位置在 45%–55% 之间，不是一种人格类型。</p></section>
+      <section class="result-section" id="result-interactions" aria-labelledby="result-interactions-title"><div class="section-kicker">维度之间</div><h2 id="result-interactions-title">维度之间：组合起来的样子</h2><p class="section-intro">两个维度都离开中间带时，才会生成一组组合描述；最多显示三组，按偏离中点的幅度排序。</p>${interactionCards}</section>
+      <section class="result-section" id="result-scenes" aria-labelledby="result-scenes-title"><div class="section-kicker">放回生活</div><h2 id="result-scenes-title">放回生活：工作、关系与恢复</h2><p class="section-intro">每个场景给出两个与你本次方向相关的具体做法，不需要全部照做。</p><div class="scene-grid">${sceneCards}</div></section>
+      <section class="result-section caveat-panel" id="result-caveats"><div class="section-kicker">边界说明</div><h2>这份解读能做什么，不能做什么</h2><ul>${reading.caveats.map(caveat => `<li>${esc(caveat)}</li>`).join('')}</ul></section>
       <div class="result-bottom"><button class="button secondary" data-action="review">返回检查答案</button><button class="button secondary" data-dialog="method">查看来源与计算过程</button><button class="button ghost" data-action="reset">换一位 / 重新开始</button></div>
     </section>`;
   }
@@ -221,7 +229,7 @@
       <div class="formula">${Object.entries(Core.FORMULAS).map(([key, formula]) => `<div><code>${esc(key)} = ${esc(formula)}</code></div>`).join('')}</div>
       <p>四维分数均在 8–40。原规则：IE &gt; 24 为 E，否则 I；SN &gt; 24 为 N，否则 S；FT &gt; 24 为 T，否则 F；JP &gt; 24 为 P，否则 J。字母排成 I/E、S/N、T/F、J/P 的通常次序，F/T 轴的低分一侧是 F。</p>
       <p>页面新增：原始分换算为 8–40 刻度上的位置，落在 45%–55%（整数分 23–25）的维度用 X 提醒复核；这个范围是页面阅读约定，不来自原量表，也不是统计置信区间。原规则结果同时保留，避免隐藏差异。中间选项数、作答时长和标记数只描述过程，不据此宣称回答有效或无效。</p>
-      <p>结果页的解读文字由页面内置的固定规则根据四维分数生成，不调用 AI，也不改变计分。它提供观察角度与反思问题，不是心理诊断、能力评价或经过验证的类型描述。</p>
+      <p>结果页的整体叙述、四维分述、维度互动和场景建议，由页面内置的固定规则根据四维分数组合生成，不调用 AI、不上传答案，也不改变计分。它提供观察角度，不是心理诊断、能力评价或经过验证的类型描述。</p>
       <h3>适用范围与共享许可</h3><p>面向能理解题意的成人自我探索。部分原题涉及外出、说话方式或工作习惯，可能受身体条件、文化与生活阶段影响；难以判断可标记并在结果中说明。不能承诺所有人的测量等值，也不据此评价能力、品德或心理健康。</p><p>原题作者：Eric Jorgenson。题库与本中文改编按 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a> 非商业、署名、相同方式共享。中文翻译、界面与边界提示为本项目改编；不得声称原作者或 MBTI 官方为其背书。核对日期：2026-10-15。</p>
       <ul class="source-list"><li><a href="${Core.SOURCE}" target="_blank" rel="noopener noreferrer">01 · OEJTS 1.2 原始题目、计分键与许可（PDF） ↗</a><small>题目与算法的一手来源，32题固定版本。</small></li><li><a href="https://openpsychometrics.org/tests/OJTS/development/" target="_blank" rel="noopener noreferrer">02 · OpenPsychometrics 开发说明 ↗</a><small>开发背景与限制；页面的不同题数叙述不作为本工具的题库。</small></li><li><a href="https://www.themyersbriggs.com/en-US/Support/Copyright-and-Permissions" target="_blank" rel="noopener noreferrer">03 · The Myers-Briggs Company：版权与许可 ↗</a></li><li><a href="https://www.myersbriggs.org/my-mbti-personality-type/take-the-mbti-Instrument/" target="_blank" rel="noopener noreferrer">04 · Myers & Briggs Foundation：正式测评入口 ↗</a></li><li><a href="https://www.16personalities.com/articles/our-theory" target="_blank" rel="noopener noreferrer">05 · 16Personalities：模型说明 ↗</a></li></ul>
       <details><summary>查看全部中英文题目（建议作答后查看）</summary><div class="source-table-wrap"><table class="source-table"><thead><tr><th>题号</th><th>左侧（1）</th><th>右侧（5）</th></tr></thead><tbody>${items.map(q => `<tr><td>${q.id}</td><td>${esc(q.leftZh)}<span class="en" lang="en">${esc(q.leftEn)}</span></td><td>${esc(q.rightZh)}<span class="en" lang="en">${esc(q.rightEn)}</span></td></tr>`).join('')}</tbody></table></div></details>
@@ -230,7 +238,7 @@
   function openDialog(kind) {
     cancelNext();
     if (kind === 'method') dialogContent.innerHTML = methodContent();
-    else if (kind === 'privacy') dialogContent.innerHTML = `<h2>你的回答，留在你的浏览器里。</h2><p>本页面不加载统计脚本、外部字体或远程服务，不会自动上传回答、笔记和结果。点击外部资料链接才会打开相应网站。</p><h3>当前保存方式</h3><label class="settings-line"><input type="checkbox" id="rememberDialog" ${state.remember ? 'checked' : ''}><span>在此设备保存进度与笔记</span></label><p>开启后，数据保存在本浏览器的 localStorage 中，直到你关闭此选项或选择“换一位 / 重新开始”。这不是加密保险箱，共用设备请关闭。关闭后只保留当前页面内存中的回答，刷新或关闭页面就会丢失。</p><p>浏览器可能限制本地 HTML 的持久存储；如保存失败，页面会提示。不会在不同浏览器、设备或文件地址之间自动同步。</p><h3>解读如何生成</h3><p>结果页的四维解读、维度互动和反思问题，由本页面内置的固定规则根据分数在本地生成，不会把答案发送给任何服务。X 只表示刻度位置处于 45%–55% 中间带，不是一种人格类型，也不代表测量结论。</p><button class="button secondary" data-action="reset">清空本工具数据 / 换一位</button>`;
+    else if (kind === 'privacy') dialogContent.innerHTML = `<h2>你的回答，留在你的浏览器里。</h2><p>本页面不加载统计脚本、外部字体或远程服务，不会自动上传回答和结果。点击外部资料链接才会打开相应网站。</p><h3>当前保存方式</h3><label class="settings-line"><input type="checkbox" id="rememberDialog" ${state.remember ? 'checked' : ''}><span>在此设备保存进度</span></label><p>开启后，数据保存在本浏览器的 localStorage 中，直到你关闭此选项或选择“换一位 / 重新开始”。这不是加密保险箱，共用设备请关闭。关闭后只保留当前页面内存中的回答，刷新或关闭页面就会丢失。</p><p>浏览器可能限制本地 HTML 的持久存储；如保存失败，页面会提示。不会在不同浏览器、设备或文件地址之间自动同步。</p><h3>解读如何生成</h3><p>结果页的整体叙述、四维解读、维度互动和场景建议，由本页面内置的固定规则根据分数在本地组合生成，不会把答案发送给任何服务。X 只表示刻度位置处于 45%–55% 中间带，不是一种人格类型，也不代表测量结论。</p><button class="button secondary" data-action="reset">清空本工具数据 / 换一位</button>`;
     else if (kind === 'palette') dialogContent.innerHTML = `<h2>你的答题进度</h2><p>已答 ${count()} / 32 · 绿色表示已答，橙色小点表示待复核。点击题号跳转。</p><div class="palette-grid">${items.map(q => `<button class="${state.answers[q.id - 1] !== null ? 'answered' : ''} ${state.flags.includes(q.id) ? 'flagged' : ''} ${q.id - 1 === state.index ? 'current' : ''}" data-question="${q.id - 1}" aria-label="第${q.id}题，${state.answers[q.id - 1] !== null ? '已答' : '未答'}${state.flags.includes(q.id) ? '，待复核' : ''}">${q.id}</button>`).join('')}</div><button class="button primary" data-action="review">进入答案复核 →</button>`;
     else return;
     dialog.setAttribute('aria-label', kind === 'method' ? '来源与计分' : kind === 'privacy' ? '隐私说明' : '答题总览');
@@ -239,7 +247,7 @@
   }
   function confirmReset() {
     cancelNext();
-    dialogContent.innerHTML = '<h2>开始一份全新的回答？</h2><p>这会清空本工具在当前页面与此浏览器中保存的答案、笔记和进度，方便下一位使用。清空后无法恢复，如需保留当前结果，请先自行记录。</p><div class="confirm-actions"><button class="button secondary" data-action="cancelReset">先保留</button><button class="button primary" data-action="confirmReset">清空并重新开始</button></div>';
+    dialogContent.innerHTML = '<h2>开始一份全新的回答？</h2><p>这会清空本工具在当前页面与此浏览器中保存的答案和进度，方便下一位使用。清空后无法恢复，如需保留当前结果，请先自行记录。</p><div class="confirm-actions"><button class="button secondary" data-action="cancelReset">先保留</button><button class="button primary" data-action="confirmReset">清空并重新开始</button></div>';
     dialog.setAttribute('aria-label', '清空并重新开始');
     if (!dialog.open) dialog.showModal();
   }
@@ -338,7 +346,6 @@
     else if (target.id === 'autoNext') { cancelNext(); patchState({ autoNext: target.checked }); }
     else if (target.id === 'remember' || target.id === 'rememberDialog') setRemember(target.checked);
   });
-  document.addEventListener('input', event => { if (event.target.id === 'reflection') patchState({ notes: event.target.value.slice(0, 2000) }); });
   document.addEventListener('keydown', event => {
     pointerChoice = false;
     if (state.view !== 'question' || dialog.open || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
