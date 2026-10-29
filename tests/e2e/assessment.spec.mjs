@@ -172,24 +172,6 @@ test('32 answers produce a local interpretation, and review changes update it wi
   await expect(page.locator('a[download], input[type="file"], [data-action="download"]')).toHaveCount(0);
 });
 
-test('hard-to-translate questions show a wording note without blocking an answer', async ({ page }) => {
-  await start(page);
-  await expect(page.locator('.translation-hint')).toHaveCount(0);
-  await answer(page, 1).check();
-  await next(page).click();
-  await expect(questionNumber(page)).toContainText('QUESTION 02');
-  const hint = page.locator('.translation-hint');
-  await expect(hint).toBeVisible();
-  await expect(hint).toContainText('难译提示 · 试译');
-  await expect(hint).toContainText('愿意相信');
-  await expect(hint).not.toContainText(/可以跳过|不必作答|翻译准确|已验证为准确/);
-  await page.setViewportSize({ width: 390, height: 844 });
-  await expectNoHorizontalOverflow(page);
-  await answer(page, 4).check();
-  await expect(answer(page, 4)).toBeChecked();
-  await expect(questionNumber(page)).toContainText('QUESTION 02');
-});
-
 test('system share sends the local summary and falls back to copy', async ({ page }) => {
   await page.addInitScript(() => {
     window.__shares = [];

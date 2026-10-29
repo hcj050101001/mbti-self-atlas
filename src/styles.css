@@ -644,27 +644,6 @@ small {
   text-align:center;
   margin-bottom:32px
 }
-.question-help:has(+ .translation-hint) {
-  margin-bottom:12px
-}
-.translation-hint {
-  margin:0 0 22px;
-  padding:8px 12px;
-  border-radius:10px;
-  background:#f3f1ea;
-  color:var(--muted);
-  font-size:11px;
-  line-height:1.7;
-  text-align:left;
-  overflow-wrap:anywhere
-}
-.translation-hint-label {
-  display:inline-block;
-  margin-right:6px;
-  color:var(--ink);
-  font-size:10px;
-  letter-spacing:.04em
-}
 .poles {
   display:grid;
   grid-template-columns:1fr auto 1fr;
