@@ -65,17 +65,35 @@ async function complete(page, options) {
   await expectNoHorizontalOverflow(page);
 }
 
-test('32 answers produce a local interpretation, and review changes update it without exports', async ({ page }) => {
+async function setFold(page, id, open) {
+  const fold = page.locator(`#${id}`);
+  if ((await fold.evaluate(node => node.open)) !== open) await fold.locator('summary').click();
+  await expect(fold).toHaveJSProperty('open', open);
+}
+
+test('32 answers produce a local interpretation, and review changes update it without file export', async ({ page, browserName }) => {
   await complete(page);
+  await expect(page.locator('.letter-tile')).toHaveCount(4);
   await expect(page.getByRole('img', { name: 'JP 原始分数 20，范围8到40，中点24，刻度位置 37.5%' })).toBeVisible();
   await expect(page.getByText('原始分 20 / 40 · 刻度位置 37.5%')).toBeVisible();
+  await expect(page.locator('.dimension-summary .track')).toHaveCount(4);
+  await expect(page.locator('.result-summary-box')).toBeVisible();
+  await expect(page.getByRole('button', { name: '复制摘要', exact: true })).toBeVisible();
+
+  const tops = await page.evaluate(() => {
+    const top = selector => document.querySelector(selector).getBoundingClientRect().top;
+    return [top('.result-type'), top('.dimension-summary'), top('.result-summary-box'), top('#result-overview')];
+  });
+  expect(tops[0]).toBeLessThan(tops[1]);
+  expect(tops[1]).toBeLessThan(tops[2]);
+  expect(tops[2]).toBeLessThan(tops[3]);
 
   const nav = page.locator('.result-nav a');
   await expect(nav).toHaveCount(4);
-  await expect(page.locator('#result-overview')).toBeVisible();
-  await expect(page.locator('#result-dimensions')).toBeVisible();
-  await expect(page.locator('#result-interactions')).toBeVisible();
-  await expect(page.locator('#result-scenes')).toBeVisible();
+  for (const id of ['result-overview', 'result-dimensions', 'result-interactions', 'result-scenes']) {
+    await expect(page.locator(`#${id}`)).toBeVisible();
+    await expect(page.locator(`#${id}`)).toHaveJSProperty('open', false);
+  }
   await expect(page.locator('#result-reflection')).toHaveCount(0);
   await expect(page.locator('.note-panel')).toHaveCount(0);
   await expect(page.getByText('补上真实生活里的你')).toHaveCount(0);
@@ -88,13 +106,52 @@ test('32 answers produce a local interpretation, and review changes update it wi
   await expect(page.locator('.scene-card')).toHaveCount(3);
   await expect(page.locator('.scene-item')).toHaveCount(6);
   for (const title of ['工作与学习', '关系与沟通', '压力与恢复']) {
+    await expect(page.getByRole('heading', { name: title, exact: true })).toBeHidden();
+  }
+
+  const viewport = page.viewportSize();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expectNoHorizontalOverflow(page);
+  for (const id of ['result-overview', 'result-dimensions', 'result-interactions', 'result-scenes']) {
+    await setFold(page, id, true);
+  }
+  for (const title of ['工作与学习', '关系与沟通', '压力与恢复']) {
     await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
   }
+  await expectNoHorizontalOverflow(page);
+  await setFold(page, 'result-scenes', false);
+  await expect(page.locator('#result-scenes .scene-card')).toHaveCount(3);
+  await expect(page.getByRole('heading', { name: '工作与学习', exact: true })).toBeHidden();
+  if (viewport) await page.setViewportSize(viewport);
 
   await page.getByRole('link', { name: '场景建议', exact: true }).click();
   await expect(page).toHaveURL(/#result-scenes$/);
+  await expect(page.locator('#result-scenes')).toHaveJSProperty('open', true);
   await expect(page.locator('#result-scenes')).toBeInViewport();
+  await expect(page.getByRole('heading', { name: '工作与学习', exact: true })).toBeVisible();
   await expectNoHorizontalOverflow(page);
+
+  if (browserName === 'chromium') {
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  }
+  const requests = [];
+  page.on('request', request => requests.push(request.url()));
+  await page.getByRole('button', { name: '复制摘要', exact: true }).click();
+  if (browserName === 'chromium') {
+    await expect(page.getByRole('status')).toContainText('已复制摘要');
+    const text = await page.evaluate(() => navigator.clipboard.readText());
+    expect(text).toContain('偏好轮廓：ESTJ');
+    expect(text).toContain('IE I/E 原始分');
+    expect(text).toContain('SN S/N 原始分');
+    expect(text).toContain('FT F/T 原始分');
+    expect(text).toContain('JP J/P 原始分');
+    expect(text).toContain('非官方 MBTI，中文试译，未经心理测量验证。');
+    expect(text.split('未经心理测量验证').length - 1).toBe(1);
+    expect(text).not.toMatch(/下载|上传/);
+  } else {
+    await expect(page.getByRole('status')).toContainText(/已复制摘要|未能写入剪贴板|不能写入剪贴板/);
+  }
+  expect(requests.every(url => url.startsWith('http://127.0.0.1') || url.startsWith('http://localhost'))).toBe(true);
 
   await page.getByRole('button', { name: '返回检查答案' }).click();
   await page.locator('.review-item').first().click();
@@ -112,6 +169,80 @@ test('32 answers produce a local interpretation, and review changes update it wi
   await expect(page.getByRole('textbox')).toHaveCount(0);
   await expect(page.getByText('继续观察')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /复制完整结果|下载 JSON|下载文本/ })).toHaveCount(0);
+  await expect(page.locator('a[download], input[type="file"], [data-action="download"]')).toHaveCount(0);
+});
+
+test('hard-to-translate questions show a wording note without blocking an answer', async ({ page }) => {
+  await start(page);
+  await expect(page.locator('.translation-hint')).toHaveCount(0);
+  await answer(page, 1).check();
+  await next(page).click();
+  await expect(questionNumber(page)).toContainText('QUESTION 02');
+  const hint = page.locator('.translation-hint');
+  await expect(hint).toBeVisible();
+  await expect(hint).toContainText('难译提示 · 试译');
+  await expect(hint).toContainText('愿意相信');
+  await expect(hint).not.toContainText(/可以跳过|不必作答|翻译准确|已验证为准确/);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expectNoHorizontalOverflow(page);
+  await answer(page, 4).check();
+  await expect(answer(page, 4)).toBeChecked();
+  await expect(questionNumber(page)).toContainText('QUESTION 02');
+});
+
+test('system share sends the local summary and falls back to copy', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__shares = [];
+    window.__copies = [];
+    window.__shareMode = 'ok';
+    const share = data => {
+      if (window.__shareMode === 'abort') {
+        const error = new Error('abort');
+        error.name = 'AbortError';
+        return Promise.reject(error);
+      }
+      if (window.__shareMode === 'unavailable') {
+        const error = new Error('unsupported');
+        error.name = 'NotSupportedError';
+        return Promise.reject(error);
+      }
+      window.__shares.push({ title: data.title, text: data.text, url: data.url, files: data.files });
+      return Promise.resolve();
+    };
+    const canShare = () => window.__shareMode !== 'cannot';
+    const clipboard = { writeText: async text => { window.__copies.push(text); } };
+    Object.defineProperty(navigator, 'share', { configurable: true, value: share });
+    Object.defineProperty(navigator, 'canShare', { configurable: true, value: canShare });
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: clipboard });
+  });
+  await complete(page);
+  const requests = [];
+  page.on('request', request => requests.push(request.url()));
+  await page.getByRole('button', { name: '分享摘要', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('已交给系统分享');
+  const shared = await page.evaluate(() => window.__shares[0]);
+  expect(shared.title).toBe('见己 · 四维探索');
+  expect(shared.text).toContain('偏好轮廓：ESTJ');
+  expect(shared.text).toContain('原始分');
+  expect(shared.text).toContain('非官方 MBTI，中文试译，未经心理测量验证。');
+  expect(shared.url).toBeUndefined();
+  expect(shared.files).toBeUndefined();
+  expect(await page.evaluate(() => window.__copies)).toEqual([]);
+
+  await page.evaluate(() => { window.__shareMode = 'cannot'; });
+  await page.getByRole('button', { name: '分享摘要', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('摘要已复制到剪贴板');
+  const copied = await page.evaluate(() => window.__copies[0]);
+  expect(copied).toContain('偏好轮廓：ESTJ');
+  expect(copied).toContain('非官方 MBTI，中文试译，未经心理测量验证。');
+
+  await page.evaluate(() => { window.__shareMode = 'abort'; window.__copies.length = 0; });
+  await page.getByRole('button', { name: '分享摘要', exact: true }).click();
+  await page.waitForTimeout(50);
+  expect(await page.evaluate(() => window.__copies.length)).toBe(0);
+  expect(await page.evaluate(() => window.__shares.length)).toBe(1);
+  expect(requests.every(url => url.startsWith('http://127.0.0.1') || url.startsWith('http://localhost'))).toBe(true);
+  await expect(page.locator('a[download], input[type="file"]')).toHaveCount(0);
 });
 
 test('missing answers cannot produce results and keyboard review filters retain focus', async ({ page }) => {
