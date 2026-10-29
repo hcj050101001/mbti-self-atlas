@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f5f3ee">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self'; font-src 'none'; connect-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'">
-  <meta name="description" content="见己 · 四维探索：可离线使用的 OEJTS 1.2 中文试译。32 题在浏览器内计分。非官方 MBTI，试译未经测量验证，不提供结果文件导出。">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' blob: data:; font-src 'none'; connect-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="description" content="见己 · 四维探索：可离线使用的 OEJTS 1.2 中文试译。32 题在浏览器内计分。非官方 MBTI，中文试译，未经心理测量验证。可在本机生成图片或 PDF 报告，不上传。">
   <meta property="og:title" content="见己 · 四维探索">
-  <meta property="og:description" content="见己 · 四维探索：OEJTS 1.2 中文试译，32 题在浏览器内计分。非官方 MBTI，试译未经测量验证，不提供结果文件导出。">
+  <meta property="og:description" content="见己 · 四维探索：OEJTS 1.2 中文试译，32 题在浏览器内计分。非官方 MBTI，中文试译，未经心理测量验证。可在本机生成图片或 PDF 报告，不上传。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://hcj050101001.github.io/mbti-self-atlas/">
   <meta property="og:image" content="https://hcj050101001.github.io/mbti-self-atlas/preview.png">
@@ -15,7 +15,7 @@
   <meta property="og:locale" content="zh_CN">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="见己 · 四维探索">
-  <meta name="twitter:description" content="见己 · 四维探索：OEJTS 1.2 中文试译，32 题在浏览器内计分。非官方 MBTI，试译未经测量验证，不提供结果文件导出。">
+  <meta name="twitter:description" content="见己 · 四维探索：OEJTS 1.2 中文试译，32 题在浏览器内计分。非官方 MBTI，中文试译，未经心理测量验证。可在本机生成图片或 PDF 报告，不上传。">
   <meta name="twitter:image" content="https://hcj050101001.github.io/mbti-self-atlas/preview.png">
   <meta name="twitter:image:alt" content="见己 · 四维探索的页面预览">
   <title>见己 · MBTI 四维探索</title>
@@ -2053,6 +2053,28 @@ summary {
   }
 }
 
+.report-download p { margin: 0 0 1rem; }
+.report-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.report-actions .button { max-width: 100%; }
+.report-preview { display: block; width: 100%; height: auto; }
+.print-report { display: none; }
+@page { size: A4; margin: 15mm; }
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  body > * { display: none !important; }
+  body > .site-shell { display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  .site-shell > * { display: none !important; }
+  .site-shell > main { display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  main > * { display: none !important; }
+  main > .print-report { display: block !important; font: 10pt/1.55 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif; overflow: visible; }
+  .print-report h1 { font-size: 20pt; margin: 0 0 3mm; }
+  .print-report h2 { font-size: 14pt; margin: 5mm 0 2mm; break-after: avoid; }
+  .print-report h3 { font-size: 11pt; margin: 2mm 0 1mm; break-after: avoid; }
+  .print-report p { margin: 1mm 0 2mm; overflow-wrap: anywhere; }
+  .print-dimension, .print-reading { break-inside: avoid; }
+  .print-disclaimer { margin-top: 5mm !important; }
+}
+
 </style>
 </head>
 <body>
@@ -2715,6 +2737,35 @@ summary {
 
 </script>
   <script>
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.MBTIReport = factory();
+})(typeof window !== 'undefined' ? window : globalThis, function () {
+  'use strict';
+  const disclaimer = '非官方 MBTI，中文试译，未经心理测量验证';
+  const attribution = 'OEJTS 1.2 作者：Eric Jorgenson · CC BY-NC-SA 4.0';
+  function create(answers, core, interpretation, config, date) {
+    const result = core.score(answers);
+    const reading = interpretation.interpret(result);
+    const day = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    return {
+      title: '见己 · 四维探索', date: day,
+      appVersion: String(config.appVersion), translationVersion: String(config.translationVersion),
+      type: result.cautiousType,
+      dimensions: result.dimensions.map((d, i) => ({
+        key: d.key, low: d.low, high: d.high, score: d.score, position: d.position,
+        name: reading.dimensions[i].name, lowLabel: interpretation.DIMENSIONS[d.key].lowLabel, highLabel: interpretation.DIMENSIONS[d.key].highLabel, direction: reading.dimensions[i].directionLabel,
+        expression: reading.dimensions[i].expression, upside: reading.dimensions[i].upside, watch: reading.dimensions[i].watch
+      })),
+      summary: reading.overall.slice(0, 3), disclaimer, attribution
+    };
+  }
+  function filename(report) { return `jianji-${report.type}-${report.date}.png`; }
+  return Object.freeze({ create, filename, disclaimer, attribution });
+});
+
+</script>
+  <script>
 (function () {
   'use strict';
   const Core = window.MBTICore;
@@ -2933,6 +2984,75 @@ summary {
       <div class="review-list">${visibleItems.length ? visibleItems.map(q => { const answer = state.answers[q.id - 1]; const flagged = state.flags.includes(q.id); return `<button class="review-item ${flagged ? 'flagged' : ''}" data-question="${q.id - 1}" data-from-review="true"><span class="review-item-num">${pad(q.id)}</span><span class="review-item-main"><span class="review-item-title">${esc(q.leftZh)} / ${esc(q.rightZh)}</span><span class="review-item-answer">${answer === null ? '尚未作答' : `${answer} · ${labels[answer - 1]}`}${flagged ? '　⚑ 待复核' : ''}</span></span><span class="muted" aria-hidden="true">↗</span></button>`; }).join('') : '<div class="empty-state">这里没有需要处理的题目。<br>可以切换到“全部”查看答案。</div>'}</div>
       <div class="review-sticky"><p>${missing ? '未答题不会被自动填成中间选项。' : state.flags.length ? `仍有 ${state.flags.length} 题标记待复核，结果会如实保留这些标记。` : '这不是考试。真实，比“选得好”更重要。'}</p><button class="button primary" data-action="${missing ? 'firstMissing' : 'finish'}">${missing ? '继续完成未答题 →' : '查看我的偏好轮廓 ↗'}</button></div></div></section>`;
   }
+  function reportData() {
+    return window.MBTIReport.create(state.answers, Core, window.MBTIInterpretation, Config, new Date());
+  }
+  function reportMarkup(report) {
+    return `<article class="print-report" aria-label="打印报告"><h1>${esc(report.title)}</h1><p>生成日期：${esc(report.date)} · 应用版本：${esc(report.appVersion)} · 翻译版本：${esc(report.translationVersion)}</p><h2>偏好轮廓：${esc(report.type)}</h2><h2>四个维度</h2>${report.dimensions.map(d => `<section class="print-dimension"><h3>${esc(d.name)}（${esc(d.key)}）</h3><p>${esc(d.lowLabel)}（${esc(d.low)}） / ${esc(d.highLabel)}（${esc(d.high)}） · 原始分 ${d.score} / 40 · 刻度位置 ${d.position.toFixed(1)}%</p></section>`).join('')}<h2>整体摘要</h2>${report.summary.map(text => `<p>${esc(text)}</p>`).join('')}<h2>四维分述</h2>${report.dimensions.map(d => `<section class="print-reading"><h3>${esc(d.name)} · ${esc(d.direction)}</h3><p><strong>通常表现：</strong>${esc(d.expression)}</p><p><strong>可以发挥的地方：</strong>${esc(d.upside)}</p><p><strong>压力下留意：</strong>${esc(d.watch)}</p></section>`).join('')}<p class="print-disclaimer">${esc(report.disclaimer)}<br>${esc(report.attribution)}</p></article>`;
+  }
+  function reportCanvas(report) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    const ctx = canvas.getContext('2d');
+    const font = '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif';
+    const commands = [];
+    let y = 100;
+    function text(value, size, color, weight = 'normal', gap = 16) {
+      ctx.font = `${weight} ${size}px ${font}`;
+      const lineHeight = Math.ceil(size * 1.55);
+      let line = '';
+      for (const char of value) {
+        if (line && ctx.measureText(line + char).width > 1032) { commands.push({ line, y, size, color, weight }); y += lineHeight; line = ''; }
+        line += char;
+      }
+      if (line) { commands.push({ line, y, size, color, weight }); y += lineHeight; }
+      y += gap;
+    }
+    text(report.title, 48, '#153e36', 'bold');
+    text(`生成日期：${report.date} · 应用版本：${report.appVersion} · 翻译版本：${report.translationVersion}`, 24, '#56635c', 'normal', 38);
+    text(`偏好轮廓  ${report.type}`, 55, '#153e36', 'bold', 30);
+    text('四个维度', 32, '#153e36', 'bold');
+    report.dimensions.forEach(d => {
+      text(`${d.name}（${d.key}）  ${d.lowLabel}（${d.low}） / ${d.highLabel}（${d.high}）`, 28, '#153e36', 'bold', 4);
+      text(`原始分 ${d.score} / 40 · 刻度位置 ${d.position.toFixed(1)}%`, 25, '#334b42', 'normal', 20);
+    });
+    text('整体摘要', 32, '#153e36', 'bold');
+    report.summary.forEach(paragraph => text(paragraph, 26, '#334b42'));
+    y += 18;
+    text(report.disclaimer, 24, '#56635c', 'normal', 5);
+    text(report.attribution, 24, '#56635c');
+    canvas.height = y + 55;
+    ctx.fillStyle = '#f7f6f0'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.textBaseline = 'top';
+    commands.forEach(item => { ctx.font = `${item.weight} ${item.size}px ${font}`; ctx.fillStyle = item.color; ctx.fillText(item.line, 84, item.y); });
+    return canvas;
+  }
+  async function downloadReport() {
+    if (!Core.validateAnswers(state.answers, true)) return;
+    const report = reportData();
+    const canvas = reportCanvas(report);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) { notice('图片生成失败，请重试。'); return; }
+    const filename = window.MBTIReport.filename(report);
+    const nav = browserNavigator();
+    const mobileApple = nav && (/iPad|iPhone|iPod/.test(nav.userAgent || '') || (nav.platform === 'MacIntel' && nav.maxTouchPoints > 1));
+    const link = document.createElement('a');
+    if (mobileApple || !('download' in link)) {
+      if (nav && typeof nav.share === 'function' && typeof nav.canShare === 'function' && typeof File === 'function') {
+        const payload = { files: [new File([blob], filename, { type: 'image/png' })] };
+        try { if (nav.canShare(payload)) { await nav.share(payload); return; } }
+        catch (error) { if (error && error.name === 'AbortError') return; }
+      }
+      dialogContent.innerHTML = '<h2>长按图片保存</h2><p>此浏览器无法直接下载，请长按下方图片保存。</p><img class="report-preview" alt="见己报告，长按保存">';
+      dialogContent.querySelector('img').src = canvas.toDataURL('image/png');
+      dialog.setAttribute('aria-label', '保存报告图片');
+      if (!dialog.open) dialog.showModal();
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    link.href = url; link.download = filename; link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
   function results() {
     if (!Core.validateAnswers(state.answers, true)) { state.view = 'review'; review(); return; }
     const result = Core.score(state.answers);
@@ -2961,15 +3081,16 @@ summary {
     main.innerHTML = `<section class="view">${steps(3)}<div class="result-intro"><div class="result-profile"><div class="eyebrow">YOUR PREFERENCE ATLAS</div><h1 class="sr-only" data-focus>你的偏好轮廓：${esc(result.cautiousType)}</h1><div class="result-type" aria-label="偏好轮廓 ${esc(result.cautiousType)}">${result.cautiousType.split('').map(letter => `<span class="letter-tile ${letter === 'X' ? 'unclear' : ''}" aria-hidden="true">${esc(letter)}</span>`).join('')}</div><h2 class="result-subtitle">${esc(reading.headline)}</h2><p class="result-lead">${lead}</p></div>
       <div class="dimension-summary">${summaryCards}</div>
       <div class="result-summary-box"><h3>先看整体，再按需要展开。</h3>${reading.summary.map(paragraph => `<p>${esc(paragraph)}</p>`).join('')}<div class="result-facts"><span class="fact">已完成 32 / 32</span><span class="fact">中间选项 ${neutral} 题</span><span class="fact">待复核 ${state.flags.length} 题</span></div></div>
-      <div class="result-actions"><button class="button secondary" data-action="copySummary">复制摘要</button>${shareButton}<p class="result-share-note">摘要只含四字母、四个维度的原始分和刻度位置，以及一句固定说明。复制或系统分享都在本机完成，不下载文件，也不上传。</p></div></div>
+      <div class="result-actions"><button class="button secondary" data-action="copySummary">复制摘要</button>${shareButton}<p class="result-share-note">摘要只含四字母、四个维度的原始分和刻度位置，以及一句固定说明。复制或系统分享都在本机完成，页面不会上传。</p></div></div>
       <nav class="result-nav" aria-label="结果页章节"><a href="#result-overview">整体</a><a href="#result-dimensions">四个维度</a><a href="#result-interactions">维度互动</a><a href="#result-scenes">场景建议</a></nav>
       <details class="result-section result-fold" id="result-overview"><summary><span class="fold-heading"><span class="section-kicker">整体</span><span class="fold-title">把四个维度放在一起看</span></span></summary><div class="fold-body"><h2 id="result-overview-title">把四个维度放在一起看</h2><p class="section-intro">以下四段由你的四个维度方向和强度按固定句式组合；同一组分数会得到同一段文字。</p><div class="overview-copy">${overallCopy}</div></div></details>
       <details class="result-section result-fold" id="result-dimensions"><summary><span class="fold-heading"><span class="section-kicker">四个维度</span><span class="fold-title">四个维度分别看</span></span></summary><div class="fold-body"><h2 id="result-dimensions-title">四个维度分别看</h2><p class="section-intro">每张卡片先给出方向和强度，再从通常表现、可以发挥的地方、压力下留意三个角度展开。</p><div class="dimension-grid">${dimensionCards}</div><p class="score-explainer">所有分数范围均为 8–40，24 为分界。横向位置只是原始分数的线性展示，不是人群百分位、准确率或成为某类型的概率。单次回答无法估计个体测量误差。X 仅表示刻度位置在 45%–55% 之间，不是一种人格类型。</p></div></details>
       <details class="result-section result-fold" id="result-interactions"><summary><span class="fold-heading"><span class="section-kicker">维度之间</span><span class="fold-title">维度之间：组合起来的样子</span></span></summary><div class="fold-body"><h2 id="result-interactions-title">维度之间：组合起来的样子</h2><p class="section-intro">两个维度都离开中间带时，才会生成一组组合描述；最多显示三组，按偏离中点的幅度排序。</p>${interactionCards}</div></details>
       <details class="result-section result-fold" id="result-scenes"><summary><span class="fold-heading"><span class="section-kicker">放回生活</span><span class="fold-title">放回生活：工作、关系与恢复</span></span></summary><div class="fold-body"><h2 id="result-scenes-title">放回生活：工作、关系与恢复</h2><p class="section-intro">每个场景给出两个与你本次方向相关的具体做法，不需要全部照做。</p><div class="scene-grid">${sceneCards}</div></div></details>
       <section class="result-section caveat-panel" id="result-caveats"><div class="section-kicker">边界说明</div><h2>这份解读能做什么，不能做什么</h2><ul>${reading.caveats.map(caveat => `<li>${esc(caveat)}</li>`).join('')}</ul></section>
+      <section class="result-section report-download"><h2>下载报告</h2><p>可在本机生成图片或 PDF 报告，不上传。PDF 通过浏览器打印或保存。</p><div class="report-actions"><button class="button primary" data-action="downloadReport">下载 PNG 图片</button><button class="button secondary" data-action="printReport">打印 / 保存 PDF</button></div></section>
       <div class="result-bottom"><button class="button secondary" data-action="review">返回检查答案</button><button class="button secondary" data-dialog="method">查看来源与计算过程</button><button class="button ghost" data-action="reset">换一位 / 重新开始</button></div>
-    </section>`;
+    </section>${reportMarkup(reportData())}`;
   }
   function render() { ({ welcome, question, review, results }[state.view] || welcome)(); }
   function methodContent() {
@@ -2989,7 +3110,7 @@ summary {
   function openDialog(kind) {
     cancelNext();
     if (kind === 'method') dialogContent.innerHTML = methodContent();
-    else if (kind === 'privacy') dialogContent.innerHTML = `<h2>你的回答，留在你的浏览器里。</h2><p>本页面不加载统计脚本、外部字体或远程服务，不会自动上传回答和结果。点击外部资料链接才会打开相应网站。</p><p>结果页的「复制摘要」只把四字母、四个维度分数和一句固定说明写入本机剪贴板。若浏览器提供系统分享，同一段文字会交给系统分享面板。这两种操作都不生成文件，也不把答案上传。</p><h3>当前保存方式</h3><label class="settings-line"><input type="checkbox" id="rememberDialog" ${state.remember ? 'checked' : ''}><span>在此设备保存进度</span></label><p>开启后，数据保存在本浏览器的 localStorage 中，直到你关闭此选项或选择“换一位 / 重新开始”。这不是加密保险箱，共用设备请关闭。关闭后只保留当前页面内存中的回答，刷新或关闭页面就会丢失。</p><p>浏览器可能限制本地 HTML 的持久存储；如保存失败，页面会提示。不会在不同浏览器、设备或文件地址之间自动同步。</p><h3>解读如何生成</h3><p>结果页的整体叙述、四维解读、维度互动和场景建议，由本页面内置的固定规则根据分数在本地组合生成，不会把答案发送给任何服务。X 只表示刻度位置处于 45%–55% 中间带，不是一种人格类型，也不代表测量结论。</p><button class="button secondary" data-action="reset">清空本工具数据 / 换一位</button>`;
+    else if (kind === 'privacy') dialogContent.innerHTML = `<h2>你的回答，留在你的浏览器里。</h2><p>本页面不加载统计脚本、外部字体或远程服务，不会自动上传回答和结果。点击外部资料链接才会打开相应网站。</p><p>结果页的「复制摘要」只把四字母、四个维度分数和一句固定说明写入本机剪贴板。若浏览器提供系统分享，同一段文字会交给系统分享面板。这两种操作都不生成文件，也不把答案上传。报告可在本机生成图片或通过浏览器打印为 PDF，不上传。</p><h3>当前保存方式</h3><label class="settings-line"><input type="checkbox" id="rememberDialog" ${state.remember ? 'checked' : ''}><span>在此设备保存进度</span></label><p>开启后，数据保存在本浏览器的 localStorage 中，直到你关闭此选项或选择“换一位 / 重新开始”。这不是加密保险箱，共用设备请关闭。关闭后只保留当前页面内存中的回答，刷新或关闭页面就会丢失。</p><p>浏览器可能限制本地 HTML 的持久存储；如保存失败，页面会提示。不会在不同浏览器、设备或文件地址之间自动同步。</p><h3>解读如何生成</h3><p>结果页的整体叙述、四维解读、维度互动和场景建议，由本页面内置的固定规则根据分数在本地组合生成，不会把答案发送给任何服务。X 只表示刻度位置处于 45%–55% 中间带，不是一种人格类型，也不代表测量结论。</p><button class="button secondary" data-action="reset">清空本工具数据 / 换一位</button>`;
     else if (kind === 'palette') dialogContent.innerHTML = `<h2>你的答题进度</h2><p>已答 ${count()} / 32 · 绿色表示已答，橙色小点表示待复核。点击题号跳转。</p><div class="palette-grid">${items.map(q => `<button class="${state.answers[q.id - 1] !== null ? 'answered' : ''} ${state.flags.includes(q.id) ? 'flagged' : ''} ${q.id - 1 === state.index ? 'current' : ''}" data-question="${q.id - 1}" aria-label="第${q.id}题，${state.answers[q.id - 1] !== null ? '已答' : '未答'}${state.flags.includes(q.id) ? '，待复核' : ''}">${q.id}</button>`).join('')}</div><button class="button primary" data-action="review">进入答案复核 →</button>`;
     else return;
     dialog.setAttribute('aria-label', kind === 'method' ? '来源与计分' : kind === 'privacy' ? '隐私说明' : '答题总览');
@@ -3086,6 +3207,16 @@ summary {
         }
       }
       if (await writeClipboard(text)) notice('此环境无法系统分享，摘要已复制到剪贴板。');
+    },
+    downloadReport,
+    printReport() {
+      if (!Core.validateAnswers(state.answers, true)) return;
+      const report = reportData();
+      const oldReport = main.querySelector('.print-report');
+      if (oldReport) oldReport.outerHTML = reportMarkup(report);
+      const previousTitle = document.title;
+      document.title = window.MBTIReport.filename(report).replace(/\.png$/, '');
+      try { window.print(); } finally { document.title = previousTitle; }
     },
     reset: confirmReset,
     cancelReset() { dialog.close(); },

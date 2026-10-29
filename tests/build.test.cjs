@@ -20,7 +20,7 @@ function fixture(t) {
     }
     fs.rmSync(cleanupRoot, { recursive: true, force: true });
   });
-  for (const file of ["package.json", "sources/oejts-1.2.json", "src/template.html", "src/styles.css", "src/core.js", "src/interpret.js", "src/app.js"]) {
+  for (const file of ["package.json", "sources/oejts-1.2.json", "src/template.html", "src/styles.css", "src/core.js", "src/interpret.js", "src/report.js", "src/app.js"]) {
     const target = path.join(rootDir, file);
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.copyFileSync(path.join(projectRoot, file), target);
@@ -52,11 +52,11 @@ test("build injects independent versions and the complete canonical bank into an
   assert.match(build.html, /property="og:image" content="https:\/\/hcj050101001\.github\.io\/mbti-self-atlas\/preview\.png"/);
   assert.match(build.html, /name="twitter:image" content="https:\/\/hcj050101001\.github\.io\/mbti-self-atlas\/preview\.png"/);
   assert.match(build.html, /property="og:url" content="https:\/\/hcj050101001\.github\.io\/mbti-self-atlas\/"/);
-  assert.match(build.html, /非官方 MBTI，试译未经测量验证，不提供结果文件导出。/);
+  assert.match(build.html, /非官方 MBTI，中文试译，未经心理测量验证。可在本机生成图片或 PDF 报告，不上传。/);
   assert.match(build.html, /http-equiv="Content-Security-Policy"[^>]*script-src 'unsafe-inline'/);
   assert.doesNotMatch(build.html, /og:description" content="[^"]*(准确率|严格测出|支持导出|可导出结果)/);
   assert.equal(build.bank.translationNotes.length, 12);
-  assert.doesNotMatch(build.html, /<!-- (?:STYLES|DATA|CORE|INTERPRET|APP|CONFIG|TRANSLATION_VERSION) -->/);
+  assert.doesNotMatch(build.html, /<!-- (?:STYLES|DATA|CORE|INTERPRET|REPORT|APP|CONFIG|TRANSLATION_VERSION) -->/);
   const context = { window: {} };
   context.window = context;
   vm.createContext(context);
@@ -77,7 +77,7 @@ test("each build marker is required exactly once", async t => {
   const rootDir = fixture(t);
   const target = path.join(rootDir, "src/template.html");
   const original = fs.readFileSync(target, "utf8");
-  for (const marker of ["STYLES", "DATA", "CORE", "INTERPRET", "APP", "CONFIG", "TRANSLATION_VERSION"]) {
+  for (const marker of ["STYLES", "DATA", "CORE", "INTERPRET", "REPORT", "APP", "CONFIG", "TRANSLATION_VERSION"]) {
     const token = `<!-- ${marker} -->`;
     for (const changed of [original.replace(token, ""), original + token]) {
       fs.writeFileSync(target, changed, "utf8");

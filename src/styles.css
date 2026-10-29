@@ -2030,3 +2030,25 @@ summary {
     break-after:avoid
   }
 }
+
+.report-download p { margin: 0 0 1rem; }
+.report-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.report-actions .button { max-width: 100%; }
+.report-preview { display: block; width: 100%; height: auto; }
+.print-report { display: none; }
+@page { size: A4; margin: 15mm; }
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  body > * { display: none !important; }
+  body > .site-shell { display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  .site-shell > * { display: none !important; }
+  .site-shell > main { display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  main > * { display: none !important; }
+  main > .print-report { display: block !important; font: 10pt/1.55 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif; overflow: visible; }
+  .print-report h1 { font-size: 20pt; margin: 0 0 3mm; }
+  .print-report h2 { font-size: 14pt; margin: 5mm 0 2mm; break-after: avoid; }
+  .print-report h3 { font-size: 11pt; margin: 2mm 0 1mm; break-after: avoid; }
+  .print-report p { margin: 1mm 0 2mm; overflow-wrap: anywhere; }
+  .print-dimension, .print-reading { break-inside: avoid; }
+  .print-disclaimer { margin-top: 5mm !important; }
+}

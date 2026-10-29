@@ -6,7 +6,7 @@
   "homepage": "https://hcj050101001.github.io/mbti-self-atlas/",
   "scripts": {
     "build": "node build.mjs",
-    "check": "node --check build.mjs && node --check src/app.js && node --check src/core.js && node --check src/interpret.js",
+    "check": "node --check build.mjs && node --check src/app.js && node --check src/core.js && node --check src/interpret.js && node --check src/report.js",
     "build:check": "node build.mjs --check",
     "test": "node --test tests/*.test.cjs",
     "test:browser": "playwright test",
