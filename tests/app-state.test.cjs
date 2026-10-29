@@ -232,23 +232,6 @@ test('web share stays local and falls back to copy when sharing is unavailable',
   assert.match(fallback.element('toast').textContent, /无法系统分享，摘要已复制到剪贴板/);
 });
 
-test('translation hints show only on noted questions and do not answer or skip them', () => {
-  const app = harness();
-  app.click('start');
-  let html = app.element('main').innerHTML;
-  assert.match(html, /QUESTION 01/);
-  assert.doesNotMatch(html, /translation-hint|难译提示|所有中文题目均为项目试译/);
-  app.click('next');
-  html = app.element('main').innerHTML;
-  assert.match(html, /QUESTION 02/);
-  assert.match(html, /class="translation-hint"/);
-  assert.match(html, /难译提示 · 试译/);
-  assert.match(html, /愿意相信/);
-  assert.doesNotMatch(html, /可以跳过|不必作答|不必回答|翻译准确|已验证为准确|更准确|所有中文题目均为项目试译/);
-  assert.equal((html.match(/name="answer"/g) || []).length, 5);
-  assert.doesNotMatch(html, /name="answer"[^>]*checked/);
-});
-
 test('legacy draft migrates to an independently versioned storage envelope on save', () => {
   const app = harness({ draft: draft(), appVersion: '2.7.3' });
   assert.match(app.element('main').innerHTML, /已答 1 \/ 32/);

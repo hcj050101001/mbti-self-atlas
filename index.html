@@ -666,27 +666,6 @@ small {
   text-align:center;
   margin-bottom:32px
 }
-.question-help:has(+ .translation-hint) {
-  margin-bottom:12px
-}
-.translation-hint {
-  margin:0 0 22px;
-  padding:8px 12px;
-  border-radius:10px;
-  background:#f3f1ea;
-  color:var(--muted);
-  font-size:11px;
-  line-height:1.7;
-  text-align:left;
-  overflow-wrap:anywhere
-}
-.translation-hint-label {
-  display:inline-block;
-  margin-right:6px;
-  color:var(--ink);
-  font-size:10px;
-  letter-spacing:.04em
-}
 .poles {
   display:grid;
   grid-template-columns:1fr auto 1fr;
@@ -2754,7 +2733,6 @@ summary {
   const dialogContent = document.getElementById('dialogContent');
   const labels = ['很像左边', '偏向左边', '中间 / 都像', '偏向右边', '很像右边'];
   const SUMMARY_DISCLAIMER = '非官方 MBTI，中文试译，未经心理测量验证。';
-  const translationHints = new Map((Array.isArray(Bank.translationNotes) ? Bank.translationNotes : []).flatMap(note => Number.isInteger(note.id) ? [[note.id, note.note]] : []));
   function browserNavigator() { return typeof navigator === 'undefined' ? null : navigator; }
   function canWebShare() { const nav = browserNavigator(); return !!(nav && typeof nav.share === 'function'); }
   function summaryText() {
@@ -2913,14 +2891,11 @@ summary {
     const q = items[state.index];
     const value = state.answers[state.index];
     const flagged = state.flags.includes(q.id);
-    const translationHint = translationHints.get(q.id);
-    const translationHintHtml = translationHint ? `<p class="translation-hint"><span class="translation-hint-label">难译提示 · 试译</span>${esc(translationHint)}</p>` : '';
     main.innerHTML = `<section class="view">${steps(1)}<div class="assessment-layout">
       <div class="assessment-top"><span><strong id="progressCount">已答 ${count()} / 32</strong><span class="muted"> · 不必着急</span></span><button class="text-button" data-dialog="palette">答题总览 <span aria-hidden="true">▦</span></button></div>
       <div class="progress" role="progressbar" aria-label="答题进度" aria-valuemin="0" aria-valuemax="32" aria-valuenow="${count()}"><span style="width:${count() / 32 * 100}%"></span></div>
       <article class="question-card"><div class="question-meta"><span class="question-number">QUESTION ${pad(q.id)} <small class="muted">/ 32</small></span><div class="question-tools"><button data-action="english" aria-pressed="${state.english}">${state.english ? '收起英文' : '英文原题'}</button><button data-action="flag" aria-pressed="${flagged}">${flagged ? '● 已标记待复核' : '⚑ 标记待复核'}</button></div></div>
       <h1 class="question-title" data-focus>平常的你，更接近哪一边？</h1><p class="question-help">按真实倾向选择，两个描述没有优劣之分。</p>
-      ${translationHintHtml}
       <fieldset class="scale-fieldset"><legend class="sr-only">第 ${q.id} 题：${esc(q.leftZh)}，还是${esc(q.rightZh)}？</legend><div class="poles"><div class="pole left">${esc(q.leftZh)}${state.english ? `<span class="pole-en" lang="en">${esc(q.leftEn)}</span>` : ''}</div><span class="versus" aria-hidden="true">or</span><div class="pole right">${esc(q.rightZh)}${state.english ? `<span class="pole-en" lang="en">${esc(q.rightEn)}</span>` : ''}</div></div>
       <div class="choices">${labels.map((label, i) => `<label class="choice"><input type="radio" name="answer" value="${i + 1}" ${value === i + 1 ? 'checked' : ''} aria-label="${i + 1}，${label}"><span class="choice-circle" aria-hidden="true">${value === i + 1 ? '✓' : i + 1}</span><span class="choice-text">${label}</span></label>`).join('')}</div></fieldset>
       <p class="question-footnote">不确定或情境不适用？可以标记后再想一想；中间选项不等于无效答案。</p></article>
