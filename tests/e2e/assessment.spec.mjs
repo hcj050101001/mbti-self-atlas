@@ -422,6 +422,21 @@ test('double-click file delivery works offline through complete scoring', async 
 });
 
 
+test('printing welcome and question pages keeps their content visible', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#appVersion')).toHaveText('1.4.0');
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.getByRole('button', { name: '开始认识自己' })).toBeVisible();
+  await expect(page.locator('.site-header')).toBeVisible();
+  await page.emulateMedia({ media: 'screen' });
+  await page.getByRole('button', { name: '开始认识自己' }).click();
+  await page.emulateMedia({ media: 'print' });
+  await expect(questionNumber(page)).toBeVisible();
+  await expect(next(page)).toBeVisible();
+  await page.emulateMedia({ media: 'screen' });
+});
+
+
 test('reports are local, available only after completion, downloadable and printable', async ({ page }) => {
   const requests = [];
   page.on('request', request => requests.push(request.url()));
@@ -434,19 +449,46 @@ test('reports are local, available only after completion, downloadable and print
   const report = page.locator('.print-report');
   await expect(report).toBeHidden();
   await expect(report).toContainText('偏好轮廓：ESTJ');
+  await expect(report).toContainText('应用版本：1.4.0');
   await expect(report).toContainText('原始分 28 / 40 · 刻度位置 62.5%');
   await expect(report).toContainText('非官方 MBTI，中文试译，未经心理测量验证');
   await expect(report).not.toContainText('待复核');
+  await page.evaluate(() => {
+    const click = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function () {
+      if (this.download) { window.__downloadLink = this; window.__linkMounted = this.parentNode === document.body; }
+      return click.call(this);
+    };
+  });
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: '下载 PNG 图片' }).click()]);
+  expect(await page.evaluate(() => window.__linkMounted && !window.__downloadLink.isConnected)).toBe(true);
   expect(download.suggestedFilename()).toMatch(/^jianji-ESTJ-\d{4}-\d{2}-\d{2}\.png$/);
   const stream = await download.createReadStream();
   const chunks = []; for await (const chunk of stream) chunks.push(chunk);
   const png = Buffer.concat(chunks);
   expect(png.length).toBeGreaterThan(1000);
   expect(png.readUInt32BE(16)).toBeGreaterThanOrEqual(1080);
-  await page.evaluate(() => { window.print = () => { window.__printed = document.title; }; });
-  await page.getByRole('button', { name: '打印 / 保存 PDF' }).click();
+  await page.evaluate(() => {
+    window.__originalTitle = document.title;
+    window.print = () => { window.__printed = document.title; };
+    const setTimer = window.setTimeout;
+    window.setTimeout = (callback, delay, ...args) => {
+      if (delay === 60000) { window.__restoreByTimeout = callback; return 0; }
+      return setTimer(callback, delay, ...args);
+    };
+  });
+  const printButton = page.getByRole('button', { name: '打印 / 保存 PDF' });
+  await printButton.click();
   expect(await page.evaluate(() => window.__printed)).toMatch(/^jianji-ESTJ-\d{4}-\d{2}-\d{2}$/);
+  await expect(page).toHaveTitle(/^jianji-ESTJ-\d{4}-\d{2}-\d{2}$/);
+  await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+  await expect(page).toHaveTitle(await page.evaluate(() => window.__originalTitle));
+  await printButton.click();
+  await page.evaluate(() => document.dispatchEvent(new Event('pointerdown')));
+  await expect(page).toHaveTitle(await page.evaluate(() => window.__originalTitle));
+  await printButton.click();
+  await page.evaluate(() => window.__restoreByTimeout());
+  await expect(page).toHaveTitle(await page.evaluate(() => window.__originalTitle));
   await page.emulateMedia({ media: 'print' });
   await expect(report).toBeVisible();
   await expect(page.locator('.site-header')).toBeHidden();

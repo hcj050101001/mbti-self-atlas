@@ -8,6 +8,7 @@
   const APP_VERSION = Config.appVersion || 'development';
   const STORAGE_SCHEMA_VERSION = Config.storageSchemaVersion || 2;
   const main = document.getElementById('main');
+  document.getElementById('appVersion').textContent = APP_VERSION;
   const persistenceNotice = document.createElement('p');
   persistenceNotice.id = 'storageConflict'; persistenceNotice.className = 'notice-inline'; persistenceNotice.hidden = true;
   persistenceNotice.setAttribute('role', 'alert');
@@ -49,6 +50,7 @@
   let activeStart = null;
   let pointerChoice = false;
   let returnToReview = false;
+  let restorePrintTitle = null;
   let storageSnapshot = null;
   let storageSession = null;
   let storageRevision = 0;
@@ -282,7 +284,9 @@
       return;
     }
     const url = URL.createObjectURL(blob);
-    link.href = url; link.download = filename; link.click();
+    link.href = url; link.download = filename;
+    document.body.appendChild(link);
+    try { link.click(); } finally { link.remove(); }
     setTimeout(() => URL.revokeObjectURL(url), 60000);
   }
   function results() {
@@ -324,7 +328,10 @@
       <div class="result-bottom"><button class="button secondary" data-action="review">返回检查答案</button><button class="button secondary" data-dialog="method">查看来源与计算过程</button><button class="button ghost" data-action="reset">换一位 / 重新开始</button></div>
     </section>${reportMarkup(reportData())}`;
   }
-  function render() { ({ welcome, question, review, results }[state.view] || welcome)(); }
+  function render() {
+    ({ welcome, question, review, results }[state.view] || welcome)();
+    document.body.classList.toggle('report-active', state.view === 'results');
+  }
   function methodContent() {
     return `<h2>每一道题，都能找到出处。</h2><p>本工具固定采用 Eric Jorgenson 于 2015 年 3 月 3 日发布的 <strong>Open Extended Jungian Type Scales 1.2（OEJTS 1.2）</strong>：32 道双极题，每维 8 道。保留原顺序、两端英文、1–5 回答格式和计分公式，不混用网站在线测试中的其他题数版本。</p>
       <h3>它与官方 MBTI、16Personalities 的关系</h3><p>OEJTS 是开放的荣格类型替代量表，不是 Myers-Briggs 官方题库。官方 MBTI 题目与材料受许可限制；16Personalities 也使用自己的 NERIS 模型，不能将它的分数或 A/T 后缀混入本量表。</p>
@@ -446,9 +453,23 @@
       const report = reportData();
       const oldReport = main.querySelector('.print-report');
       if (oldReport) oldReport.outerHTML = reportMarkup(report);
+      if (restorePrintTitle) restorePrintTitle();
       const previousTitle = document.title;
       document.title = window.MBTIReport.filename(report).replace(/\.png$/, '');
-      try { window.print(); } finally { document.title = previousTitle; }
+      const restore = () => {
+        document.title = previousTitle;
+        window.removeEventListener('afterprint', restore);
+        document.removeEventListener('pointerdown', restore, true);
+        document.removeEventListener('keydown', restore, true);
+        clearTimeout(timer);
+        restorePrintTitle = null;
+      };
+      restorePrintTitle = restore;
+      window.addEventListener('afterprint', restore, { once: true });
+      document.addEventListener('pointerdown', restore, true);
+      document.addEventListener('keydown', restore, true);
+      const timer = setTimeout(restore, 60000);
+      try { window.print(); } catch (error) { restore(); throw error; }
     },
     reset: confirmReset,
     cancelReset() { dialog.close(); },
@@ -467,7 +488,8 @@
   };
   const ACTION_WITH_CANCEL = new Set(['prev', 'next', 'english', 'flag', 'review']);
   document.addEventListener('click', event => {
-    const foldLink = event.target.closest && event.target.closest('a[href^="#result-"]');
+    if (!(event.target instanceof Element)) return;
+    const foldLink = event.target.closest('a[href^="#result-"]');
     if (foldLink && typeof foldLink.getAttribute === 'function') {
       const fold = document.getElementById(foldLink.getAttribute('href').slice(1));
       if (fold && fold.tagName === 'DETAILS') fold.open = true;
@@ -483,7 +505,7 @@
     const handler = actionHandlers[action];
     if (handler) handler();
   });
-  document.addEventListener('pointerdown', event => { pointerChoice = !!event.target.closest('.choice'); });
+  document.addEventListener('pointerdown', event => { pointerChoice = event.target instanceof Element && !!event.target.closest('.choice'); });
   document.addEventListener('change', event => {
     const target = event.target;
     if (target.name === 'answer') { updateSelection(Number(target.value), pointerChoice); pointerChoice = false; }

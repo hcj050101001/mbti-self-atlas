@@ -2001,54 +2001,54 @@ summary {
 }
 
 @media print {
-  .site-header nav,.actions,.steps,.result-nav,.result-bottom,.site-footer,.toast,.skip-link {
+  body.report-active .site-header nav, body.report-active .actions, body.report-active .steps, body.report-active .result-nav, body.report-active .result-bottom, body.report-active .site-footer, body.report-active .toast, body.report-active .skip-link {
     display:none!important
   }
-  .site-shell {
+  body.report-active .site-shell {
     padding:0
   }
-  .site-header {
+  body.report-active .site-header {
     height:65px
   }
-  body {
+  body.report-active {
     background:white
   }
-  .view {
+  body.report-active .view {
     animation:none
   }
-  .result-intro {
+  body.report-active .result-intro {
     margin-top:25px
   }
-  .result-fold > summary::after {
+  body.report-active .result-fold > summary::after {
     content:none
   }
-  .dimension-card,.interaction-card,.scene-card,.caveat-panel {
+  body.report-active .dimension-card, body.report-active .interaction-card, body.report-active .scene-card, body.report-active .caveat-panel {
     break-inside:avoid
   }
-  .dimension-grid {
+  body.report-active .dimension-grid {
     display:grid;
     grid-template-columns:1fr 1fr
   }
-  .scene-grid {
+  body.report-active .scene-grid {
     grid-template-columns:1fr
   }
-  .result-section {
+  body.report-active .result-section {
     margin-top:28px
   }
-  .result-type {
+  body.report-active .result-type {
     justify-content:flex-start
   }
-  .result-profile {
+  body.report-active .result-profile {
     text-align:left
   }
-  .dimension-summary {
+  body.report-active .dimension-summary {
     grid-template-columns:1fr 1fr
   }
-  .result-summary-box {
+  body.report-active .result-summary-box {
     border-top:1px solid var(--line);
     padding-top:16px
   }
-  h2,h3 {
+  body.report-active h2, body.report-active h3 {
     break-after:avoid
   }
 }
@@ -2058,21 +2058,21 @@ summary {
 .report-actions .button { max-width: 100%; }
 .report-preview { display: block; width: 100%; height: auto; }
 .print-report { display: none; }
-@page { size: A4; margin: 15mm; }
+@page report { size: A4; margin: 15mm; }
 @media print {
-  body { background: #fff !important; color: #111 !important; }
-  body > * { display: none !important; }
-  body > .site-shell { display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
-  .site-shell > * { display: none !important; }
-  .site-shell > main { display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
-  main > * { display: none !important; }
-  main > .print-report { display: block !important; font: 10pt/1.55 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif; overflow: visible; }
-  .print-report h1 { font-size: 20pt; margin: 0 0 3mm; }
-  .print-report h2 { font-size: 14pt; margin: 5mm 0 2mm; break-after: avoid; }
-  .print-report h3 { font-size: 11pt; margin: 2mm 0 1mm; break-after: avoid; }
-  .print-report p { margin: 1mm 0 2mm; overflow-wrap: anywhere; }
-  .print-dimension, .print-reading { break-inside: avoid; }
-  .print-disclaimer { margin-top: 5mm !important; }
+  body.report-active { background: #fff !important; color: #111 !important; }
+  body.report-active > * { display: none !important; }
+  body.report-active > .site-shell { display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  body.report-active .site-shell > * { display: none !important; }
+  body.report-active .site-shell > main { display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  body.report-active main > * { display: none !important; }
+  body.report-active main > .print-report { display: block !important; page: report; font: 10pt/1.55 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif; overflow: visible; }
+  body.report-active .print-report h1 { font-size: 20pt; margin: 0 0 3mm; }
+  body.report-active .print-report h2 { font-size: 14pt; margin: 5mm 0 2mm; break-after: avoid; }
+  body.report-active .print-report h3 { font-size: 11pt; margin: 2mm 0 1mm; break-after: avoid; }
+  body.report-active .print-report p { margin: 1mm 0 2mm; overflow-wrap: anywhere; }
+  body.report-active .print-dimension, body.report-active .print-reading { break-inside: avoid; }
+  body.report-active .print-disclaimer { margin-top: 5mm !important; }
 }
 
 </style>
@@ -2085,12 +2085,12 @@ summary {
       <nav aria-label="帮助导航"><button class="text-button" data-dialog="method">来源与计分 <span aria-hidden="true">↗</span></button><button class="text-button" data-dialog="privacy">隐私说明</button></nav>
     </header>
     <main id="main" tabindex="-1"></main>
-    <footer class="site-footer"><span>一份偏好的地图，一次认识自己的起点。</span><span>OEJTS 1.2 · 中文试译 v1.0 <span class="footer-dot">·</span> 非官方 MBTI</span></footer>
+    <footer class="site-footer"><span>一份偏好的地图，一次认识自己的起点。</span><span>OEJTS 1.2 · 中文试译 v1.0 · 应用 v<span id="appVersion"></span> <span class="footer-dot">·</span> 非官方 MBTI</span></footer>
   </div>
   <dialog id="infoDialog" class="modal"><div class="modal-top"><span class="eyebrow">SELF ATLAS / REFERENCE</span><button class="icon-button" id="closeDialog" aria-label="关闭对话框">×</button></div><div id="dialogContent"></div></dialog>
   <div id="toast" role="status" aria-live="polite" class="toast"></div>
   <noscript><p class="noscript">请启用 JavaScript 后使用此测评。页面计算在你的浏览器内完成。</p></noscript>
-  <script>window.APP_CONFIG={"appVersion":"1.3.0","storageSchemaVersion":2,"translationVersion":"1.0"};</script>
+  <script>window.APP_CONFIG={"appVersion":"1.4.0","storageSchemaVersion":2,"translationVersion":"1.0"};</script>
   <script>window.QUESTION_BANK={"instrument":"Open Extended Jungian Type Scales","version":"1.2","author":"Eric Jorgenson","published":"2015-03-03","sourceUrl":"https://openpsychometrics.org/tests/OJTS/development/OEJTS1.2.pdf","developmentUrl":"https://openpsychometrics.org/tests/OJTS/development/","retrieved":"2026-10-15","license":"CC BY-NC-SA 4.0","licenseUrl":"https://creativecommons.org/licenses/by-nc-sa/4.0/","adaptation":"中文译文为本项目翻译，未经独立跨文化或心理测量验证；英文与原 PDF 一一对应。OEJTS 并非官方 MBTI，也不隶属于其发行方。","translationVersion":"1.0","itemCount":32,"responseScale":{"min":1,"max":5,"midpoint":3,"direction":"1 最接近左侧，5 最接近右侧，3 两侧大致相当。没有正确或错误答案。"},"scales":{"IE":{"constant":30,"low":"I","high":"E"},"SN":{"constant":12,"low":"S","high":"N"},"FT":{"constant":30,"low":"F","high":"T"},"JP":{"constant":18,"low":"J","high":"P"}},"scoring":{"min":8,"max":40,"threshold":24,"highWhen":"score > 24","originalTieRule":"score == 24 时，原 PDF 分别归为 I、S、F、J。临界结果不等于已确定偏好。","displayPositionMeaning":"仅为量表位置，不是概率、百分位、准确率或人格强度。"},"items":[{"id":1,"leftEn":"makes lists","rightEn":"relies on memory","leftZh":"列清单","rightZh":"依靠记忆","scale":"JP","coefficient":1},{"id":2,"leftEn":"sceptical","rightEn":"wants to believe","leftZh":"心存怀疑","rightZh":"愿意相信","scale":"FT","coefficient":-1},{"id":3,"leftEn":"bored by time alone","rightEn":"needs time alone","leftZh":"独处时感到无聊","rightZh":"需要独处的时间","scale":"IE","coefficient":-1},{"id":4,"leftEn":"accepts things as they are","rightEn":"unsatisfied with the ways things are","leftZh":"接受事物的现状","rightZh":"对事物的现状感到不满","scale":"SN","coefficient":1},{"id":5,"leftEn":"keeps a clean room","rightEn":"just puts stuff where ever","leftZh":"保持房间整洁","rightZh":"东西随手放置","scale":"JP","coefficient":1},{"id":6,"leftEn":"thinks \"robotic\" is an insult","rightEn":"strives to have a mechanical mind","leftZh":"认为被说“像机器人”是一种冒犯","rightZh":"追求像机器般运作的思维","scale":"FT","coefficient":1},{"id":7,"leftEn":"energetic","rightEn":"mellow","leftZh":"精力充沛","rightZh":"平和舒缓","scale":"IE","coefficient":-1},{"id":8,"leftEn":"prefer to take multiple choice test","rightEn":"prefer essay answers","leftZh":"偏好做选择题","rightZh":"偏好做论述题","scale":"SN","coefficient":1},{"id":9,"leftEn":"chaotic","rightEn":"organized","leftZh":"杂乱无章","rightZh":"有条有理","scale":"JP","coefficient":-1},{"id":10,"leftEn":"easily hurt","rightEn":"thick-skinned","leftZh":"容易受到伤害","rightZh":"不容易被冒犯或伤害","scale":"FT","coefficient":1},{"id":11,"leftEn":"works best in groups","rightEn":"works best alone","leftZh":"合作时表现最好","rightZh":"独自做事时表现最好","scale":"IE","coefficient":-1},{"id":12,"leftEn":"focused on the present","rightEn":"focused on the future","leftZh":"关注当下","rightZh":"关注未来","scale":"SN","coefficient":1},{"id":13,"leftEn":"plans far ahead","rightEn":"plans at the last minute","leftZh":"早早做好计划","rightZh":"到最后一刻才做计划","scale":"JP","coefficient":1},{"id":14,"leftEn":"wants people's respect","rightEn":"wants their love","leftZh":"希望得到他人的尊重","rightZh":"希望得到他人的喜爱","scale":"FT","coefficient":-1},{"id":15,"leftEn":"gets worn out by parties","rightEn":"gets fired up by parties","leftZh":"聚会让自己疲惫","rightZh":"聚会让自己振奋","scale":"IE","coefficient":1},{"id":16,"leftEn":"fits in","rightEn":"stands out","leftZh":"融入群体","rightZh":"显得与众不同","scale":"SN","coefficient":1},{"id":17,"leftEn":"keeps options open","rightEn":"commits","leftZh":"保留各种选择","rightZh":"作出决定并投入","scale":"JP","coefficient":-1},{"id":18,"leftEn":"wants to be good at fixing things","rightEn":"wants to be good at fixing people","leftZh":"希望擅长修理物品","rightZh":"希望擅长帮助人解决自身问题","scale":"FT","coefficient":-1},{"id":19,"leftEn":"talks more","rightEn":"listens more","leftZh":"说得更多","rightZh":"听得更多","scale":"IE","coefficient":-1},{"id":20,"leftEn":"when describing an event, will tell people what happened","rightEn":"when describing an event, will tell people what it meant","leftZh":"描述事件时，讲述发生了什么","rightZh":"描述事件时，讲述它意味着什么","scale":"SN","coefficient":1},{"id":21,"leftEn":"gets work done right away","rightEn":"procrastinates","leftZh":"立即把事情做完","rightZh":"拖延着再做","scale":"JP","coefficient":1},{"id":22,"leftEn":"follows the heart","rightEn":"follows the head","leftZh":"听从内心感受","rightZh":"听从理性思考","scale":"FT","coefficient":1},{"id":23,"leftEn":"stays at home","rightEn":"goes out on the town","leftZh":"待在家里","rightZh":"外出娱乐","scale":"IE","coefficient":1},{"id":24,"leftEn":"wants the big picture","rightEn":"wants the details","leftZh":"想了解整体情况","rightZh":"想了解具体细节","scale":"SN","coefficient":-1},{"id":25,"leftEn":"improvises","rightEn":"prepares","leftZh":"临场发挥","rightZh":"事先准备","scale":"JP","coefficient":-1},{"id":26,"leftEn":"bases morality on justice","rightEn":"bases morality on compassion","leftZh":"以公正为道德判断的基础","rightZh":"以同情关怀为道德判断的基础","scale":"FT","coefficient":-1},{"id":27,"leftEn":"finds it difficult to yell very loudly","rightEn":"yelling to others when they are far away comes naturally","leftZh":"觉得很难大声喊叫","rightZh":"向远处的人大声喊话很自然","scale":"IE","coefficient":1},{"id":28,"leftEn":"theoretical","rightEn":"empirical","leftZh":"偏重理论","rightZh":"偏重实证经验","scale":"SN","coefficient":-1},{"id":29,"leftEn":"works hard","rightEn":"plays hard","leftZh":"努力工作","rightZh":"尽情玩乐","scale":"JP","coefficient":1},{"id":30,"leftEn":"uncomfortable with emotions","rightEn":"values emotions","leftZh":"面对情绪感到不自在","rightZh":"重视情绪感受","scale":"FT","coefficient":-1},{"id":31,"leftEn":"likes to perform in front of other people","rightEn":"avoids public speaking","leftZh":"喜欢在他人面前表演","rightZh":"回避公开发言","scale":"IE","coefficient":-1},{"id":32,"leftEn":"likes to know \"who?\", \"what?\", \"when?\"","rightEn":"likes to know \"why?\"","leftZh":"喜欢了解“谁、什么、何时”","rightZh":"喜欢了解“为什么”","scale":"SN","coefficient":1}],"translationNotes":[{"id":2,"note":"wants to believe 含有希望相信的意愿，译为“愿意相信”；不是对诚实、智力或轻信程度的道德评价。"},{"id":6,"note":"robotic 与 mechanical mind 带有评价色彩且难直译；保留“机器人/机器般运作”的原始比喻，不额外加入“理性更优”等价值判断。"},{"id":7,"note":"mellow 可含平和、柔和、放松等意思，“平和舒缓”只是近似表达，并不表示精力不足。"},{"id":10,"note":"thick-skinned 直译“脸皮厚”在中文带较强贬义；译为“不容易被冒犯或伤害”，含义接近但语义未验证。"},{"id":16,"note":"fits in / stands out 受到文化与环境影响；译文保留“融入群体/与众不同”，不将其中任一侧解释为优劣。"},{"id":18,"note":"fixing people 字面为“修复人”，此处译为“帮助人解决自身问题”；没有暗示他人有缺陷，且文化语义可能不完全等同。"},{"id":23,"note":"goes out on the town 偏向外出娱乐，原题可能受到行动条件、生活阶段和文化影响。"},{"id":26,"note":"justice 与 compassion 分别译为“公正”和“同情关怀”；二者并非现实生活中必然对立的道德品质。"},{"id":27,"note":"大声喊话也可能受到身体、语言、场景或文化条件影响；不应单凭此题推断人格。"},{"id":29,"note":"works hard / plays hard 是原题提供的对照，译为“努力工作/尽情玩乐”；现实中两者可以并存，不据此推断勤奋或品德。"},{"id":31,"note":"表演与公开发言并非完全对称的活动，中文保留原文这一差异，不自行改成同义反向题。"},{"id":null,"note":"所有中文题目均为项目试译；未完成专业回译、跨文化等值检验或中文常模验证。原题与五点作答格式保留用于核对，不将译文称为官方中文版。"}]};</script>
   <script>
 /*
@@ -2776,6 +2776,7 @@ summary {
   const APP_VERSION = Config.appVersion || 'development';
   const STORAGE_SCHEMA_VERSION = Config.storageSchemaVersion || 2;
   const main = document.getElementById('main');
+  document.getElementById('appVersion').textContent = APP_VERSION;
   const persistenceNotice = document.createElement('p');
   persistenceNotice.id = 'storageConflict'; persistenceNotice.className = 'notice-inline'; persistenceNotice.hidden = true;
   persistenceNotice.setAttribute('role', 'alert');
@@ -2817,6 +2818,7 @@ summary {
   let activeStart = null;
   let pointerChoice = false;
   let returnToReview = false;
+  let restorePrintTitle = null;
   let storageSnapshot = null;
   let storageSession = null;
   let storageRevision = 0;
@@ -3050,7 +3052,9 @@ summary {
       return;
     }
     const url = URL.createObjectURL(blob);
-    link.href = url; link.download = filename; link.click();
+    link.href = url; link.download = filename;
+    document.body.appendChild(link);
+    try { link.click(); } finally { link.remove(); }
     setTimeout(() => URL.revokeObjectURL(url), 60000);
   }
   function results() {
@@ -3092,7 +3096,10 @@ summary {
       <div class="result-bottom"><button class="button secondary" data-action="review">返回检查答案</button><button class="button secondary" data-dialog="method">查看来源与计算过程</button><button class="button ghost" data-action="reset">换一位 / 重新开始</button></div>
     </section>${reportMarkup(reportData())}`;
   }
-  function render() { ({ welcome, question, review, results }[state.view] || welcome)(); }
+  function render() {
+    ({ welcome, question, review, results }[state.view] || welcome)();
+    document.body.classList.toggle('report-active', state.view === 'results');
+  }
   function methodContent() {
     return `<h2>每一道题，都能找到出处。</h2><p>本工具固定采用 Eric Jorgenson 于 2015 年 3 月 3 日发布的 <strong>Open Extended Jungian Type Scales 1.2（OEJTS 1.2）</strong>：32 道双极题，每维 8 道。保留原顺序、两端英文、1–5 回答格式和计分公式，不混用网站在线测试中的其他题数版本。</p>
       <h3>它与官方 MBTI、16Personalities 的关系</h3><p>OEJTS 是开放的荣格类型替代量表，不是 Myers-Briggs 官方题库。官方 MBTI 题目与材料受许可限制；16Personalities 也使用自己的 NERIS 模型，不能将它的分数或 A/T 后缀混入本量表。</p>
@@ -3214,9 +3221,23 @@ summary {
       const report = reportData();
       const oldReport = main.querySelector('.print-report');
       if (oldReport) oldReport.outerHTML = reportMarkup(report);
+      if (restorePrintTitle) restorePrintTitle();
       const previousTitle = document.title;
       document.title = window.MBTIReport.filename(report).replace(/\.png$/, '');
-      try { window.print(); } finally { document.title = previousTitle; }
+      const restore = () => {
+        document.title = previousTitle;
+        window.removeEventListener('afterprint', restore);
+        document.removeEventListener('pointerdown', restore, true);
+        document.removeEventListener('keydown', restore, true);
+        clearTimeout(timer);
+        restorePrintTitle = null;
+      };
+      restorePrintTitle = restore;
+      window.addEventListener('afterprint', restore, { once: true });
+      document.addEventListener('pointerdown', restore, true);
+      document.addEventListener('keydown', restore, true);
+      const timer = setTimeout(restore, 60000);
+      try { window.print(); } catch (error) { restore(); throw error; }
     },
     reset: confirmReset,
     cancelReset() { dialog.close(); },
@@ -3235,7 +3256,8 @@ summary {
   };
   const ACTION_WITH_CANCEL = new Set(['prev', 'next', 'english', 'flag', 'review']);
   document.addEventListener('click', event => {
-    const foldLink = event.target.closest && event.target.closest('a[href^="#result-"]');
+    if (!(event.target instanceof Element)) return;
+    const foldLink = event.target.closest('a[href^="#result-"]');
     if (foldLink && typeof foldLink.getAttribute === 'function') {
       const fold = document.getElementById(foldLink.getAttribute('href').slice(1));
       if (fold && fold.tagName === 'DETAILS') fold.open = true;
@@ -3251,7 +3273,7 @@ summary {
     const handler = actionHandlers[action];
     if (handler) handler();
   });
-  document.addEventListener('pointerdown', event => { pointerChoice = !!event.target.closest('.choice'); });
+  document.addEventListener('pointerdown', event => { pointerChoice = event.target instanceof Element && !!event.target.closest('.choice'); });
   document.addEventListener('change', event => {
     const target = event.target;
     if (target.name === 'answer') { updateSelection(Number(target.value), pointerChoice); pointerChoice = false; }
