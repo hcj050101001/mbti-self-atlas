@@ -30,6 +30,13 @@ function harness(options = {}) {
     return elements.get(id);
   }
   const store = options.store || new Map(options.draft ? [[KEY, JSON.stringify(options.draft)]] : []);
+  const navigator = {};
+  if (options.clipboard) navigator.clipboard = { writeText(text) { options.clipboard.push(text); return Promise.resolve(); } };
+  if (options.denyClipboard) navigator.clipboard = { writeText() { return Promise.reject(new Error('denied')); } };
+  if (options.share) {
+    navigator.share = options.share;
+    navigator.canShare = options.canShare || (() => true);
+  }
   const document = {
     hidden: false,
     getElementById: element,
@@ -44,7 +51,7 @@ function harness(options = {}) {
     setItem(key, value) { if (options.denyWrite) throw new Error('denied write'); store.set(key, value); },
     removeItem(key) { if (options.denyRemove) throw new Error('denied remove'); if (!options.ignoreRemove) store.delete(key); }
   };
-  vm.runInNewContext(source, { window, document, localStorage,
+  vm.runInNewContext(source, { window, document, localStorage, navigator, Promise, Error,
     Date, setTimeout() { return 1; }, clearTimeout() {}, console });
   function emit(name, target, extra = {}) {
     const event = { target, prevented: false, preventDefault() { this.prevented = true; }, ...extra };
@@ -105,12 +112,19 @@ test('successful participant reset clears persisted answers', () => {
   assert.equal(app.element('dialogContent').innerHTML, '');
 });
 
-test('the result page renders sectioned local interpretation and offers no export controls', () => {
+test('the result page keeps a short summary first and folds the long sections', () => {
   const app = harness({ draft: draft(true) });
   app.click('start');
   const html = app.element('main').innerHTML;
   assert.match(html, /45%–55% 中间带/);
   assert.match(html, /<nav class="result-nav" aria-label="结果页章节">/);
+  const typeAt = html.indexOf('class="result-type"');
+  const barsAt = html.indexOf('class="dimension-summary"');
+  const summaryAt = html.indexOf('class="result-summary-box"');
+  const foldAt = html.indexOf('id="result-overview"');
+  assert.ok(typeAt >= 0 && typeAt < barsAt && barsAt < summaryAt && summaryAt < foldAt);
+  assert.equal((html.match(/class="dimension-summary-card"/g) || []).length, 4);
+  assert.equal((html.match(/class="track"/g) || []).length, 4);
   for (const [label, target] of [
     ['整体', 'result-overview'],
     ['四个维度', 'result-dimensions'],
@@ -118,8 +132,9 @@ test('the result page renders sectioned local interpretation and offers no expor
     ['场景建议', 'result-scenes']
   ]) {
     assert.match(html, new RegExp(`<a href="#${target}">${label}</a>`));
-    assert.match(html, new RegExp(`<section class="result-section" id="${target}"`));
+    assert.match(html, new RegExp(`<details class="result-section result-fold" id="${target}">`));
   }
+  assert.doesNotMatch(html, /<details[^>]*\sopen[\s>]/);
   assert.match(html, /把四个维度放在一起看/);
   assert.match(html, /四个维度分别看/);
   assert.match(html, /维度之间：组合起来的样子/);
@@ -133,8 +148,105 @@ test('the result page renders sectioned local interpretation and offers no expor
   assert.equal((html.match(/class="scene-card"/g) || []).length, 3);
   assert.equal((html.match(/class="scene-item"/g) || []).length, 6);
   assert.match(html, /class="interaction-empty"/);
+  assert.match(html, /data-action="copySummary"/);
+  assert.doesNotMatch(html, /data-action="shareSummary"/);
   assert.doesNotMatch(html, /result-reflection|补上真实生活里的你|继续观察|id="reflection"/);
-  assert.doesNotMatch(html, /复制完整结果|下载文本|下载 JSON|data-action="copy"|data-action="download/);
+  assert.doesNotMatch(html, /复制完整结果|下载文本|下载 JSON|data-action="download|download=|type="file"/);
+});
+
+test('copy summary is local text with the type, four scores, and one fixed disclaimer', async () => {
+  const clipboard = [];
+  const app = harness({ draft: draft(true), clipboard });
+  app.click('start');
+  app.click('copySummary');
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(clipboard.length, 1);
+  const lines = clipboard[0].split('\n');
+  assert.deepEqual(lines, [
+    '见己 · 四维探索',
+    '偏好轮廓：XXXX',
+    'IE I/E 原始分 24/40 · 刻度位置 50.0%',
+    'SN S/N 原始分 24/40 · 刻度位置 50.0%',
+    'FT F/T 原始分 24/40 · 刻度位置 50.0%',
+    'JP J/P 原始分 24/40 · 刻度位置 50.0%',
+    '非官方 MBTI，中文试译，未经心理测量验证。'
+  ]);
+  assert.equal(clipboard[0].split('未经心理测量验证').length - 1, 1);
+  assert.doesNotMatch(clipboard[0], /通常表现|工作与学习|下载|上传/);
+  assert.match(app.element('toast').textContent, /已复制摘要/);
+});
+
+test('web share stays local and falls back to copy when sharing is unavailable', async () => {
+  const clipboard = [];
+  const shared = [];
+  const app = harness({
+    draft: draft(true),
+    clipboard,
+    share(data) { shared.push(data); return Promise.resolve(); }
+  });
+  app.click('start');
+  assert.match(app.element('main').innerHTML, /data-action="shareSummary"/);
+  app.click('shareSummary');
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(shared.length, 1);
+  assert.equal(shared[0].title, '见己 · 四维探索');
+  assert.match(shared[0].text, /偏好轮廓：XXXX/);
+  assert.match(shared[0].text, /非官方 MBTI，中文试译，未经心理测量验证。/);
+  assert.equal(shared[0].url, undefined);
+  assert.equal(shared[0].files, undefined);
+  assert.equal(clipboard.length, 0);
+  assert.match(app.element('toast').textContent, /已交给系统分享/);
+
+  const cancelled = [];
+  const cancelClipboard = [];
+  const cancelApp = harness({
+    draft: draft(true),
+    clipboard: cancelClipboard,
+    share() {
+      const error = new Error('abort');
+      error.name = 'AbortError';
+      return Promise.reject(error);
+    }
+  });
+  cancelApp.click('start');
+  cancelApp.click('shareSummary');
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(cancelClipboard.length, 0);
+  assert.equal(cancelled.length, 0);
+  assert.equal(cancelApp.element('toast').textContent, '');
+
+  const fallbackClipboard = [];
+  let shareCalls = 0;
+  const fallback = harness({
+    draft: draft(true),
+    clipboard: fallbackClipboard,
+    canShare() { return false; },
+    share() { shareCalls += 1; return Promise.resolve(); }
+  });
+  fallback.click('start');
+  fallback.click('shareSummary');
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(shareCalls, 0);
+  assert.equal(fallbackClipboard.length, 1);
+  assert.match(fallbackClipboard[0], /非官方 MBTI，中文试译，未经心理测量验证。/);
+  assert.match(fallback.element('toast').textContent, /无法系统分享，摘要已复制到剪贴板/);
+});
+
+test('translation hints show only on noted questions and do not answer or skip them', () => {
+  const app = harness();
+  app.click('start');
+  let html = app.element('main').innerHTML;
+  assert.match(html, /QUESTION 01/);
+  assert.doesNotMatch(html, /translation-hint|难译提示|所有中文题目均为项目试译/);
+  app.click('next');
+  html = app.element('main').innerHTML;
+  assert.match(html, /QUESTION 02/);
+  assert.match(html, /class="translation-hint"/);
+  assert.match(html, /难译提示 · 试译/);
+  assert.match(html, /愿意相信/);
+  assert.doesNotMatch(html, /可以跳过|不必作答|不必回答|翻译准确|已验证为准确|更准确|所有中文题目均为项目试译/);
+  assert.equal((html.match(/name="answer"/g) || []).length, 5);
+  assert.doesNotMatch(html, /name="answer"[^>]*checked/);
 });
 
 test('legacy draft migrates to an independently versioned storage envelope on save', () => {

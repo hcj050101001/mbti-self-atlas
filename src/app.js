@@ -15,6 +15,31 @@
   const dialog = document.getElementById('infoDialog');
   const dialogContent = document.getElementById('dialogContent');
   const labels = ['很像左边', '偏向左边', '中间 / 都像', '偏向右边', '很像右边'];
+  const SUMMARY_DISCLAIMER = '非官方 MBTI，中文试译，未经心理测量验证。';
+  const translationHints = new Map((Array.isArray(Bank.translationNotes) ? Bank.translationNotes : []).flatMap(note => Number.isInteger(note.id) ? [[note.id, note.note]] : []));
+  function browserNavigator() { return typeof navigator === 'undefined' ? null : navigator; }
+  function canWebShare() { const nav = browserNavigator(); return !!(nav && typeof nav.share === 'function'); }
+  function summaryText() {
+    const result = Core.score(state.answers);
+    const lines = ['见己 · 四维探索', `偏好轮廓：${result.cautiousType}`];
+    result.dimensions.forEach(dimension => lines.push(`${dimension.key} ${dimension.low}/${dimension.high} 原始分 ${dimension.score}/40 · 刻度位置 ${dimension.position.toFixed(1)}%`));
+    lines.push(SUMMARY_DISCLAIMER);
+    return lines.join('\n');
+  }
+  async function writeClipboard(text) {
+    const nav = browserNavigator();
+    if (!nav || !nav.clipboard || typeof nav.clipboard.writeText !== 'function') {
+      notice('此浏览器不能写入剪贴板。摘要仍在本页，没有生成文件。');
+      return false;
+    }
+    try {
+      await nav.clipboard.writeText(text);
+      return true;
+    } catch (_) {
+      notice('未能写入剪贴板。摘要仍在本页，没有生成文件。');
+      return false;
+    }
+  }
   function freshState() { return { answers: Array(32).fill(null), flags: [], index: 0, view: 'welcome', autoNext: true, english: false, remember: false, startedAt: null, completedAt: null, activeMs: 0 }; }
   let state = freshState();
   let recovered = false;
@@ -150,11 +175,14 @@
     const q = items[state.index];
     const value = state.answers[state.index];
     const flagged = state.flags.includes(q.id);
+    const translationHint = translationHints.get(q.id);
+    const translationHintHtml = translationHint ? `<p class="translation-hint"><span class="translation-hint-label">难译提示 · 试译</span>${esc(translationHint)}</p>` : '';
     main.innerHTML = `<section class="view">${steps(1)}<div class="assessment-layout">
       <div class="assessment-top"><span><strong id="progressCount">已答 ${count()} / 32</strong><span class="muted"> · 不必着急</span></span><button class="text-button" data-dialog="palette">答题总览 <span aria-hidden="true">▦</span></button></div>
       <div class="progress" role="progressbar" aria-label="答题进度" aria-valuemin="0" aria-valuemax="32" aria-valuenow="${count()}"><span style="width:${count() / 32 * 100}%"></span></div>
       <article class="question-card"><div class="question-meta"><span class="question-number">QUESTION ${pad(q.id)} <small class="muted">/ 32</small></span><div class="question-tools"><button data-action="english" aria-pressed="${state.english}">${state.english ? '收起英文' : '英文原题'}</button><button data-action="flag" aria-pressed="${flagged}">${flagged ? '● 已标记待复核' : '⚑ 标记待复核'}</button></div></div>
       <h1 class="question-title" data-focus>平常的你，更接近哪一边？</h1><p class="question-help">按真实倾向选择，两个描述没有优劣之分。</p>
+      ${translationHintHtml}
       <fieldset class="scale-fieldset"><legend class="sr-only">第 ${q.id} 题：${esc(q.leftZh)}，还是${esc(q.rightZh)}？</legend><div class="poles"><div class="pole left">${esc(q.leftZh)}${state.english ? `<span class="pole-en" lang="en">${esc(q.leftEn)}</span>` : ''}</div><span class="versus" aria-hidden="true">or</span><div class="pole right">${esc(q.rightZh)}${state.english ? `<span class="pole-en" lang="en">${esc(q.rightEn)}</span>` : ''}</div></div>
       <div class="choices">${labels.map((label, i) => `<label class="choice"><input type="radio" name="answer" value="${i + 1}" ${value === i + 1 ? 'checked' : ''} aria-label="${i + 1}，${label}"><span class="choice-circle" aria-hidden="true">${value === i + 1 ? '✓' : i + 1}</span><span class="choice-text">${label}</span></label>`).join('')}</div></fieldset>
       <p class="question-footnote">不确定或情境不适用？可以标记后再想一想；中间选项不等于无效答案。</p></article>
@@ -203,19 +231,29 @@
     const overallCopy = reading.overall.map(paragraph => `<p>${esc(paragraph)}</p>`).join('');
     const dimensionCards = result.dimensions.map(d => {
       const item = readings[d.key];
-      return `<article class="dimension-card"><div class="dimension-title"><h3>${esc(item.name)}</h3><span class="score-tag">${d.score} 分 · ${esc(item.directionLabel)}</span></div><div class="dimension-poles"><span><b>${d.low}</b> ${item.side === 'low' ? esc(item.directionLabel.split(' · ')[1]) : ''}</span><span>${item.side === 'high' ? esc(item.directionLabel.split(' · ')[1]) : ''} <b>${d.high}</b></span></div><div class="track" role="img" aria-label="${d.key} 原始分数 ${d.score}，范围8到40，中点24，刻度位置 ${d.position.toFixed(1)}%"><span class="track-marker" style="left:${d.position}%"></span></div><div class="track-labels"><span>8</span><span>24 · 中点</span><span>40</span></div><p class="score-line">${esc(item.scoreLine)}</p><p class="dimension-strength"><span class="strength-tag ${item.strength}">${esc(item.strengthLabel)}</span><span>${esc(item.strengthNote)}</span></p><div class="reading-block"><div class="reading-label">通常表现</div><p class="reading-text">${esc(item.expression)}</p></div><div class="reading-block"><div class="reading-label">可以发挥的地方</div><p class="reading-text">${esc(item.upside)}</p></div><div class="reading-block"><div class="reading-label">压力下留意</div><p class="reading-text">${esc(item.watch)}</p></div></article>`;
+      return `<article class="dimension-card"><div class="dimension-title"><h3>${esc(item.name)}</h3><span class="score-tag">${d.score} 分 · ${esc(item.directionLabel)}</span></div><p class="dimension-strength"><span class="strength-tag ${item.strength}">${esc(item.strengthLabel)}</span><span>${esc(item.strengthNote)}</span></p><div class="reading-block"><div class="reading-label">通常表现</div><p class="reading-text">${esc(item.expression)}</p></div><div class="reading-block"><div class="reading-label">可以发挥的地方</div><p class="reading-text">${esc(item.upside)}</p></div><div class="reading-block"><div class="reading-label">压力下留意</div><p class="reading-text">${esc(item.watch)}</p></div></article>`;
     }).join('');
     const interactionCards = reading.interactions.length
       ? `<div class="interaction-grid">${reading.interactions.map(item => `<article class="interaction-card"><div class="interaction-keys">${esc(item.keys.join(' × '))}</div><h3>${esc(item.title)}</h3><p>${esc(item.text)}</p></article>`).join('')}</div>`
       : '<p class="interaction-empty">本次回答没有两个维度同时离开 45%–55% 中间带，因此不生成互动组合；这比硬凑一组描述更接近现有信息。</p>';
     const sceneCards = reading.scenes.map(scene => `<article class="scene-card"><h3>${esc(scene.title)}</h3>${scene.items.map(item => `<div class="scene-item"><div class="scene-label">${esc(item.name)} · ${esc(item.label)}</div><p>${esc(item.text)}</p></div>`).join('')}</article>`).join('');
-    main.innerHTML = `<section class="view">${steps(3)}<div class="result-intro"><div class="result-profile"><div class="eyebrow">YOUR PREFERENCE ATLAS</div><h1 class="sr-only" data-focus>你的偏好轮廓：${esc(result.cautiousType)}</h1><div class="result-type" aria-label="偏好轮廓 ${esc(result.cautiousType)}">${result.cautiousType.split('').map(letter => `<span class="letter-tile ${letter === 'X' ? 'unclear' : ''}" aria-hidden="true">${esc(letter)}</span>`).join('')}</div><h2 class="result-subtitle">${esc(reading.headline)}</h2><p class="result-lead">${uncertain.length ? `${uncertain.length} 个维度位于 45%–55% 中间带，以 X 留白。<br>下面按整体、四个维度、维度互动和场景建议展开。` : '四个维度都落在 45%–55% 中间带之外。<br>下面按整体、四个维度、维度互动和场景建议展开；这反映本次回答的倾向，不证明类型永远不变。'}</p></div>
-      <div class="result-summary-box"><h3>先看整体，再读每一个维度。</h3>${reading.summary.map(paragraph => `<p>${esc(paragraph)}</p>`).join('')}<div class="result-facts"><span class="fact">已完成 32 / 32</span><span class="fact">中间选项 ${neutral} 题</span><span class="fact">待复核 ${state.flags.length} 题</span></div></div></div>
+    const summaryCards = result.dimensions.map(d => {
+      const item = readings[d.key];
+      return `<article class="dimension-summary-card"><div class="dimension-title"><h3>${esc(item.name)}</h3><span class="score-tag">${d.score} 分 · ${esc(item.directionLabel)}</span></div><div class="dimension-poles"><span><b>${esc(d.low)}</b></span><span><b>${esc(d.high)}</b></span></div><div class="track" role="img" aria-label="${esc(d.key)} 原始分数 ${d.score}，范围8到40，中点24，刻度位置 ${d.position.toFixed(1)}%"><span class="track-marker" style="left:${d.position}%"></span></div><div class="track-labels"><span>8</span><span>24</span><span>40</span></div><p class="score-line">${esc(item.scoreLine)}</p></article>`;
+    }).join('');
+    const lead = uncertain.length
+      ? `${uncertain.length} 个维度位于 45%–55% 中间带，以 X 留白。先看四个维度的分数和一段短摘要；详细解读、维度互动和场景建议可以展开。`
+      : '四个维度都落在 45%–55% 中间带之外。先看四个维度的分数和一段短摘要；详细解读、维度互动和场景建议可以展开。这反映本次回答的倾向，不证明类型永远不变。';
+    const shareButton = canWebShare() ? '<button class="button secondary" data-action="shareSummary">分享摘要</button>' : '';
+    main.innerHTML = `<section class="view">${steps(3)}<div class="result-intro"><div class="result-profile"><div class="eyebrow">YOUR PREFERENCE ATLAS</div><h1 class="sr-only" data-focus>你的偏好轮廓：${esc(result.cautiousType)}</h1><div class="result-type" aria-label="偏好轮廓 ${esc(result.cautiousType)}">${result.cautiousType.split('').map(letter => `<span class="letter-tile ${letter === 'X' ? 'unclear' : ''}" aria-hidden="true">${esc(letter)}</span>`).join('')}</div><h2 class="result-subtitle">${esc(reading.headline)}</h2><p class="result-lead">${lead}</p></div>
+      <div class="dimension-summary">${summaryCards}</div>
+      <div class="result-summary-box"><h3>先看整体，再按需要展开。</h3>${reading.summary.map(paragraph => `<p>${esc(paragraph)}</p>`).join('')}<div class="result-facts"><span class="fact">已完成 32 / 32</span><span class="fact">中间选项 ${neutral} 题</span><span class="fact">待复核 ${state.flags.length} 题</span></div></div>
+      <div class="result-actions"><button class="button secondary" data-action="copySummary">复制摘要</button>${shareButton}<p class="result-share-note">摘要只含四字母、四个维度的原始分和刻度位置，以及一句固定说明。复制或系统分享都在本机完成，不下载文件，也不上传。</p></div></div>
       <nav class="result-nav" aria-label="结果页章节"><a href="#result-overview">整体</a><a href="#result-dimensions">四个维度</a><a href="#result-interactions">维度互动</a><a href="#result-scenes">场景建议</a></nav>
-      <section class="result-section" id="result-overview" aria-labelledby="result-overview-title"><div class="section-kicker">整体</div><h2 id="result-overview-title">把四个维度放在一起看</h2><p class="section-intro">以下四段由你的四个维度方向和强度按固定句式组合；同一组分数会得到同一段文字。</p><div class="overview-copy">${overallCopy}</div></section>
-      <section class="result-section" id="result-dimensions" aria-labelledby="result-dimensions-title"><div class="section-kicker">四个维度</div><h2 id="result-dimensions-title">四个维度分别看</h2><p class="section-intro">每张卡片先给出方向和强度，再从通常表现、可以发挥的地方、压力下留意三个角度展开。</p><div class="dimension-grid">${dimensionCards}</div><p class="score-explainer">所有分数范围均为 8–40，24 为分界。横向位置只是原始分数的线性展示，不是人群百分位、准确率或成为某类型的概率。单次回答无法估计个体测量误差。X 仅表示刻度位置在 45%–55% 之间，不是一种人格类型。</p></section>
-      <section class="result-section" id="result-interactions" aria-labelledby="result-interactions-title"><div class="section-kicker">维度之间</div><h2 id="result-interactions-title">维度之间：组合起来的样子</h2><p class="section-intro">两个维度都离开中间带时，才会生成一组组合描述；最多显示三组，按偏离中点的幅度排序。</p>${interactionCards}</section>
-      <section class="result-section" id="result-scenes" aria-labelledby="result-scenes-title"><div class="section-kicker">放回生活</div><h2 id="result-scenes-title">放回生活：工作、关系与恢复</h2><p class="section-intro">每个场景给出两个与你本次方向相关的具体做法，不需要全部照做。</p><div class="scene-grid">${sceneCards}</div></section>
+      <details class="result-section result-fold" id="result-overview"><summary><span class="fold-heading"><span class="section-kicker">整体</span><span class="fold-title">把四个维度放在一起看</span></span></summary><div class="fold-body"><h2 id="result-overview-title">把四个维度放在一起看</h2><p class="section-intro">以下四段由你的四个维度方向和强度按固定句式组合；同一组分数会得到同一段文字。</p><div class="overview-copy">${overallCopy}</div></div></details>
+      <details class="result-section result-fold" id="result-dimensions"><summary><span class="fold-heading"><span class="section-kicker">四个维度</span><span class="fold-title">四个维度分别看</span></span></summary><div class="fold-body"><h2 id="result-dimensions-title">四个维度分别看</h2><p class="section-intro">每张卡片先给出方向和强度，再从通常表现、可以发挥的地方、压力下留意三个角度展开。</p><div class="dimension-grid">${dimensionCards}</div><p class="score-explainer">所有分数范围均为 8–40，24 为分界。横向位置只是原始分数的线性展示，不是人群百分位、准确率或成为某类型的概率。单次回答无法估计个体测量误差。X 仅表示刻度位置在 45%–55% 之间，不是一种人格类型。</p></div></details>
+      <details class="result-section result-fold" id="result-interactions"><summary><span class="fold-heading"><span class="section-kicker">维度之间</span><span class="fold-title">维度之间：组合起来的样子</span></span></summary><div class="fold-body"><h2 id="result-interactions-title">维度之间：组合起来的样子</h2><p class="section-intro">两个维度都离开中间带时，才会生成一组组合描述；最多显示三组，按偏离中点的幅度排序。</p>${interactionCards}</div></details>
+      <details class="result-section result-fold" id="result-scenes"><summary><span class="fold-heading"><span class="section-kicker">放回生活</span><span class="fold-title">放回生活：工作、关系与恢复</span></span></summary><div class="fold-body"><h2 id="result-scenes-title">放回生活：工作、关系与恢复</h2><p class="section-intro">每个场景给出两个与你本次方向相关的具体做法，不需要全部照做。</p><div class="scene-grid">${sceneCards}</div></div></details>
       <section class="result-section caveat-panel" id="result-caveats"><div class="section-kicker">边界说明</div><h2>这份解读能做什么，不能做什么</h2><ul>${reading.caveats.map(caveat => `<li>${esc(caveat)}</li>`).join('')}</ul></section>
       <div class="result-bottom"><button class="button secondary" data-action="review">返回检查答案</button><button class="button secondary" data-dialog="method">查看来源与计算过程</button><button class="button ghost" data-action="reset">换一位 / 重新开始</button></div>
     </section>`;
@@ -238,7 +276,7 @@
   function openDialog(kind) {
     cancelNext();
     if (kind === 'method') dialogContent.innerHTML = methodContent();
-    else if (kind === 'privacy') dialogContent.innerHTML = `<h2>你的回答，留在你的浏览器里。</h2><p>本页面不加载统计脚本、外部字体或远程服务，不会自动上传回答和结果。点击外部资料链接才会打开相应网站。</p><h3>当前保存方式</h3><label class="settings-line"><input type="checkbox" id="rememberDialog" ${state.remember ? 'checked' : ''}><span>在此设备保存进度</span></label><p>开启后，数据保存在本浏览器的 localStorage 中，直到你关闭此选项或选择“换一位 / 重新开始”。这不是加密保险箱，共用设备请关闭。关闭后只保留当前页面内存中的回答，刷新或关闭页面就会丢失。</p><p>浏览器可能限制本地 HTML 的持久存储；如保存失败，页面会提示。不会在不同浏览器、设备或文件地址之间自动同步。</p><h3>解读如何生成</h3><p>结果页的整体叙述、四维解读、维度互动和场景建议，由本页面内置的固定规则根据分数在本地组合生成，不会把答案发送给任何服务。X 只表示刻度位置处于 45%–55% 中间带，不是一种人格类型，也不代表测量结论。</p><button class="button secondary" data-action="reset">清空本工具数据 / 换一位</button>`;
+    else if (kind === 'privacy') dialogContent.innerHTML = `<h2>你的回答，留在你的浏览器里。</h2><p>本页面不加载统计脚本、外部字体或远程服务，不会自动上传回答和结果。点击外部资料链接才会打开相应网站。</p><p>结果页的「复制摘要」只把四字母、四个维度分数和一句固定说明写入本机剪贴板。若浏览器提供系统分享，同一段文字会交给系统分享面板。这两种操作都不生成文件，也不把答案上传。</p><h3>当前保存方式</h3><label class="settings-line"><input type="checkbox" id="rememberDialog" ${state.remember ? 'checked' : ''}><span>在此设备保存进度</span></label><p>开启后，数据保存在本浏览器的 localStorage 中，直到你关闭此选项或选择“换一位 / 重新开始”。这不是加密保险箱，共用设备请关闭。关闭后只保留当前页面内存中的回答，刷新或关闭页面就会丢失。</p><p>浏览器可能限制本地 HTML 的持久存储；如保存失败，页面会提示。不会在不同浏览器、设备或文件地址之间自动同步。</p><h3>解读如何生成</h3><p>结果页的整体叙述、四维解读、维度互动和场景建议，由本页面内置的固定规则根据分数在本地组合生成，不会把答案发送给任何服务。X 只表示刻度位置处于 45%–55% 中间带，不是一种人格类型，也不代表测量结论。</p><button class="button secondary" data-action="reset">清空本工具数据 / 换一位</button>`;
     else if (kind === 'palette') dialogContent.innerHTML = `<h2>你的答题进度</h2><p>已答 ${count()} / 32 · 绿色表示已答，橙色小点表示待复核。点击题号跳转。</p><div class="palette-grid">${items.map(q => `<button class="${state.answers[q.id - 1] !== null ? 'answered' : ''} ${state.flags.includes(q.id) ? 'flagged' : ''} ${q.id - 1 === state.index ? 'current' : ''}" data-question="${q.id - 1}" aria-label="第${q.id}题，${state.answers[q.id - 1] !== null ? '已答' : '未答'}${state.flags.includes(q.id) ? '，待复核' : ''}">${q.id}</button>`).join('')}</div><button class="button primary" data-action="review">进入答案复核 →</button>`;
     else return;
     dialog.setAttribute('aria-label', kind === 'method' ? '来源与计分' : kind === 'privacy' ? '隐私说明' : '答题总览');
@@ -247,7 +285,7 @@
   }
   function confirmReset() {
     cancelNext();
-    dialogContent.innerHTML = '<h2>开始一份全新的回答？</h2><p>这会清空本工具在当前页面与此浏览器中保存的答案和进度，方便下一位使用。清空后无法恢复，如需保留当前结果，请先自行记录。</p><div class="confirm-actions"><button class="button secondary" data-action="cancelReset">先保留</button><button class="button primary" data-action="confirmReset">清空并重新开始</button></div>';
+    dialogContent.innerHTML = '<h2>开始一份全新的回答？</h2><p>这会清空本工具在当前页面与此浏览器中保存的答案和进度，方便下一位使用。清空后无法恢复。若要留下记录，请先在结果页复制摘要。</p><div class="confirm-actions"><button class="button secondary" data-action="cancelReset">先保留</button><button class="button primary" data-action="confirmReset">清空并重新开始</button></div>';
     dialog.setAttribute('aria-label', '清空并重新开始');
     if (!dialog.open) dialog.showModal();
   }
@@ -311,6 +349,31 @@
     review() { if (dialog.open) dialog.close(); filter = 'all'; returnToReview = false; setView('review'); },
     firstMissing() { openQuestion(state.answers.indexOf(null), true); },
     finish() { if (count() < 32) return; checkpoint(); state.completedAt = new Date().toISOString(); setView('results'); },
+    async copySummary() {
+      if (!Core.validateAnswers(state.answers, true)) return;
+      if (await writeClipboard(summaryText())) notice('已复制摘要。只在本机剪贴板，没有生成文件。');
+    },
+    async shareSummary() {
+      if (!Core.validateAnswers(state.answers, true)) return;
+      const text = summaryText();
+      const nav = browserNavigator();
+      const payload = { title: '见己 · 四维探索', text };
+      if (nav && typeof nav.share === 'function') {
+        try {
+          if (typeof nav.canShare === 'function' && !nav.canShare(payload)) {
+            const unavailable = new Error('share unavailable');
+            unavailable.name = 'NotSupportedError';
+            throw unavailable;
+          }
+          await nav.share(payload);
+          notice('已交给系统分享。页面不会上传这段摘要。');
+          return;
+        } catch (error) {
+          if (error && error.name === 'AbortError') return;
+        }
+      }
+      if (await writeClipboard(text)) notice('此环境无法系统分享，摘要已复制到剪贴板。');
+    },
     reset: confirmReset,
     cancelReset() { dialog.close(); },
     confirmReset() {
@@ -328,6 +391,11 @@
   };
   const ACTION_WITH_CANCEL = new Set(['prev', 'next', 'english', 'flag', 'review']);
   document.addEventListener('click', event => {
+    const foldLink = event.target.closest && event.target.closest('a[href^="#result-"]');
+    if (foldLink && typeof foldLink.getAttribute === 'function') {
+      const fold = document.getElementById(foldLink.getAttribute('href').slice(1));
+      if (fold && fold.tagName === 'DETAILS') fold.open = true;
+    }
     const button = event.target.closest('button');
     if (!button || button.disabled) return;
     if (button.dataset.dialog) { openDialog(button.dataset.dialog); return; }
@@ -368,5 +436,16 @@
     catch (_) { storageWorking = false; updateSaveStatus(); notice('无法核对本地草稿；当前页面暂时不能保存进度。'); }
   });
   window.addEventListener('beforeunload', event => { if (count() > 0 && (!state.remember || !storageWorking) && !state.completedAt) { event.preventDefault(); event.returnValue = ''; } });
+  window.addEventListener('beforeprint', () => {
+    document.querySelectorAll('details.result-fold').forEach(fold => {
+      fold.dataset.printOpen = fold.open ? 'true' : 'false';
+      fold.open = true;
+    });
+  });
+  window.addEventListener('afterprint', () => {
+    document.querySelectorAll('details.result-fold').forEach(fold => {
+      if (fold.dataset.printOpen !== 'true') fold.open = false;
+    });
+  });
   load(); render();
 })();

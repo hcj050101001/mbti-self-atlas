@@ -45,6 +45,16 @@ test("build injects independent versions and the complete canonical bank into an
     appVersion: "7.3.2", storageSchemaVersion: 2, translationVersion: "1.1"
   });
   assert.match(build.html, /中文试译 v1\.1/);
+  assert.match(build.html, /property="og:title" content="见己 · 四维探索"/);
+  assert.match(build.html, /property="og:description" content="见己 · 四维探索：/);
+  assert.match(build.html, /name="twitter:title" content="见己 · 四维探索"/);
+  assert.match(build.html, /name="twitter:description" content="见己 · 四维探索：/);
+  assert.match(build.html, /property="og:image" content="https:\/\/hcj050101001\.github\.io\/mbti-self-atlas\/preview\.png"/);
+  assert.match(build.html, /name="twitter:image" content="https:\/\/hcj050101001\.github\.io\/mbti-self-atlas\/preview\.png"/);
+  assert.match(build.html, /property="og:url" content="https:\/\/hcj050101001\.github\.io\/mbti-self-atlas\/"/);
+  assert.match(build.html, /非官方 MBTI，试译未经测量验证，不提供结果文件导出。/);
+  assert.match(build.html, /http-equiv="Content-Security-Policy"[^>]*script-src 'unsafe-inline'/);
+  assert.doesNotMatch(build.html, /og:description" content="[^"]*(准确率|严格测出|支持导出|可导出结果)/);
   assert.equal(build.bank.translationNotes.length, 12);
   assert.doesNotMatch(build.html, /<!-- (?:STYLES|DATA|CORE|INTERPRET|APP|CONFIG|TRANSLATION_VERSION) -->/);
   const context = { window: {} };

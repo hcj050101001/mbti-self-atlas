@@ -3,6 +3,7 @@
   "version": "1.3.0",
   "private": true,
   "description": "见己 · MBTI 四维探索：OEJTS 1.2 中文试译单文件离线测评工具",
+  "homepage": "https://hcj050101001.github.io/mbti-self-atlas/",
   "scripts": {
     "build": "node build.mjs",
     "check": "node --check build.mjs && node --check src/app.js && node --check src/core.js && node --check src/interpret.js",
