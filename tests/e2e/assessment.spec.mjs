@@ -71,11 +71,11 @@ async function setFold(page, id, open) {
   await expect(fold).toHaveJSProperty('open', open);
 }
 
-test('32 answers produce a local interpretation, and review changes update it without file export', async ({ page, browserName }) => {
+test('32 answers produce a local interpretation, and review changes update it', async ({ page, browserName }) => {
   await complete(page);
   await expect(page.locator('.letter-tile')).toHaveCount(4);
   await expect(page.getByRole('img', { name: 'JP 原始分数 20，范围8到40，中点24，刻度位置 37.5%' })).toBeVisible();
-  await expect(page.getByText('原始分 20 / 40 · 刻度位置 37.5%')).toBeVisible();
+  await expect(page.locator('.dimension-summary').getByText('原始分 20 / 40 · 刻度位置 37.5%', { exact: true })).toBeVisible();
   await expect(page.locator('.dimension-summary .track')).toHaveCount(4);
   await expect(page.locator('.result-summary-box')).toBeVisible();
   await expect(page.getByRole('button', { name: '复制摘要', exact: true })).toBeVisible();
@@ -169,7 +169,8 @@ test('32 answers produce a local interpretation, and review changes update it wi
   await expect(page.getByRole('textbox')).toHaveCount(0);
   await expect(page.getByText('继续观察')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /复制完整结果|下载 JSON|下载文本/ })).toHaveCount(0);
-  await expect(page.locator('a[download], input[type="file"], [data-action="download"]')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '下载 PNG 图片' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '打印 / 保存 PDF' })).toBeVisible();
 });
 
 test('system share sends the local summary and falls back to copy', async ({ page }) => {
@@ -418,4 +419,56 @@ test('double-click file delivery works offline through complete scoring', async 
   await expect(page.getByRole('img', { name: 'SN 原始分数 16，范围8到40，中点24' })).toBeVisible();
   await expect(page.getByRole('img', { name: 'FT 原始分数 28，范围8到40，中点24' })).toBeVisible();
   await expect(page.getByRole('img', { name: 'JP 原始分数 20，范围8到40，中点24' })).toBeVisible();
+});
+
+
+test('reports are local, available only after completion, downloadable and printable', async ({ page }) => {
+  const requests = [];
+  page.on('request', request => requests.push(request.url()));
+  await start(page);
+  await expect(page.getByRole('button', { name: '下载 PNG 图片' })).toHaveCount(0);
+  for (let number = 1; number <= 32; number++) { await answer(page, 1).check(); await next(page).click(); }
+  await expect(page.getByRole('button', { name: '下载 PNG 图片' })).toHaveCount(0);
+  await page.getByRole('button', { name: '查看我的偏好轮廓 ↗' }).click();
+  await expectNoHorizontalOverflow(page);
+  const report = page.locator('.print-report');
+  await expect(report).toBeHidden();
+  await expect(report).toContainText('偏好轮廓：ESTJ');
+  await expect(report).toContainText('原始分 28 / 40 · 刻度位置 62.5%');
+  await expect(report).toContainText('非官方 MBTI，中文试译，未经心理测量验证');
+  await expect(report).not.toContainText('待复核');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: '下载 PNG 图片' }).click()]);
+  expect(download.suggestedFilename()).toMatch(/^jianji-ESTJ-\d{4}-\d{2}-\d{2}\.png$/);
+  const stream = await download.createReadStream();
+  const chunks = []; for await (const chunk of stream) chunks.push(chunk);
+  const png = Buffer.concat(chunks);
+  expect(png.length).toBeGreaterThan(1000);
+  expect(png.readUInt32BE(16)).toBeGreaterThanOrEqual(1080);
+  await page.evaluate(() => { window.print = () => { window.__printed = document.title; }; });
+  await page.getByRole('button', { name: '打印 / 保存 PDF' }).click();
+  expect(await page.evaluate(() => window.__printed)).toMatch(/^jianji-ESTJ-\d{4}-\d{2}-\d{2}$/);
+  await page.emulateMedia({ media: 'print' });
+  await expect(report).toBeVisible();
+  await expect(page.locator('.site-header')).toBeHidden();
+  await expect(page.locator('.result-intro')).toBeHidden();
+  await expect(page.locator('.report-download')).toBeHidden();
+  await page.emulateMedia({ media: 'screen' });
+  await expect(report).toBeHidden();
+  expect(requests.every(url => new URL(url).origin === new URL(page.url()).origin)).toBe(true);
+});
+
+
+test('iOS falls back to file sharing or a long-press image', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'userAgent', { value: 'iPhone' });
+    navigator.canShare = data => !!data.files;
+    navigator.share = async data => { window.__sharedFile = data.files[0].name; };
+  });
+  await complete(page);
+  await page.getByRole('button', { name: '下载 PNG 图片' }).click();
+  await expect.poll(() => page.evaluate(() => window.__sharedFile)).toMatch(/^jianji-ESTJ-\d{4}-\d{2}-\d{2}\.png$/);
+  await page.evaluate(() => { navigator.canShare = () => false; });
+  await page.getByRole('button', { name: '下载 PNG 图片' }).click();
+  await expect(page.getByRole('dialog', { name: '保存报告图片' })).toBeVisible();
+  await expect(page.getByAltText('见己报告，长按保存')).toHaveAttribute('src', /^data:image\/png;base64,/);
 });

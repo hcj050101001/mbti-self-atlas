@@ -6,6 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const Core = require('../src/core.js');
 const Interpretation = require('../src/interpret.js');
+const Report = require('../src/report.js');
 const bank = require('../sources/oejts-1.2.json');
 const source = fs.readFileSync(path.join(__dirname, '../src/app.js'), 'utf8');
 const KEY = 'self-atlas.oejts12.zh.v1';
@@ -43,7 +44,7 @@ function harness(options = {}) {
     createElement() { const node = element(`created-${elements.size}`); Object.defineProperty(node, 'id', { set(value) { elements.set(value, node); } }); return node; },
     addEventListener(name, handler) { (handlers[name] ||= []).push(handler); }
   };
-  const window = { MBTICore: Core, MBTIInterpretation: Interpretation, QUESTION_BANK: bank,
+  const window = { MBTICore: Core, MBTIInterpretation: Interpretation, MBTIReport: Report, QUESTION_BANK: bank,
     APP_CONFIG: { appVersion: options.appVersion || '1.1.0', storageSchemaVersion: 2, translationVersion: '1.0' },
     addEventListener(name, handler) { (windowHandlers[name] ||= []).push(handler); }, scrollTo() {} };
   const localStorage = {
@@ -151,7 +152,9 @@ test('the result page keeps a short summary first and folds the long sections', 
   assert.match(html, /data-action="copySummary"/);
   assert.doesNotMatch(html, /data-action="shareSummary"/);
   assert.doesNotMatch(html, /result-reflection|补上真实生活里的你|继续观察|id="reflection"/);
-  assert.doesNotMatch(html, /复制完整结果|下载文本|下载 JSON|data-action="download|download=|type="file"/);
+  assert.match(html, /data-action="downloadReport"/);
+  assert.match(html, /data-action="printReport"/);
+  assert.match(html, /非官方 MBTI，中文试译，未经心理测量验证/);
 });
 
 test('copy summary is local text with the type, four scores, and one fixed disclaimer', async () => {

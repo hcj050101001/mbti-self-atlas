@@ -30,6 +30,7 @@ export function createBuild(rootDir = root) {
     '<!-- DATA -->': `<script>window.QUESTION_BANK=${serializeScriptData(bank)};</script>`,
     '<!-- CORE -->': `<script>\n${read('src/core.js')}\n</script>`,
     '<!-- INTERPRET -->': `<script>\n${read('src/interpret.js')}\n</script>`,
+    '<!-- REPORT -->': `<script>\n${read('src/report.js')}\n</script>`,
     '<!-- APP -->': `<script>\n${read('src/app.js')}\n</script>`
   };
   // Check every marker before replacing any of them. A duplicate is as unsafe as
