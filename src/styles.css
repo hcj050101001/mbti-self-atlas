@@ -1979,54 +1979,54 @@ summary {
 }
 
 @media print {
-  .site-header nav,.actions,.steps,.result-nav,.result-bottom,.site-footer,.toast,.skip-link {
+  body.report-active .site-header nav, body.report-active .actions, body.report-active .steps, body.report-active .result-nav, body.report-active .result-bottom, body.report-active .site-footer, body.report-active .toast, body.report-active .skip-link {
     display:none!important
   }
-  .site-shell {
+  body.report-active .site-shell {
     padding:0
   }
-  .site-header {
+  body.report-active .site-header {
     height:65px
   }
-  body {
+  body.report-active {
     background:white
   }
-  .view {
+  body.report-active .view {
     animation:none
   }
-  .result-intro {
+  body.report-active .result-intro {
     margin-top:25px
   }
-  .result-fold > summary::after {
+  body.report-active .result-fold > summary::after {
     content:none
   }
-  .dimension-card,.interaction-card,.scene-card,.caveat-panel {
+  body.report-active .dimension-card, body.report-active .interaction-card, body.report-active .scene-card, body.report-active .caveat-panel {
     break-inside:avoid
   }
-  .dimension-grid {
+  body.report-active .dimension-grid {
     display:grid;
     grid-template-columns:1fr 1fr
   }
-  .scene-grid {
+  body.report-active .scene-grid {
     grid-template-columns:1fr
   }
-  .result-section {
+  body.report-active .result-section {
     margin-top:28px
   }
-  .result-type {
+  body.report-active .result-type {
     justify-content:flex-start
   }
-  .result-profile {
+  body.report-active .result-profile {
     text-align:left
   }
-  .dimension-summary {
+  body.report-active .dimension-summary {
     grid-template-columns:1fr 1fr
   }
-  .result-summary-box {
+  body.report-active .result-summary-box {
     border-top:1px solid var(--line);
     padding-top:16px
   }
-  h2,h3 {
+  body.report-active h2, body.report-active h3 {
     break-after:avoid
   }
 }
@@ -2036,19 +2036,19 @@ summary {
 .report-actions .button { max-width: 100%; }
 .report-preview { display: block; width: 100%; height: auto; }
 .print-report { display: none; }
-@page { size: A4; margin: 15mm; }
+@page report { size: A4; margin: 15mm; }
 @media print {
-  body { background: #fff !important; color: #111 !important; }
-  body > * { display: none !important; }
-  body > .site-shell { display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
-  .site-shell > * { display: none !important; }
-  .site-shell > main { display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
-  main > * { display: none !important; }
-  main > .print-report { display: block !important; font: 10pt/1.55 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif; overflow: visible; }
-  .print-report h1 { font-size: 20pt; margin: 0 0 3mm; }
-  .print-report h2 { font-size: 14pt; margin: 5mm 0 2mm; break-after: avoid; }
-  .print-report h3 { font-size: 11pt; margin: 2mm 0 1mm; break-after: avoid; }
-  .print-report p { margin: 1mm 0 2mm; overflow-wrap: anywhere; }
-  .print-dimension, .print-reading { break-inside: avoid; }
-  .print-disclaimer { margin-top: 5mm !important; }
+  body.report-active { background: #fff !important; color: #111 !important; }
+  body.report-active > * { display: none !important; }
+  body.report-active > .site-shell { display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  body.report-active .site-shell > * { display: none !important; }
+  body.report-active .site-shell > main { display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  body.report-active main > * { display: none !important; }
+  body.report-active main > .print-report { display: block !important; page: report; font: 10pt/1.55 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif; overflow: visible; }
+  body.report-active .print-report h1 { font-size: 20pt; margin: 0 0 3mm; }
+  body.report-active .print-report h2 { font-size: 14pt; margin: 5mm 0 2mm; break-after: avoid; }
+  body.report-active .print-report h3 { font-size: 11pt; margin: 2mm 0 1mm; break-after: avoid; }
+  body.report-active .print-report p { margin: 1mm 0 2mm; overflow-wrap: anywhere; }
+  body.report-active .print-dimension, body.report-active .print-reading { break-inside: avoid; }
+  body.report-active .print-disclaimer { margin-top: 5mm !important; }
 }

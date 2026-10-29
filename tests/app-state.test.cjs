@@ -14,10 +14,14 @@ const KEY = 'self-atlas.oejts12.zh.v1';
 // These tests exercise app event handlers against storage failures and render
 // states; they do not replace real-browser layout and interaction verification.
 function harness(options = {}) {
+  class Element {}
   const handlers = {};
   const windowHandlers = {};
   const elements = new Map();
   let focused = null;
+  const timers = new Map();
+  let nextTimer = 0;
+  let downloadLink = null;
   function element(id) {
     if (!elements.has(id)) elements.set(id, {
       innerHTML: '', textContent: '', value: '', checked: false, open: false,
@@ -39,30 +43,56 @@ function harness(options = {}) {
     navigator.canShare = options.canShare || (() => true);
   }
   const document = {
-    hidden: false,
+    hidden: false, title: '原页面标题',
+    body: { classList: { toggle() {} }, appendChild(node) { node.mounted = true; } },
     getElementById: element,
-    createElement() { const node = element(`created-${elements.size}`); Object.defineProperty(node, 'id', { set(value) { elements.set(value, node); } }); return node; },
-    addEventListener(name, handler) { (handlers[name] ||= []).push(handler); }
+    querySelectorAll() { return []; },
+    createElement(tag) {
+      const node = element(`created-${elements.size}`);
+      Object.defineProperty(node, 'id', { set(value) { elements.set(value, node); } });
+      if (tag === 'canvas') {
+        node.getContext = () => ({ measureText: text => ({ width: text.length * 10 }), fillRect() {}, fillText() {} });
+        node.toBlob = callback => callback({});
+      }
+      if (tag === 'a') {
+        node.download = '';
+        node.click = () => { node.mountedAtClick = node.mounted; };
+        node.remove = () => { node.mounted = false; };
+        downloadLink = node;
+      }
+      return node;
+    },
+    addEventListener(name, handler) { (handlers[name] ||= []).push(handler); },
+    removeEventListener(name, handler) { handlers[name] = (handlers[name] || []).filter(item => item !== handler); }
   };
   const window = { MBTICore: Core, MBTIInterpretation: Interpretation, MBTIReport: Report, QUESTION_BANK: bank,
     APP_CONFIG: { appVersion: options.appVersion || '1.1.0', storageSchemaVersion: 2, translationVersion: '1.0' },
-    addEventListener(name, handler) { (windowHandlers[name] ||= []).push(handler); }, scrollTo() {} };
+    addEventListener(name, handler) { (windowHandlers[name] ||= []).push(handler); },
+    removeEventListener(name, handler) { windowHandlers[name] = (windowHandlers[name] || []).filter(item => item !== handler); },
+    print() { window.printedTitle = document.title; }, scrollTo() {} };
   const localStorage = {
     getItem(key) { if (options.denyRead) throw new Error('denied read'); return store.get(key) || null; },
     setItem(key, value) { if (options.denyWrite) throw new Error('denied write'); store.set(key, value); },
     removeItem(key) { if (options.denyRemove) throw new Error('denied remove'); if (!options.ignoreRemove) store.delete(key); }
   };
-  vm.runInNewContext(source, { window, document, localStorage, navigator, Promise, Error,
-    Date, setTimeout() { return 1; }, clearTimeout() {}, console });
+  vm.runInNewContext(source, { window, document, localStorage, navigator, Promise, Error, Element,
+    Date, URL: { createObjectURL() { return 'blob:report'; }, revokeObjectURL() {} },
+    setTimeout(callback, delay) { const id = ++nextTimer; timers.set(id, { callback, delay }); return id; },
+    clearTimeout(id) { timers.delete(id); }, console });
   function emit(name, target, extra = {}) {
     const event = { target, prevented: false, preventDefault() { this.prevented = true; }, ...extra };
     for (const handler of handlers[name] || []) handler(event);
     return event;
   }
-  return { elements, store, element,
+  return { elements, store, element, document, window,
+    get downloadLink() { return downloadLink; },
+    afterprint() { for (const handler of [...windowHandlers.afterprint || []]) handler(); },
+    interaction() { emit('pointerdown', document); },
+    nonElementClick() { emit('click', { nodeType: 3 }); emit('click', document); },
+    timeout(delay) { for (const timer of [...timers.values()]) if (timer.delay === delay) timer.callback(); },
     get focused() { return focused; },
-    click(action) { emit('click', { closest() { return { dataset: { action }, disabled: false }; } }); },
-    filter(value) { emit('click', { closest() { return { dataset: { filter: value }, disabled: false }; } }); },
+    click(action) { emit('click', Object.assign(new Element(), { closest() { return { dataset: { action }, disabled: false }; } })); },
+    filter(value) { emit('click', Object.assign(new Element(), { closest() { return { dataset: { filter: value }, disabled: false }; } })); },
     change(id, checked) { emit('change', { id, checked }); },
     key(key, target = { tagName: 'H1' }) { return emit('keydown', target, { key }); },
     hide() { emit('visibilitychange', document); },
@@ -371,4 +401,32 @@ test('English toggle, flag and review filters preserve control focus after rende
   app.click('english'); assert.equal(app.focused, '[data-action="english"]');
   app.click('flag'); assert.equal(app.focused, '[data-action="flag"]');
   app.click('review'); app.filter('missing'); assert.equal(app.focused, '[data-filter="missing"]');
+});
+
+
+test('report print keeps the filename title until afterprint or a fallback', () => {
+  const app = harness({ draft: draft(true) });
+  app.click('start');
+  app.click('printReport');
+  assert.match(app.window.printedTitle, /^jianji-XXXX-\d{4}-\d{2}-\d{2}$/);
+  assert.equal(app.document.title, app.window.printedTitle);
+  app.afterprint();
+  assert.equal(app.document.title, '原页面标题');
+  app.click('printReport');
+  app.interaction();
+  assert.equal(app.document.title, '原页面标题');
+  app.nonElementClick();
+  app.click('printReport');
+  app.timeout(60000);
+  assert.equal(app.document.title, '原页面标题');
+});
+
+test('PNG download clicks an attached anchor and removes it', async () => {
+  const app = harness({ draft: draft(true) });
+  app.click('start');
+  app.click('downloadReport');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(app.downloadLink.mountedAtClick, true);
+  assert.equal(app.downloadLink.mounted, false);
+  assert.match(app.downloadLink.download, /^jianji-XXXX-\d{4}-\d{2}-\d{2}\.png$/);
 });
